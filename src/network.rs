@@ -1,5 +1,4 @@
-use petgraph::data::FromElements;
-use petgraph::graph::{DiGraph, Edge, Node, NodeIndex};
+use petgraph::graph::{DiGraph, NodeIndex};
 
 use crate::edge_data::EdgeData;
 use crate::node_data::{NodeData, NodeKind};

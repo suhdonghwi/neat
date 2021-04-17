@@ -1,3 +1,3 @@
-mod edge;
+mod edge_data;
 mod network;
-mod node;
+mod node_data;

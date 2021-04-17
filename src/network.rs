@@ -1,5 +1,8 @@
 use petgraph::graph::DiGraph;
 
+use crate::edge::Edge;
+use crate::node::Node;
+
 pub struct Network {
-  graph: DiGraph<u32, f32>,
+  graph: DiGraph<Node, Edge>,
 }

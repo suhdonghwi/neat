@@ -1,3 +1,6 @@
+use neatlib::network::Network;
+
 fn main() {
-  println!("Hello, world!");
+    let network = Network::new(10, 1);
+    println!("{:?}", network);
 }

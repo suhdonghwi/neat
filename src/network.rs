@@ -3,7 +3,8 @@ use petgraph::graph::{DiGraph, NodeIndex};
 use crate::edge_data::EdgeData;
 use crate::node_data::{NodeData, NodeKind};
 
-struct Network {
+#[derive(Debug)]
+pub struct Network {
     graph: DiGraph<NodeData, EdgeData>,
     input_number: usize,
     output_number: usize,

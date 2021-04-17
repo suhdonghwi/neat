@@ -1,4 +1,5 @@
 use petgraph::graph::{DiGraph, NodeIndex};
+use rand::distributions::{Distribution, Uniform}; // 0.6.5
 
 use crate::edge_data::EdgeData;
 use crate::node_data::{NodeData, NodeKind};
@@ -28,21 +29,34 @@ impl Network {
 
         for i in 0..input_number {
             for j in 0..output_number {
+                let edge_data = EdgeData {
+                    weight: 0.0,
+                    disabled: false,
+                };
+
                 graph.add_edge(
                     NodeIndex::new(i),
                     NodeIndex::new(input_number + j),
-                    EdgeData {
-                        weight: 1.0,
-                        disabled: false,
-                    },
+                    edge_data,
                 );
             }
         }
 
-        Self {
+        let mut result = Self {
             graph,
             input_number,
             output_number,
+        };
+
+        result.randomize_weights();
+        return result;
+    }
+
+    fn randomize_weights(&mut self) {
+        let uniform = Uniform::new(-1.0, 1.0);
+        let mut rng = rand::thread_rng();
+        for edge_data in self.graph.edge_weights_mut() {
+            edge_data.weight = uniform.sample(&mut rng);
         }
     }
 }
@@ -55,6 +69,7 @@ mod tests {
         a: &petgraph::Graph<N, E, Ty, Ix>,
         b: &petgraph::Graph<N, E, Ty, Ix>,
     ) -> bool
+    // NOTE: Does not check equality of edge weights
     where
         N: PartialEq,
         E: PartialEq,
@@ -63,14 +78,8 @@ mod tests {
     {
         let a_ns = a.raw_nodes().iter().map(|n| &n.weight);
         let b_ns = b.raw_nodes().iter().map(|n| &n.weight);
-        let a_es = a
-            .raw_edges()
-            .iter()
-            .map(|e| (e.source(), e.target(), &e.weight));
-        let b_es = b
-            .raw_edges()
-            .iter()
-            .map(|e| (e.source(), e.target(), &e.weight));
+        let a_es = a.raw_edges().iter().map(|e| (e.source(), e.target()));
+        let b_es = b.raw_edges().iter().map(|e| (e.source(), e.target()));
         a_ns.eq(b_ns) && a_es.eq(b_es)
     }
 

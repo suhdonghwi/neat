@@ -1,3 +1,4 @@
+#[derive(Debug, PartialEq)]
 pub enum NodeKind {
   Input,
   Output,
@@ -5,6 +6,7 @@ pub enum NodeKind {
   Bias,
 }
 
+#[derive(Debug, PartialEq)]
 pub struct Node {
-  kind: NodeKind,
+  pub kind: NodeKind,
 }

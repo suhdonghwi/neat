@@ -1,5 +1,5 @@
-use petgraph::graph::{DiGraph, NodeIndex};
-use rand::distributions::{Distribution, Uniform}; // 0.6.5
+use petgraph::graph::{DiGraph, EdgeIndex, NodeIndex};
+use rand::distributions::{Distribution, Uniform};
 
 use crate::edge_data::EdgeData;
 use crate::node_data::{NodeData, NodeKind};
@@ -42,22 +42,52 @@ impl Network {
             }
         }
 
-        let mut result = Self {
+        return Self {
             graph,
             input_number,
             output_number,
         };
-
-        result.randomize_weights();
-        return result;
     }
 
-    fn randomize_weights(&mut self) {
+    pub fn randomize_weights(&mut self) {
         let uniform = Uniform::new(-1.0, 1.0);
         let mut rng = rand::thread_rng();
         for edge_data in self.graph.edge_weights_mut() {
             edge_data.weight = uniform.sample(&mut rng);
         }
+    }
+
+    pub fn add_hidden_node(&mut self, edge: EdgeIndex) {
+        let previous_weight: f32;
+        let new_node_index: NodeIndex;
+
+        {
+            let edge_data = self.graph.edge_weight_mut(edge).unwrap();
+            edge_data.disabled = true;
+            previous_weight = edge_data.weight;
+
+            new_node_index = self.graph.add_node(NodeData {
+                kind: NodeKind::Hidden,
+            });
+        }
+
+        let (source, target) = self.graph.edge_endpoints(edge).unwrap();
+        self.graph.add_edge(
+            source,
+            new_node_index,
+            EdgeData {
+                weight: previous_weight,
+                disabled: false,
+            },
+        );
+        self.graph.add_edge(
+            new_node_index,
+            target,
+            EdgeData {
+                weight: 1.0,
+                disabled: false,
+            },
+        );
     }
 }
 
@@ -72,7 +102,6 @@ mod tests {
     // NOTE: Does not check equality of edge weights
     where
         N: PartialEq,
-        E: PartialEq,
         Ty: petgraph::EdgeType,
         Ix: petgraph::graph::IndexType + PartialEq,
     {
@@ -102,7 +131,36 @@ mod tests {
                 a.into(),
                 b.into(),
                 EdgeData {
-                    weight: 1.0,
+                    weight: 0.0,
+                    disabled: false,
+                },
+            );
+        }
+
+        assert!(graph_eq(&network.graph, &graph));
+    }
+
+    #[test]
+    fn adding_hidden_node() {
+        let mut network = Network::new(2, 1);
+        network.add_hidden_node(EdgeIndex::new(0));
+
+        let mut graph = DiGraph::<NodeData, EdgeData>::new();
+        for &kind in &[
+            NodeKind::Input,
+            NodeKind::Input,
+            NodeKind::Output,
+            NodeKind::Hidden,
+        ] {
+            graph.add_node(NodeData { kind });
+        }
+
+        for &(a, b) in &[(0, 2), (1, 2), (0, 3), (3, 2)] {
+            graph.add_edge(
+                a.into(),
+                b.into(),
+                EdgeData {
+                    weight: 0.0,
                     disabled: false,
                 },
             );

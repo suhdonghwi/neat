@@ -58,7 +58,7 @@ impl NetworkInternal {
     }
 
     pub fn add_hidden_node(&mut self, edge: EdgeIndex) {
-        let previous_weight: f32;
+        let previous_weight: f64;
         let new_node_index: NodeIndex;
 
         {

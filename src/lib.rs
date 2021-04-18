@@ -1,3 +1,5 @@
 mod edge_data;
-pub mod network_internal;
 mod node_data;
+
+pub mod network;
+mod network_internal;

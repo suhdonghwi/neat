@@ -1,5 +1,5 @@
-use petgraph::algo::toposort;
-use petgraph::graph::{DiGraph, EdgeIndex, NodeIndex};
+use petgraph::graph::{DiGraph, EdgeIndex, NodeIndex, WalkNeighbors};
+use petgraph::{algo::toposort, graph::Neighbors};
 use rand::distributions::{Distribution, Uniform};
 
 use crate::edge_data::EdgeData;
@@ -27,7 +27,7 @@ impl NetworkGraph {
         for i in 0..input_number {
             for j in 0..output_number {
                 let edge_data = EdgeData {
-                    weight: 0.0,
+                    weight: 1.0,
                     disabled: false,
                 };
 
@@ -67,7 +67,34 @@ impl NetworkGraph {
         result
     }
 
-    pub fn add_hidden_node(&mut self, edge: EdgeIndex) {
+    pub fn node(&self, index: NodeIndex) -> &NodeData {
+        &self.graph[index]
+    }
+
+    pub fn node_mut(&mut self, index: NodeIndex) -> &mut NodeData {
+        &mut self.graph[index]
+    }
+
+    pub fn edge(&self, index: EdgeIndex) -> &EdgeData {
+        &self.graph[index]
+    }
+
+    pub fn outgoing(&self, index: NodeIndex) -> Vec<(EdgeIndex, NodeIndex)> {
+        let mut result = Vec::new();
+        let mut neighbors = self.graph.neighbors(index).detach();
+
+        while let Some(n) = neighbors.next(&self.graph) {
+            result.push(n);
+        }
+
+        result
+    }
+
+    pub fn toposort(&self) -> Option<Vec<NodeIndex>> {
+        toposort(&self.graph, None).ok()
+    }
+
+    pub fn mutate_add_node(&mut self, edge: EdgeIndex) {
         let previous_weight: f64;
         let new_node_index: NodeIndex;
 
@@ -97,20 +124,6 @@ impl NetworkGraph {
             },
         );
     }
-
-    pub fn activate_node(&mut self, index: NodeIndex) {
-        let activation = self.graph[index].activate();
-        let mut neighbors = self.graph.neighbors(index).detach();
-
-        while let Some((edge, target)) = neighbors.next(&self.graph) {
-            let weight = self.graph[edge].weight;
-            self.graph[target].add_input(activation * weight);
-        }
-    }
-
-    pub fn toposort(&self) -> Option<Vec<NodeIndex>> {
-        toposort(&self.graph, None).ok()
-    }
 }
 
 #[cfg(test)]
@@ -135,7 +148,7 @@ mod tests {
     }
 
     #[test]
-    fn nodes_should_fully_connect_on_init() {
+    fn nodes_should_fully_connect_on_initialization() {
         let network = NetworkGraph::new(2, 2);
 
         let mut graph = DiGraph::<NodeData, EdgeData>::new();
@@ -171,9 +184,9 @@ mod tests {
     }
 
     #[test]
-    fn adding_hidden_node_between_nodes() {
+    fn mutate_add_node_should_add_node_between_nodes() {
         let mut network = NetworkGraph::new(2, 1);
-        network.add_hidden_node(EdgeIndex::new(0));
+        network.mutate_add_node(EdgeIndex::new(0));
 
         let mut graph = DiGraph::<NodeData, EdgeData>::new();
         for &kind in &[
@@ -202,7 +215,7 @@ mod tests {
     #[test]
     fn toposort_should_work_on_dag() {
         let mut network = NetworkGraph::new(2, 1);
-        network.add_hidden_node(EdgeIndex::new(0));
+        network.mutate_add_node(EdgeIndex::new(0));
 
         let result = network.toposort();
 

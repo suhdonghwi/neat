@@ -1,5 +1,5 @@
-use petgraph::graph::{DiGraph, EdgeIndex, NodeIndex, WalkNeighbors};
-use petgraph::{algo::toposort, graph::Neighbors};
+use petgraph::algo::toposort;
+use petgraph::graph::{DiGraph, EdgeIndex, NodeIndex};
 use rand::distributions::{Distribution, Uniform};
 
 use crate::edge_data::EdgeData;

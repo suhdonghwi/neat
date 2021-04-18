@@ -1,8 +1,7 @@
 use petgraph::graph::NodeIndex;
 
-use crate::node_data::NodeData;
-
 use super::{network_graph::NetworkGraph, Network};
+use crate::node_data::NodeData;
 
 struct Feedforward {
     graph: NetworkGraph,
@@ -42,7 +41,16 @@ impl Feedforward {
         let targets = self.graph.outgoing(index);
 
         for (edge_index, target_index) in targets {
-            let weight = self.graph.edge(edge_index).weight;
+            let weight: f64;
+
+            {
+                let edge = self.graph.edge(edge_index);
+                if edge.disabled {
+                    continue;
+                };
+                weight = edge.weight;
+            }
+
             let target = self.graph.node_mut(target_index);
             target.add_input(activation * weight);
         }
@@ -54,12 +62,25 @@ mod tests {
     use super::*;
     use crate::activations::sigmoid;
 
+    use petgraph::graph::EdgeIndex;
+
     #[test]
     fn initial_network_activation_should_sum_input_and_squash() {
         let mut network = Feedforward::new(2, 1);
         assert_eq!(
             network.activate(vec![1.0, 2.0]),
             Some(vec![sigmoid(1.0 + 2.0)])
+        );
+    }
+
+    #[test]
+    fn add_node_mutation_should_have_minimal_effect() {
+        let mut network = Feedforward::new(2, 1);
+        network.graph.mutate_add_node(EdgeIndex::new(0));
+
+        assert_eq!(
+            network.activate(vec![1.0, 2.0]),
+            Some(vec![sigmoid(sigmoid(1.0) + 2.0)])
         );
     }
 }

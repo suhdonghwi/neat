@@ -10,7 +10,6 @@ pub struct NetworkGraph {
     graph: DiGraph<NodeData, EdgeData>,
     input_number: usize,
     output_number: usize,
-    toposort_cache: Option<Vec<NodeIndex>>,
 }
 
 impl NetworkGraph {
@@ -18,15 +17,11 @@ impl NetworkGraph {
         let mut graph = DiGraph::new();
 
         for _ in 0..input_number {
-            graph.add_node(NodeData {
-                kind: NodeKind::Input,
-            });
+            graph.add_node(NodeData::new(NodeKind::Input));
         }
 
         for _ in 0..output_number {
-            graph.add_node(NodeData {
-                kind: NodeKind::Output,
-            });
+            graph.add_node(NodeData::new(NodeKind::Output));
         }
 
         for i in 0..input_number {
@@ -48,7 +43,6 @@ impl NetworkGraph {
             graph,
             input_number,
             output_number,
-            toposort_cache: None,
         };
     }
 
@@ -60,9 +54,20 @@ impl NetworkGraph {
         }
     }
 
-    pub fn add_hidden_node(&mut self, edge: EdgeIndex) {
-        self.toposort_cache = None;
+    pub fn input_nodes_mut(&mut self) -> impl Iterator<Item = &mut NodeData> {
+        self.graph.node_weights_mut().take(self.input_number)
+    }
 
+    pub fn get_output(&self) -> Vec<f64> {
+        let mut result = Vec::new();
+        for index in self.input_number..self.input_number + self.output_number {
+            result.push(self.graph[NodeIndex::new(index)].activate());
+        }
+
+        result
+    }
+
+    pub fn add_hidden_node(&mut self, edge: EdgeIndex) {
         let previous_weight: f64;
         let new_node_index: NodeIndex;
 
@@ -71,9 +76,7 @@ impl NetworkGraph {
             edge_data.disabled = true;
             previous_weight = edge_data.weight;
 
-            new_node_index = self.graph.add_node(NodeData {
-                kind: NodeKind::Hidden,
-            });
+            new_node_index = self.graph.add_node(NodeData::new(NodeKind::Hidden));
         }
 
         let (source, target) = self.graph.edge_endpoints(edge).unwrap();
@@ -95,12 +98,18 @@ impl NetworkGraph {
         );
     }
 
-    pub fn toposort(&mut self) -> &Option<Vec<NodeIndex>> {
-        if self.toposort_cache.is_none() {
-            self.toposort_cache = toposort(&self.graph, None).ok()
-        }
+    pub fn activate_node(&mut self, index: NodeIndex) {
+        let activation = self.graph[index].activate();
+        let mut neighbors = self.graph.neighbors(index).detach();
 
-        return &self.toposort_cache;
+        while let Some((edge, target)) = neighbors.next(&self.graph) {
+            let weight = self.graph[edge].weight;
+            self.graph[target].add_input(activation * weight);
+        }
+    }
+
+    pub fn toposort(&self) -> Option<Vec<NodeIndex>> {
+        toposort(&self.graph, None).ok()
     }
 }
 
@@ -136,7 +145,7 @@ mod tests {
             NodeKind::Output,
             NodeKind::Output,
         ] {
-            graph.add_node(NodeData { kind });
+            graph.add_node(NodeData::new(kind));
         }
 
         for &(a, b) in &[(0, 2), (0, 3), (1, 2), (1, 3)] {
@@ -154,6 +163,14 @@ mod tests {
     }
 
     #[test]
+    fn input_nodes_should_be_returned() {
+        let mut network = NetworkGraph::new(5, 1);
+        let input_nodes = network.input_nodes_mut().collect::<Vec<_>>();
+
+        assert_eq!(input_nodes, vec![&NodeData::new(NodeKind::Input); 5])
+    }
+
+    #[test]
     fn adding_hidden_node_between_nodes() {
         let mut network = NetworkGraph::new(2, 1);
         network.add_hidden_node(EdgeIndex::new(0));
@@ -165,7 +182,7 @@ mod tests {
             NodeKind::Output,
             NodeKind::Hidden,
         ] {
-            graph.add_node(NodeData { kind });
+            graph.add_node(NodeData::new(kind));
         }
 
         for &(a, b) in &[(0, 2), (1, 2), (0, 3), (3, 2)] {
@@ -189,7 +206,7 @@ mod tests {
 
         let result = network.toposort();
 
-        assert_eq!(*result, Some(vec![1.into(), 0.into(), 3.into(), 2.into()]));
+        assert_eq!(result, Some(vec![1.into(), 0.into(), 3.into(), 2.into()]));
     }
 
     // TODO: fn toposort_should_return_None_on_cyclic_graph()

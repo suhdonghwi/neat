@@ -1,3 +1,5 @@
+use crate::activations;
+
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum NodeKind {
     Input,
@@ -8,5 +10,23 @@ pub enum NodeKind {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct NodeData {
-    pub kind: NodeKind,
+    kind: NodeKind,
+    input_sum: f64,
+}
+
+impl NodeData {
+    pub fn new(kind: NodeKind) -> Self {
+        Self {
+            kind,
+            input_sum: 0.0,
+        }
+    }
+
+    pub fn add_input(&mut self, input: f64) {
+        self.input_sum += input;
+    }
+
+    pub fn activate(&self) -> f64 {
+        activations::sigmoid(self.input_sum)
+    }
 }

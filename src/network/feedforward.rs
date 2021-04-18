@@ -76,7 +76,7 @@ mod tests {
     #[test]
     fn add_node_mutation_should_have_minimal_effect() {
         let mut network = Feedforward::new(2, 1);
-        network.graph.mutate_add_node(EdgeIndex::new(0));
+        network.graph.add_node(EdgeIndex::new(0));
 
         assert_eq!(
             network.activate(vec![1.0, 2.0]),

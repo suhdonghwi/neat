@@ -94,7 +94,7 @@ impl NetworkGraph {
         toposort(&self.graph, None).ok()
     }
 
-    pub fn mutate_add_node(&mut self, edge: EdgeIndex) -> NodeIndex {
+    pub fn add_node(&mut self, edge: EdgeIndex) -> NodeIndex {
         let previous_weight: f64;
         let new_node_index: NodeIndex;
 
@@ -127,17 +127,13 @@ impl NetworkGraph {
         new_node_index
     }
 
-    pub fn mutate_add_connection(
+    pub fn add_connection(
         &mut self,
         source: NodeIndex,
         target: NodeIndex,
         edge_data: EdgeData,
-    ) -> Option<EdgeIndex> {
-        if self.graph.contains_edge(source, target) {
-            None
-        } else {
-            Some(self.graph.add_edge(source, target, edge_data))
-        }
+    ) -> EdgeIndex {
+        self.graph.add_edge(source, target, edge_data)
     }
 }
 
@@ -199,9 +195,9 @@ mod tests {
     }
 
     #[test]
-    fn mutate_add_node_should_split_edge() {
+    fn add_node_should_split_edge() {
         let mut network = NetworkGraph::new(2, 1);
-        network.mutate_add_node(EdgeIndex::new(0));
+        network.add_node(EdgeIndex::new(0));
 
         let mut graph = DiGraph::<NodeData, EdgeData>::new();
         for &kind in &[
@@ -228,10 +224,10 @@ mod tests {
     }
 
     #[test]
-    fn mutate_add_connection_should_connect_nodes() {
+    fn add_connection_should_connect_nodes() {
         let mut network = NetworkGraph::new(2, 1);
-        network.mutate_add_node(EdgeIndex::new(0));
-        let result = network.mutate_add_connection(
+        network.add_node(EdgeIndex::new(0));
+        let result = network.add_connection(
             1.into(),
             3.into(),
             EdgeData {
@@ -240,7 +236,7 @@ mod tests {
             },
         );
 
-        assert_eq!(result, Some(4.into()));
+        assert_eq!(result, 4.into());
 
         let mut graph = DiGraph::<NodeData, EdgeData>::new();
         for &kind in &[
@@ -266,24 +262,9 @@ mod tests {
     }
 
     #[test]
-    fn mutate_add_connection_should_only_add_unique_connections() {
-        let mut network = NetworkGraph::new(2, 1);
-        let result = network.mutate_add_connection(
-            0.into(),
-            2.into(),
-            EdgeData {
-                weight: 0.0,
-                disabled: false,
-            },
-        );
-
-        assert_eq!(result, None);
-    }
-
-    #[test]
     fn toposort_should_work_on_dag() {
         let mut network = NetworkGraph::new(2, 1);
-        network.mutate_add_node(EdgeIndex::new(0));
+        network.add_node(EdgeIndex::new(0));
 
         let result = network.toposort();
 

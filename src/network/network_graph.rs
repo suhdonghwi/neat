@@ -5,13 +5,13 @@ use crate::edge_data::EdgeData;
 use crate::node_data::{NodeData, NodeKind};
 
 #[derive(Debug)]
-pub struct NetworkInternal {
+pub struct NetworkGraph {
     graph: DiGraph<NodeData, EdgeData>,
     input_number: usize,
     output_number: usize,
 }
 
-impl NetworkInternal {
+impl NetworkGraph {
     pub fn new(input_number: usize, output_number: usize) -> Self {
         let mut graph = DiGraph::new();
 
@@ -113,8 +113,8 @@ mod tests {
     }
 
     #[test]
-    fn network_initialization() {
-        let network = NetworkInternal::new(2, 2);
+    fn nodes_should_fully_connect_on_init() {
+        let network = NetworkGraph::new(2, 2);
 
         let mut graph = DiGraph::<NodeData, EdgeData>::new();
         for &kind in &[
@@ -141,8 +141,8 @@ mod tests {
     }
 
     #[test]
-    fn adding_hidden_node() {
-        let mut network = NetworkInternal::new(2, 1);
+    fn adding_hidden_node_between_nodes() {
+        let mut network = NetworkGraph::new(2, 1);
         network.add_hidden_node(EdgeIndex::new(0));
 
         let mut graph = DiGraph::<NodeData, EdgeData>::new();

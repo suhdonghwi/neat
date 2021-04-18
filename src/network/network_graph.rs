@@ -1,3 +1,4 @@
+use petgraph::algo::toposort;
 use petgraph::graph::{DiGraph, EdgeIndex, NodeIndex};
 use rand::distributions::{Distribution, Uniform};
 
@@ -9,6 +10,7 @@ pub struct NetworkGraph {
     graph: DiGraph<NodeData, EdgeData>,
     input_number: usize,
     output_number: usize,
+    toposort_cache: Option<Vec<NodeIndex>>,
 }
 
 impl NetworkGraph {
@@ -46,6 +48,7 @@ impl NetworkGraph {
             graph,
             input_number,
             output_number,
+            toposort_cache: None,
         };
     }
 
@@ -58,6 +61,8 @@ impl NetworkGraph {
     }
 
     pub fn add_hidden_node(&mut self, edge: EdgeIndex) {
+        self.toposort_cache = None;
+
         let previous_weight: f64;
         let new_node_index: NodeIndex;
 
@@ -88,6 +93,14 @@ impl NetworkGraph {
                 disabled: false,
             },
         );
+    }
+
+    pub fn toposort(&mut self) -> &Option<Vec<NodeIndex>> {
+        if self.toposort_cache.is_none() {
+            self.toposort_cache = toposort(&self.graph, None).ok()
+        }
+
+        return &self.toposort_cache;
     }
 }
 
@@ -168,4 +181,16 @@ mod tests {
 
         assert!(graph_eq(&network.graph, &graph));
     }
+
+    #[test]
+    fn toposort_should_work_on_dag() {
+        let mut network = NetworkGraph::new(2, 1);
+        network.add_hidden_node(EdgeIndex::new(0));
+
+        let result = network.toposort();
+
+        assert_eq!(*result, Some(vec![1.into(), 0.into(), 3.into(), 2.into()]));
+    }
+
+    // TODO: fn toposort_should_return_None_on_cyclic_graph()
 }

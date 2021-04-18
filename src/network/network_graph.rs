@@ -94,7 +94,7 @@ impl NetworkGraph {
         toposort(&self.graph, None).ok()
     }
 
-    pub fn mutate_add_node(&mut self, edge: EdgeIndex) {
+    pub fn mutate_add_node(&mut self, edge: EdgeIndex) -> NodeIndex {
         let previous_weight: f64;
         let new_node_index: NodeIndex;
 
@@ -123,6 +123,8 @@ impl NetworkGraph {
                 disabled: false,
             },
         );
+
+        new_node_index
     }
 }
 

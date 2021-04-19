@@ -25,6 +25,8 @@ impl NetworkGraph {
             graph.add_node(NodeData::new(NodeKind::Output));
         }
 
+        graph.add_node(NodeData::new(NodeKind::Bias));
+
         for i in 0..input_number {
             for j in 0..output_number {
                 let edge_data = EdgeData {
@@ -190,6 +192,7 @@ mod tests {
             NodeKind::Input,
             NodeKind::Output,
             NodeKind::Output,
+            NodeKind::Bias,
         ] {
             graph.add_node(NodeData::new(kind));
         }
@@ -226,12 +229,13 @@ mod tests {
             NodeKind::Input,
             NodeKind::Input,
             NodeKind::Output,
+            NodeKind::Bias,
             NodeKind::Hidden,
         ] {
             graph.add_node(NodeData::new(kind));
         }
 
-        for &(a, b) in &[(0, 2), (1, 2), (0, 3), (3, 2)] {
+        for &(a, b) in &[(0, 2), (1, 2), (0, 4), (4, 2)] {
             graph.add_edge(
                 a.into(),
                 b.into(),
@@ -251,7 +255,7 @@ mod tests {
         network.add_node(EdgeIndex::new(0));
         let result = network.add_connection(
             1.into(),
-            3.into(),
+            4.into(),
             EdgeData {
                 weight: 0.0,
                 disabled: false,
@@ -265,12 +269,13 @@ mod tests {
             NodeKind::Input,
             NodeKind::Input,
             NodeKind::Output,
+            NodeKind::Bias,
             NodeKind::Hidden,
         ] {
             graph.add_node(NodeData::new(kind));
         }
 
-        for &(a, b) in &[(0, 2), (1, 2), (0, 3), (3, 2), (1, 3)] {
+        for &(a, b) in &[(0, 2), (1, 2), (0, 4), (4, 2), (1, 4)] {
             graph.add_edge(
                 a.into(),
                 b.into(),
@@ -290,7 +295,10 @@ mod tests {
 
         let result = network.toposort();
 
-        assert_eq!(result, Some(vec![1.into(), 0.into(), 3.into(), 2.into()]));
+        assert_eq!(
+            result,
+            Some(vec![3.into(), 1.into(), 0.into(), 4.into(), 2.into()])
+        );
     }
 
     // TODO: fn toposort_should_return_None_on_cyclic_graph()

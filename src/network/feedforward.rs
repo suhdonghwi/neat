@@ -119,12 +119,12 @@ mod tests {
     }
 
     #[test]
-    fn mutate_add_connection_should_connect_two_nodes() {
+    fn mutate_add_connection_should_connect_nodes() {
         let mut network = Feedforward::new(2, 1);
         assert!(network.mutate_add_node(0.into()));
         assert!(network.mutate_add_connection(
             1.into(),
-            3.into(),
+            4.into(),
             EdgeData {
                 weight: 2.0,
                 disabled: false,

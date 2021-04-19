@@ -15,5 +15,6 @@ pub trait Network {
         target: NodeIndex,
         edge_data: EdgeData,
     ) -> bool;
-    fn mutate_weight(&mut self, index: EdgeIndex, weight: f64) -> bool;
+    fn mutate_assign_weight(&mut self, index: EdgeIndex, weight: f64) -> bool;
+    fn mutate_perturb_weight(&mut self, index: EdgeIndex, delta: f64) -> bool;
 }

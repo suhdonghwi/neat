@@ -68,9 +68,15 @@ impl Network for Feedforward {
         true
     }
 
-    fn mutate_weight(&mut self, index: EdgeIndex, weight: f64) -> bool {
+    fn mutate_assign_weight(&mut self, index: EdgeIndex, weight: f64) -> bool {
         let edge = self.graph.edge_mut(index);
         edge.weight = weight;
+        true
+    }
+
+    fn mutate_perturb_weight(&mut self, index: EdgeIndex, delta: f64) -> bool {
+        let edge = self.graph.edge_mut(index);
+        edge.weight += delta;
         true
     }
 }

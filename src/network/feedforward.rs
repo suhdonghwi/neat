@@ -1,7 +1,7 @@
-use petgraph::graph::NodeIndex;
+use petgraph::graph::{EdgeIndex, NodeIndex};
 
 use super::{network_graph::NetworkGraph, Network};
-use crate::node_data::NodeData;
+use crate::{edge_data::EdgeData, node_data::NodeData};
 
 struct Feedforward {
     graph: NetworkGraph,
@@ -26,6 +26,30 @@ impl Network for Feedforward {
         }
 
         Some(self.graph.get_output())
+    }
+
+    fn mutate_add_node(&mut self, index: EdgeIndex) -> bool {
+        self.graph.add_node(index);
+        true
+    }
+
+    fn mutate_add_connection(
+        &mut self,
+        source: NodeIndex,
+        target: NodeIndex,
+        edge_data: EdgeData,
+    ) -> bool {
+        if self.graph.has_connection(source, target) {
+            return false;
+        }
+
+        let new_edge_index = self.graph.add_connection(source, target, edge_data);
+        if self.graph.has_cycle() {
+            self.graph.remove_connetion(new_edge_index);
+            return false;
+        }
+
+        true
     }
 }
 
@@ -74,9 +98,9 @@ mod tests {
     }
 
     #[test]
-    fn add_node_mutation_should_have_minimal_effect() {
+    fn disabled_connection_should_not_propagate() {
         let mut network = Feedforward::new(2, 1);
-        network.graph.add_node(EdgeIndex::new(0));
+        network.mutate_add_node(EdgeIndex::new(0));
 
         assert_eq!(
             network.activate(vec![1.0, 2.0]),

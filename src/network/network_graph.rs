@@ -10,6 +10,7 @@ pub struct NetworkGraph {
     graph: DiGraph<NodeData, EdgeData>,
     input_number: usize,
     output_number: usize,
+    toposort_cache: Option<Vec<NodeIndex>>,
 }
 
 impl NetworkGraph {
@@ -43,6 +44,7 @@ impl NetworkGraph {
             graph,
             input_number,
             output_number,
+            toposort_cache: None,
         };
     }
 
@@ -94,6 +96,14 @@ impl NetworkGraph {
         toposort(&self.graph, None).ok()
     }
 
+    pub fn has_connection(&self, source: NodeIndex, target: NodeIndex) -> bool {
+        self.graph.contains_edge(source, target)
+    }
+
+    pub fn has_cycle(&self) -> bool {
+        petgraph::algo::is_cyclic_directed(&self.graph)
+    }
+
     pub fn add_node(&mut self, edge: EdgeIndex) -> NodeIndex {
         let previous_weight: f64;
         let new_node_index: NodeIndex;
@@ -134,6 +144,10 @@ impl NetworkGraph {
         edge_data: EdgeData,
     ) -> EdgeIndex {
         self.graph.add_edge(source, target, edge_data)
+    }
+
+    pub fn remove_connetion(&mut self, edge: EdgeIndex) {
+        self.graph.remove_edge(edge);
     }
 }
 

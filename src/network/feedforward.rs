@@ -107,4 +107,23 @@ mod tests {
             Some(vec![sigmoid(sigmoid(1.0) + 2.0)])
         );
     }
+
+    #[test]
+    fn complex_network_should_propagate_correctly() {
+        let mut network = Feedforward::new(2, 1);
+        network.mutate_add_node(EdgeIndex::new(0));
+        network.mutate_add_connection(
+            1.into(),
+            3.into(),
+            EdgeData {
+                weight: 2.0,
+                disabled: false,
+            },
+        );
+
+        assert_eq!(
+            network.activate(vec![1.0, 2.0]),
+            Some(vec![sigmoid(sigmoid(5.0) + 2.0)])
+        );
+    }
 }

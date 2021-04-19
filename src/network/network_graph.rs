@@ -60,7 +60,7 @@ impl NetworkGraph {
         self.graph.node_weights_mut().take(self.input_number)
     }
 
-    pub fn get_output(&self) -> Vec<f64> {
+    pub fn activate_output(&self) -> Vec<f64> {
         let mut result = Vec::new();
         for index in self.input_number..self.input_number + self.output_number {
             result.push(self.graph[NodeIndex::new(index)].activate());

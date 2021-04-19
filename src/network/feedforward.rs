@@ -25,7 +25,7 @@ impl Network for Feedforward {
             self.activate_node(index);
         }
 
-        Some(self.graph.get_output())
+        Some(self.graph.activate_output())
     }
 
     fn mutate_add_node(&mut self, index: EdgeIndex) -> bool {

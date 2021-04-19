@@ -92,8 +92,12 @@ impl NetworkGraph {
         result
     }
 
-    pub fn toposort(&self) -> Option<Vec<NodeIndex>> {
-        toposort(&self.graph, None).ok()
+    pub fn toposort(&mut self) -> Option<Vec<NodeIndex>> {
+        if self.toposort_cache.is_none() {
+            self.toposort_cache = toposort(&self.graph, None).ok();
+        }
+
+        self.toposort_cache.clone()
     }
 
     pub fn has_connection(&self, source: NodeIndex, target: NodeIndex) -> bool {

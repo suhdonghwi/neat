@@ -20,8 +20,8 @@ impl Network for Feedforward {
         }
 
         // Activate nodes in topological order
-        let sorted = self.graph.toposort()?;
-        for index in sorted {
+        let sorted = self.graph.toposort();
+        for index in sorted? {
             self.activate_node(index);
         }
 

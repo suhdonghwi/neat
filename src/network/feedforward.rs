@@ -38,6 +38,10 @@ impl Network for Feedforward {
         Some(self.graph.activate_output())
     }
 
+    fn randomize_weights(&mut self, low: f64, high: f64) {
+        self.graph.randomize_weights(low, high);
+    }
+
     fn mutate_add_node(&mut self, index: EdgeIndex) -> bool {
         self.graph.add_node(index);
         true

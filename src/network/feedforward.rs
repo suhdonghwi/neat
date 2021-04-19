@@ -42,8 +42,11 @@ impl Network for Feedforward {
         target: NodeIndex,
         edge_data: EdgeData,
     ) -> bool {
-        if self.graph.node(source).kind() == NodeKind::Output
-            || self.graph.node(target).kind() == NodeKind::Input
+        let source_kind = self.graph.node(source).kind();
+        let target_kind = self.graph.node(target).kind();
+        if source_kind == NodeKind::Output
+            || target_kind == NodeKind::Input
+            || target_kind == NodeKind::Bias
             || self.graph.has_connection(source, target)
         {
             return false;
@@ -159,8 +162,8 @@ mod tests {
         assert!(network.mutate_add_node(0.into()));
         assert!(network.mutate_add_node(1.into()));
         assert!(network.mutate_add_connection(
-            3.into(),
             4.into(),
+            5.into(),
             EdgeData {
                 weight: 1.0,
                 disabled: false
@@ -168,8 +171,8 @@ mod tests {
         ));
         assert_eq!(
             network.mutate_add_connection(
+                5.into(),
                 4.into(),
-                3.into(),
                 EdgeData {
                     weight: 1.0,
                     disabled: false
@@ -180,13 +183,13 @@ mod tests {
     }
 
     #[test]
-    fn mutate_add_connection_should_not_start_from_output_nor_end_to_input() {
+    fn mutate_add_connection_should_start_or_end_at_valid_node() {
         let mut network = Feedforward::new(2, 1);
         assert!(network.mutate_add_node(0.into()));
         assert_eq!(
             network.mutate_add_connection(
                 2.into(),
-                3.into(),
+                4.into(),
                 EdgeData {
                     weight: 1.0,
                     disabled: false
@@ -194,10 +197,23 @@ mod tests {
             ),
             false
         );
+
         assert_eq!(
             network.mutate_add_connection(
-                3.into(),
+                4.into(),
                 0.into(),
+                EdgeData {
+                    weight: 1.0,
+                    disabled: false
+                }
+            ),
+            false
+        );
+
+        assert_eq!(
+            network.mutate_add_connection(
+                4.into(),
+                3.into(),
                 EdgeData {
                     weight: 1.0,
                     disabled: false

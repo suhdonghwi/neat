@@ -12,14 +12,21 @@ struct Feedforward {
 
 impl Network for Feedforward {
     fn activate(&mut self, inputs: Vec<f64>) -> Option<Vec<f64>> {
-        let input_nodes: Vec<&mut NodeData> = self.graph.input_nodes_mut().collect();
-        if input_nodes.len() != inputs.len() {
-            return None;
+        {
+            let input_nodes: Vec<&mut NodeData> = self.graph.input_nodes_mut().collect();
+            if input_nodes.len() != inputs.len() {
+                return None;
+            }
+
+            // Set input to input nodes
+            for (node_data, input) in input_nodes.into_iter().zip(inputs.into_iter()) {
+                node_data.add_input(input);
+            }
         }
 
-        // Set input to input nodes
-        for (node_data, input) in input_nodes.into_iter().zip(inputs.into_iter()) {
-            node_data.add_input(input);
+        {
+            let bias_node = self.graph.bias_node_mut();
+            bias_node.add_input(1.0);
         }
 
         // Activate nodes in topological order
@@ -118,6 +125,24 @@ mod tests {
         assert_eq!(
             network.activate(vec![1.0, 2.0]),
             Some(vec![sigmoid(sigmoid(1.0) + 2.0)])
+        );
+    }
+
+    #[test]
+    fn bias_node_should_sum_weight_as_is() {
+        let mut network = Feedforward::new(2, 1);
+        assert!(network.mutate_add_connection(
+            3.into(),
+            2.into(),
+            EdgeData {
+                weight: -3.0,
+                disabled: false
+            }
+        ));
+
+        assert_eq!(
+            network.activate(vec![1.0, 2.0]),
+            Some(vec![sigmoid(1.0 + 2.0 - 3.0)])
         );
     }
 

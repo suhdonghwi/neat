@@ -62,6 +62,10 @@ impl NetworkGraph {
         self.graph.node_weights_mut().take(self.input_number)
     }
 
+    pub fn bias_node_mut(&mut self) -> &mut NodeData {
+        &mut self.graph[NodeIndex::new(self.input_number + self.output_number)]
+    }
+
     pub fn activate_output(&self) -> Vec<f64> {
         let mut result = Vec::new();
         for index in self.input_number..self.input_number + self.output_number {

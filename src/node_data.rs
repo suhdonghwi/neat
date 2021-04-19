@@ -27,7 +27,7 @@ impl NodeData {
     }
 
     pub fn activate(&self) -> f64 {
-        if self.kind == NodeKind::Input {
+        if self.kind == NodeKind::Input || self.kind == NodeKind::Bias {
             self.input_sum
         } else {
             activations::sigmoid(self.input_sum)

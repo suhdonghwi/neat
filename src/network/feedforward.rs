@@ -1,7 +1,10 @@
 use petgraph::graph::{EdgeIndex, NodeIndex};
 
 use super::{network_graph::NetworkGraph, Network};
-use crate::{edge_data::EdgeData, node_data::NodeData};
+use crate::{
+    edge_data::EdgeData,
+    node_data::{NodeData, NodeKind},
+};
 
 struct Feedforward {
     graph: NetworkGraph,
@@ -39,7 +42,10 @@ impl Network for Feedforward {
         target: NodeIndex,
         edge_data: EdgeData,
     ) -> bool {
-        if self.graph.has_connection(source, target) {
+        if self.graph.node(source).kind() == NodeKind::Output
+            || self.graph.node(target).kind() == NodeKind::Input
+            || self.graph.has_connection(source, target)
+        {
             return false;
         }
 
@@ -49,6 +55,12 @@ impl Network for Feedforward {
             return false;
         }
 
+        true
+    }
+
+    fn mutate_weight(&mut self, index: EdgeIndex, weight: f64) -> bool {
+        let edge = self.graph.edge_mut(index);
+        edge.weight = weight;
         true
     }
 }
@@ -86,8 +98,6 @@ mod tests {
     use super::*;
     use crate::activations::sigmoid;
 
-    use petgraph::graph::EdgeIndex;
-
     #[test]
     fn initial_network_activation_should_sum_input_and_squash() {
         let mut network = Feedforward::new(2, 1);
@@ -100,7 +110,7 @@ mod tests {
     #[test]
     fn disabled_connection_should_not_propagate() {
         let mut network = Feedforward::new(2, 1);
-        network.mutate_add_node(EdgeIndex::new(0));
+        assert!(network.mutate_add_node(0.into()));
 
         assert_eq!(
             network.activate(vec![1.0, 2.0]),
@@ -109,21 +119,91 @@ mod tests {
     }
 
     #[test]
-    fn complex_network_should_propagate_correctly() {
+    fn mutate_add_connection_should_connect_two_nodes() {
         let mut network = Feedforward::new(2, 1);
-        network.mutate_add_node(EdgeIndex::new(0));
-        network.mutate_add_connection(
+        assert!(network.mutate_add_node(0.into()));
+        assert!(network.mutate_add_connection(
             1.into(),
             3.into(),
             EdgeData {
                 weight: 2.0,
                 disabled: false,
             },
-        );
+        ));
 
         assert_eq!(
             network.activate(vec![1.0, 2.0]),
             Some(vec![sigmoid(sigmoid(5.0) + 2.0)])
+        );
+    }
+
+    #[test]
+    fn mutate_add_connection_should_be_unique() {
+        let mut network = Feedforward::new(2, 1);
+        assert_eq!(
+            network.mutate_add_connection(
+                0.into(),
+                2.into(),
+                EdgeData {
+                    weight: 1.0,
+                    disabled: false,
+                },
+            ),
+            false
+        );
+    }
+
+    #[test]
+    fn mutate_add_connection_should_not_form_cycle() {
+        let mut network = Feedforward::new(2, 1);
+        assert!(network.mutate_add_node(0.into()));
+        assert!(network.mutate_add_node(1.into()));
+        assert!(network.mutate_add_connection(
+            3.into(),
+            4.into(),
+            EdgeData {
+                weight: 1.0,
+                disabled: false
+            }
+        ));
+        assert_eq!(
+            network.mutate_add_connection(
+                4.into(),
+                3.into(),
+                EdgeData {
+                    weight: 1.0,
+                    disabled: false
+                }
+            ),
+            false
+        );
+    }
+
+    #[test]
+    fn mutate_add_connection_should_not_start_from_output_nor_end_to_input() {
+        let mut network = Feedforward::new(2, 1);
+        assert!(network.mutate_add_node(0.into()));
+        assert_eq!(
+            network.mutate_add_connection(
+                2.into(),
+                3.into(),
+                EdgeData {
+                    weight: 1.0,
+                    disabled: false
+                }
+            ),
+            false
+        );
+        assert_eq!(
+            network.mutate_add_connection(
+                3.into(),
+                0.into(),
+                EdgeData {
+                    weight: 1.0,
+                    disabled: false
+                }
+            ),
+            false
         );
     }
 }

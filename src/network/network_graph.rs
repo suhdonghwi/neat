@@ -81,6 +81,10 @@ impl NetworkGraph {
         &self.graph[index]
     }
 
+    pub fn edge_mut(&mut self, index: EdgeIndex) -> &mut EdgeData {
+        &mut self.graph[index]
+    }
+
     pub fn outgoing(&self, index: NodeIndex) -> Vec<(EdgeIndex, NodeIndex)> {
         let mut result = Vec::new();
         let mut neighbors = self.graph.neighbors(index).detach();

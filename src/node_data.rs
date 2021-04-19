@@ -33,4 +33,8 @@ impl NodeData {
             activations::sigmoid(self.input_sum)
         }
     }
+
+    pub fn kind(&self) -> NodeKind {
+        self.kind
+    }
 }

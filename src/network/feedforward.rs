@@ -3,6 +3,7 @@ use petgraph::graph::{EdgeIndex, NodeIndex};
 use super::{network_graph::NetworkGraph, Network};
 use crate::{
     edge_data::EdgeData,
+    innovation_record::InnovationRecord,
     node_data::{NodeData, NodeKind},
 };
 
@@ -38,8 +39,8 @@ impl Network for Feedforward {
         self.graph.randomize_weights(low, high);
     }
 
-    fn mutate_add_node(&mut self, index: EdgeIndex) -> bool {
-        self.graph.add_node(index);
+    fn mutate_add_node(&mut self, index: EdgeIndex, innov_record: &mut InnovationRecord) -> bool {
+        self.graph.add_node(index, innov_record);
         true
     }
 
@@ -82,9 +83,13 @@ impl Network for Feedforward {
 }
 
 impl Feedforward {
-    fn new(input_number: usize, output_number: usize) -> Feedforward {
+    fn new(
+        input_number: usize,
+        output_number: usize,
+        innov_record: &mut InnovationRecord,
+    ) -> Feedforward {
         Self {
-            graph: NetworkGraph::new(input_number, output_number),
+            graph: NetworkGraph::new(input_number, output_number, innov_record),
         }
     }
 
@@ -116,7 +121,8 @@ mod tests {
 
     #[test]
     fn initial_network_activation_should_sum_input_and_squash() {
-        let mut network = Feedforward::new(2, 1);
+        let mut innov_record = InnovationRecord::new();
+        let mut network = Feedforward::new(2, 1, &mut innov_record);
         assert_eq!(
             network.activate(vec![1.0, 2.0]),
             Some(vec![sigmoid(1.0 + 2.0)])
@@ -125,8 +131,9 @@ mod tests {
 
     #[test]
     fn disabled_connection_should_not_propagate() {
-        let mut network = Feedforward::new(2, 1);
-        assert!(network.mutate_add_node(0.into()));
+        let mut innov_record = InnovationRecord::new();
+        let mut network = Feedforward::new(2, 1, &mut innov_record);
+        assert!(network.mutate_add_node(0.into(), &mut innov_record));
 
         assert_eq!(
             network.activate(vec![1.0, 2.0]),
@@ -136,7 +143,8 @@ mod tests {
 
     #[test]
     fn bias_node_should_sum_weight_as_is() {
-        let mut network = Feedforward::new(2, 1);
+        let mut innov_record = InnovationRecord::new();
+        let mut network = Feedforward::new(2, 1, &mut innov_record);
         assert!(network.mutate_add_connection(
             3.into(),
             2.into(),
@@ -154,8 +162,9 @@ mod tests {
 
     #[test]
     fn mutate_add_connection_should_connect_nodes() {
-        let mut network = Feedforward::new(2, 1);
-        assert!(network.mutate_add_node(0.into()));
+        let mut innov_record = InnovationRecord::new();
+        let mut network = Feedforward::new(2, 1, &mut innov_record);
+        assert!(network.mutate_add_node(0.into(), &mut innov_record));
         assert!(network.mutate_add_connection(
             1.into(),
             4.into(),
@@ -173,7 +182,8 @@ mod tests {
 
     #[test]
     fn mutate_add_connection_should_be_unique() {
-        let mut network = Feedforward::new(2, 1);
+        let mut innov_record = InnovationRecord::new();
+        let mut network = Feedforward::new(2, 1, &mut innov_record);
         assert_eq!(
             network.mutate_add_connection(
                 0.into(),
@@ -189,9 +199,10 @@ mod tests {
 
     #[test]
     fn mutate_add_connection_should_not_form_cycle() {
-        let mut network = Feedforward::new(2, 1);
-        assert!(network.mutate_add_node(0.into()));
-        assert!(network.mutate_add_node(1.into()));
+        let mut innov_record = InnovationRecord::new();
+        let mut network = Feedforward::new(2, 1, &mut innov_record);
+        assert!(network.mutate_add_node(0.into(), &mut innov_record));
+        assert!(network.mutate_add_node(1.into(), &mut innov_record));
         assert!(network.mutate_add_connection(
             4.into(),
             5.into(),
@@ -215,8 +226,9 @@ mod tests {
 
     #[test]
     fn mutate_add_connection_should_start_or_end_at_valid_node() {
-        let mut network = Feedforward::new(2, 1);
-        assert!(network.mutate_add_node(0.into()));
+        let mut innov_record = InnovationRecord::new();
+        let mut network = Feedforward::new(2, 1, &mut innov_record);
+        assert!(network.mutate_add_node(0.into(), &mut innov_record));
         assert_eq!(
             network.mutate_add_connection(
                 2.into(),

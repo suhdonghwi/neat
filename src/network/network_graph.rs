@@ -2,8 +2,8 @@ use petgraph::algo::toposort;
 use petgraph::graph::{DiGraph, EdgeIndex, NodeIndex};
 use rand::distributions::{Distribution, Uniform};
 
-use crate::edge_data::EdgeData;
 use crate::node_data::{NodeData, NodeKind};
+use crate::{edge_data::EdgeData, innovation_record::InnovationRecord};
 
 #[derive(Debug)]
 pub struct NetworkGraph {
@@ -14,18 +14,22 @@ pub struct NetworkGraph {
 }
 
 impl NetworkGraph {
-    pub fn new(input_number: usize, output_number: usize) -> Self {
+    pub fn new(
+        input_number: usize,
+        output_number: usize,
+        innov_record: &mut InnovationRecord,
+    ) -> Self {
         let mut graph = DiGraph::new();
 
         for _ in 0..input_number {
-            graph.add_node(NodeData::new(NodeKind::Input));
+            graph.add_node(NodeData::new(NodeKind::Input, innov_record.new_node()));
         }
 
         for _ in 0..output_number {
-            graph.add_node(NodeData::new(NodeKind::Output));
+            graph.add_node(NodeData::new(NodeKind::Output, innov_record.new_node()));
         }
 
-        graph.add_node(NodeData::new(NodeKind::Bias));
+        graph.add_node(NodeData::new(NodeKind::Bias, innov_record.new_node()));
 
         for i in 0..input_number {
             for j in 0..output_number {
@@ -118,7 +122,7 @@ impl NetworkGraph {
         petgraph::algo::is_cyclic_directed(&self.graph)
     }
 
-    pub fn add_node(&mut self, edge: EdgeIndex) -> NodeIndex {
+    pub fn add_node(&mut self, edge: EdgeIndex, innov_record: &mut InnovationRecord) -> NodeIndex {
         let previous_weight: f64;
         let new_node_index: NodeIndex;
 
@@ -127,7 +131,9 @@ impl NetworkGraph {
             edge_data.disabled = true;
             previous_weight = edge_data.weight;
 
-            new_node_index = self.graph.add_node(NodeData::new(NodeKind::Hidden));
+            new_node_index = self
+                .graph
+                .add_node(NodeData::new(NodeKind::Hidden, innov_record.new_node()));
         }
 
         let (source, target) = self.graph.edge_endpoints(edge).unwrap();
@@ -188,9 +194,11 @@ mod tests {
 
     #[test]
     fn nodes_should_fully_connect_on_initialization() {
-        let network = NetworkGraph::new(2, 2);
+        let mut innov_record = InnovationRecord::new();
+        let network = NetworkGraph::new(2, 2, &mut innov_record);
 
         let mut graph = DiGraph::<NodeData, EdgeData>::new();
+        let mut i: usize = 0;
         for &kind in &[
             NodeKind::Input,
             NodeKind::Input,
@@ -198,7 +206,8 @@ mod tests {
             NodeKind::Output,
             NodeKind::Bias,
         ] {
-            graph.add_node(NodeData::new(kind));
+            graph.add_node(NodeData::new(kind, i));
+            i += 1;
         }
 
         for &(a, b) in &[(0, 2), (0, 3), (1, 2), (1, 3)] {
@@ -217,26 +226,40 @@ mod tests {
 
     #[test]
     fn input_nodes_should_be_returned() {
-        let mut network = NetworkGraph::new(5, 1);
+        let mut innov_record = InnovationRecord::new();
+        let mut network = NetworkGraph::new(5, 1, &mut innov_record);
         let input_nodes = network.input_nodes_mut().collect::<Vec<_>>();
 
-        assert_eq!(input_nodes, vec![&NodeData::new(NodeKind::Input); 5])
+        assert_eq!(
+            input_nodes,
+            vec![
+                &NodeData::new(NodeKind::Input, 0),
+                &NodeData::new(NodeKind::Input, 1),
+                &NodeData::new(NodeKind::Input, 2),
+                &NodeData::new(NodeKind::Input, 3),
+                &NodeData::new(NodeKind::Input, 4),
+            ]
+        )
     }
 
     #[test]
     fn add_node_should_split_edge() {
-        let mut network = NetworkGraph::new(2, 1);
-        network.add_node(EdgeIndex::new(0));
+        let mut innov_record = InnovationRecord::new();
+        let mut network = NetworkGraph::new(2, 1, &mut innov_record);
+        network.add_node(EdgeIndex::new(0), &mut innov_record);
 
         let mut graph = DiGraph::<NodeData, EdgeData>::new();
-        for &kind in &[
+        for (i, &kind) in [
             NodeKind::Input,
             NodeKind::Input,
             NodeKind::Output,
             NodeKind::Bias,
             NodeKind::Hidden,
-        ] {
-            graph.add_node(NodeData::new(kind));
+        ]
+        .iter()
+        .enumerate()
+        {
+            graph.add_node(NodeData::new(kind, i));
         }
 
         for &(a, b) in &[(0, 2), (1, 2), (0, 4), (4, 2)] {
@@ -255,8 +278,10 @@ mod tests {
 
     #[test]
     fn add_connection_should_connect_nodes() {
-        let mut network = NetworkGraph::new(2, 1);
-        network.add_node(EdgeIndex::new(0));
+        let mut innov_record = InnovationRecord::new();
+        let mut network = NetworkGraph::new(2, 1, &mut innov_record);
+        network.add_node(EdgeIndex::new(0), &mut innov_record);
+
         let result = network.add_connection(
             1.into(),
             4.into(),
@@ -269,14 +294,17 @@ mod tests {
         assert_eq!(result, 4.into());
 
         let mut graph = DiGraph::<NodeData, EdgeData>::new();
-        for &kind in &[
+        for (i, &kind) in [
             NodeKind::Input,
             NodeKind::Input,
             NodeKind::Output,
             NodeKind::Bias,
             NodeKind::Hidden,
-        ] {
-            graph.add_node(NodeData::new(kind));
+        ]
+        .iter()
+        .enumerate()
+        {
+            graph.add_node(NodeData::new(kind, i));
         }
 
         for &(a, b) in &[(0, 2), (1, 2), (0, 4), (4, 2), (1, 4)] {
@@ -294,8 +322,9 @@ mod tests {
 
     #[test]
     fn toposort_should_work_on_dag() {
-        let mut network = NetworkGraph::new(2, 1);
-        network.add_node(EdgeIndex::new(0));
+        let mut innov_record = InnovationRecord::new();
+        let mut network = NetworkGraph::new(2, 1, &mut innov_record);
+        network.add_node(EdgeIndex::new(0), &mut innov_record);
 
         let result = network.toposort();
 

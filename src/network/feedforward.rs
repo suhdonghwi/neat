@@ -12,22 +12,18 @@ struct Feedforward {
 
 impl Network for Feedforward {
     fn activate(&mut self, inputs: Vec<f64>) -> Option<Vec<f64>> {
-        {
-            let input_nodes: Vec<&mut NodeData> = self.graph.input_nodes_mut().collect();
-            if input_nodes.len() != inputs.len() {
-                return None;
-            }
-
-            // Set input to input nodes
-            for (node_data, input) in input_nodes.into_iter().zip(inputs.into_iter()) {
-                node_data.add_input(input);
-            }
+        let input_nodes: Vec<&mut NodeData> = self.graph.input_nodes_mut().collect();
+        if input_nodes.len() != inputs.len() {
+            return None;
         }
 
-        {
-            let bias_node = self.graph.bias_node_mut();
-            bias_node.add_input(1.0);
+        // Set input to input nodes
+        for (node_data, input) in input_nodes.into_iter().zip(inputs.into_iter()) {
+            node_data.add_input(input);
         }
+
+        let bias_node = self.graph.bias_node_mut();
+        bias_node.add_input(1.0);
 
         // Activate nodes in topological order
         let sorted = self.graph.toposort();

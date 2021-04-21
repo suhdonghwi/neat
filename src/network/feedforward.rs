@@ -71,13 +71,13 @@ impl Network for Feedforward {
 
     fn mutate_assign_weight(&mut self, index: EdgeIndex, weight: f64) -> bool {
         let edge = self.graph.edge_mut(index);
-        edge.weight = weight;
+        edge.set_weight(weight);
         true
     }
 
     fn mutate_perturb_weight(&mut self, index: EdgeIndex, delta: f64) -> bool {
         let edge = self.graph.edge_mut(index);
-        edge.weight += delta;
+        edge.set_weight(edge.get_weight() + delta);
         true
     }
 }
@@ -102,10 +102,10 @@ impl Feedforward {
 
             {
                 let edge = self.graph.edge(edge_index);
-                if edge.disabled {
+                if edge.is_disabled() {
                     continue;
                 };
-                weight = edge.weight;
+                weight = edge.get_weight();
             }
 
             let target = self.graph.node_mut(target_index);
@@ -145,14 +145,7 @@ mod tests {
     fn bias_node_should_sum_weight_as_is() {
         let mut innov_record = InnovationRecord::new();
         let mut network = Feedforward::new(2, 1, &mut innov_record);
-        assert!(network.mutate_add_connection(
-            3.into(),
-            2.into(),
-            EdgeData {
-                weight: -3.0,
-                disabled: false
-            }
-        ));
+        assert!(network.mutate_add_connection(3.into(), 2.into(), EdgeData::new(-3.0)));
 
         assert_eq!(
             network.activate(vec![1.0, 2.0]),
@@ -165,14 +158,7 @@ mod tests {
         let mut innov_record = InnovationRecord::new();
         let mut network = Feedforward::new(2, 1, &mut innov_record);
         assert!(network.mutate_add_node(0.into(), &mut innov_record));
-        assert!(network.mutate_add_connection(
-            1.into(),
-            4.into(),
-            EdgeData {
-                weight: 2.0,
-                disabled: false,
-            },
-        ));
+        assert!(network.mutate_add_connection(1.into(), 4.into(), EdgeData::new(2.0)));
 
         assert_eq!(
             network.activate(vec![1.0, 2.0]),
@@ -185,14 +171,7 @@ mod tests {
         let mut innov_record = InnovationRecord::new();
         let mut network = Feedforward::new(2, 1, &mut innov_record);
         assert_eq!(
-            network.mutate_add_connection(
-                0.into(),
-                2.into(),
-                EdgeData {
-                    weight: 1.0,
-                    disabled: false,
-                },
-            ),
+            network.mutate_add_connection(0.into(), 2.into(), EdgeData::new(1.0),),
             false
         );
     }
@@ -203,23 +182,9 @@ mod tests {
         let mut network = Feedforward::new(2, 1, &mut innov_record);
         assert!(network.mutate_add_node(0.into(), &mut innov_record));
         assert!(network.mutate_add_node(1.into(), &mut innov_record));
-        assert!(network.mutate_add_connection(
-            4.into(),
-            5.into(),
-            EdgeData {
-                weight: 1.0,
-                disabled: false
-            }
-        ));
+        assert!(network.mutate_add_connection(4.into(), 5.into(), EdgeData::new(1.0)));
         assert_eq!(
-            network.mutate_add_connection(
-                5.into(),
-                4.into(),
-                EdgeData {
-                    weight: 1.0,
-                    disabled: false
-                }
-            ),
+            network.mutate_add_connection(5.into(), 4.into(), EdgeData::new(1.0)),
             false
         );
     }
@@ -230,38 +195,17 @@ mod tests {
         let mut network = Feedforward::new(2, 1, &mut innov_record);
         assert!(network.mutate_add_node(0.into(), &mut innov_record));
         assert_eq!(
-            network.mutate_add_connection(
-                2.into(),
-                4.into(),
-                EdgeData {
-                    weight: 1.0,
-                    disabled: false
-                }
-            ),
+            network.mutate_add_connection(2.into(), 4.into(), EdgeData::new(1.0)),
             false
         );
 
         assert_eq!(
-            network.mutate_add_connection(
-                4.into(),
-                0.into(),
-                EdgeData {
-                    weight: 1.0,
-                    disabled: false
-                }
-            ),
+            network.mutate_add_connection(4.into(), 0.into(), EdgeData::new(1.0)),
             false
         );
 
         assert_eq!(
-            network.mutate_add_connection(
-                4.into(),
-                3.into(),
-                EdgeData {
-                    weight: 1.0,
-                    disabled: false
-                }
-            ),
+            network.mutate_add_connection(4.into(), 3.into(), EdgeData::new(1.0)),
             false
         );
     }

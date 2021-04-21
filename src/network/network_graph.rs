@@ -333,6 +333,4 @@ mod tests {
             Some(vec![3.into(), 1.into(), 0.into(), 4.into(), 2.into()])
         );
     }
-
-    // TODO: fn toposort_should_return_None_on_cyclic_graph()
 }

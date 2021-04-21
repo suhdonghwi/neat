@@ -11,15 +11,15 @@ pub enum NodeKind {
 #[derive(Debug, PartialEq, Clone)]
 pub struct NodeData {
     kind: NodeKind,
-    identifying_number: usize,
+    id: usize,
     input_sum: f64,
 }
 
 impl NodeData {
-    pub fn new(kind: NodeKind, identifying_number: usize) -> Self {
+    pub fn new(kind: NodeKind, id: usize) -> Self {
         Self {
             kind,
-            identifying_number,
+            id,
             input_sum: 0.0,
         }
     }

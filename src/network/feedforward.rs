@@ -48,7 +48,8 @@ impl Network for Feedforward {
         &mut self,
         source: NodeIndex,
         target: NodeIndex,
-        edge_data: EdgeData,
+        weight: f64,
+        innov_record: &mut InnovationRecord,
     ) -> bool {
         let source_kind = self.graph.node(source).kind();
         let target_kind = self.graph.node(target).kind();
@@ -60,7 +61,9 @@ impl Network for Feedforward {
             return false;
         }
 
-        let new_edge_index = self.graph.add_connection(source, target, edge_data);
+        let new_edge_index = self
+            .graph
+            .add_connection(source, target, weight, innov_record);
         if self.graph.has_cycle() {
             self.graph.remove_connetion(new_edge_index);
             return false;
@@ -151,7 +154,7 @@ mod tests {
         let output_number = 1;
         let mut innov_record = InnovationRecord::new(input_number, output_number);
         let mut network = Feedforward::new(input_number, output_number, &mut innov_record);
-        assert!(network.mutate_add_connection(3.into(), 2.into(), EdgeData::new(-3.0)));
+        assert!(network.mutate_add_connection(3.into(), 2.into(), -3.0, &mut innov_record));
 
         assert_eq!(
             network.activate(vec![1.0, 2.0]),
@@ -166,7 +169,7 @@ mod tests {
         let mut innov_record = InnovationRecord::new(input_number, output_number);
         let mut network = Feedforward::new(2, 1, &mut innov_record);
         assert!(network.mutate_add_node(0.into(), &mut innov_record));
-        assert!(network.mutate_add_connection(1.into(), 4.into(), EdgeData::new(2.0)));
+        assert!(network.mutate_add_connection(1.into(), 4.into(), 2.0, &mut innov_record));
 
         assert_eq!(
             network.activate(vec![1.0, 2.0]),
@@ -181,7 +184,7 @@ mod tests {
         let mut innov_record = InnovationRecord::new(input_number, output_number);
         let mut network = Feedforward::new(2, 1, &mut innov_record);
         assert_eq!(
-            network.mutate_add_connection(0.into(), 2.into(), EdgeData::new(1.0),),
+            network.mutate_add_connection(0.into(), 2.into(), 1.0, &mut innov_record),
             false
         );
     }
@@ -194,9 +197,9 @@ mod tests {
         let mut network = Feedforward::new(input_number, output_number, &mut innov_record);
         assert!(network.mutate_add_node(0.into(), &mut innov_record));
         assert!(network.mutate_add_node(1.into(), &mut innov_record));
-        assert!(network.mutate_add_connection(4.into(), 5.into(), EdgeData::new(1.0)));
+        assert!(network.mutate_add_connection(4.into(), 5.into(), 1.0, &mut innov_record));
         assert_eq!(
-            network.mutate_add_connection(5.into(), 4.into(), EdgeData::new(1.0)),
+            network.mutate_add_connection(5.into(), 4.into(), 1.0, &mut innov_record),
             false
         );
     }
@@ -209,17 +212,17 @@ mod tests {
         let mut network = Feedforward::new(input_number, output_number, &mut innov_record);
         assert!(network.mutate_add_node(0.into(), &mut innov_record));
         assert_eq!(
-            network.mutate_add_connection(2.into(), 4.into(), EdgeData::new(1.0)),
+            network.mutate_add_connection(2.into(), 4.into(), 1.0, &mut innov_record),
             false
         );
 
         assert_eq!(
-            network.mutate_add_connection(4.into(), 0.into(), EdgeData::new(1.0)),
+            network.mutate_add_connection(4.into(), 0.into(), 1.0, &mut innov_record),
             false
         );
 
         assert_eq!(
-            network.mutate_add_connection(4.into(), 3.into(), EdgeData::new(1.0)),
+            network.mutate_add_connection(4.into(), 3.into(), 1.0, &mut innov_record),
             false
         );
     }

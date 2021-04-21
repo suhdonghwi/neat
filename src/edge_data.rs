@@ -2,13 +2,15 @@
 pub struct EdgeData {
     weight: f64,
     disabled: bool,
+    innov_number: usize,
 }
 
 impl EdgeData {
-    pub fn new(weight: f64) -> Self {
+    pub fn new(weight: f64, innov_number: usize) -> Self {
         Self {
             weight,
             disabled: false,
+            innov_number,
         }
     }
 

@@ -33,7 +33,8 @@ impl NetworkGraph {
 
         for i in 0..input_number {
             for j in 0..output_number {
-                let edge_data = EdgeData::new(1.0);
+                let innov_number = innov_record.new_connection(i, input_number + j);
+                let edge_data = EdgeData::new(1.0, innov_number);
 
                 graph.add_edge(
                     NodeIndex::new(i),
@@ -122,22 +123,35 @@ impl NetworkGraph {
     pub fn add_node(&mut self, edge: EdgeIndex, innov_record: &mut InnovationRecord) -> NodeIndex {
         let previous_weight: f64;
         let new_node_index: NodeIndex;
+        let new_node_id: usize;
 
         {
             let edge_data = self.graph.edge_weight_mut(edge).unwrap();
             edge_data.disable();
             previous_weight = edge_data.get_weight();
 
+            new_node_id = innov_record.new_node();
             new_node_index = self
                 .graph
-                .add_node(NodeData::new(NodeKind::Hidden, innov_record.new_node()));
+                .add_node(NodeData::new(NodeKind::Hidden, new_node_id));
         }
 
         let (source, target) = self.graph.edge_endpoints(edge).unwrap();
-        self.graph
-            .add_edge(source, new_node_index, EdgeData::new(previous_weight));
-        self.graph
-            .add_edge(new_node_index, target, EdgeData::new(1.0));
+        let source_id = self.graph[source].id();
+        let target_id = self.graph[target].id();
+        self.graph.add_edge(
+            source,
+            new_node_index,
+            EdgeData::new(
+                previous_weight,
+                innov_record.new_connection(source_id, new_node_id),
+            ),
+        );
+        self.graph.add_edge(
+            new_node_index,
+            target,
+            EdgeData::new(1.0, innov_record.new_connection(new_node_id, target_id)),
+        );
 
         new_node_index
     }
@@ -146,8 +160,13 @@ impl NetworkGraph {
         &mut self,
         source: NodeIndex,
         target: NodeIndex,
-        edge_data: EdgeData,
+        weight: f64,
+        innov_record: &mut InnovationRecord,
     ) -> EdgeIndex {
+        let source_id = self.graph[source].id();
+        let target_id = self.graph[source].id();
+        let innov_number = innov_record.new_connection(source_id, target_id);
+        let edge_data = EdgeData::new(weight, innov_number);
         self.graph.add_edge(source, target, edge_data)
     }
 
@@ -198,8 +217,8 @@ mod tests {
             graph.add_node(NodeData::new(kind, i));
         }
 
-        for &(a, b) in &[(0, 2), (0, 3), (1, 2), (1, 3)] {
-            graph.add_edge(a.into(), b.into(), EdgeData::new(0.0));
+        for (i, &(a, b)) in [(0, 2), (0, 3), (1, 2), (1, 3)].iter().enumerate() {
+            graph.add_edge(a.into(), b.into(), EdgeData::new(0.0, i));
         }
 
         assert!(graph_eq(&network.graph, &graph));
@@ -227,8 +246,8 @@ mod tests {
             graph.add_node(NodeData::new(kind, i));
         }
 
-        for &(a, b) in &[(0, 2), (1, 2)] {
-            graph.add_edge(a.into(), b.into(), EdgeData::new(0.0));
+        for (i, &(a, b)) in [(0, 2), (1, 2)].iter().enumerate() {
+            graph.add_edge(a.into(), b.into(), EdgeData::new(0.0, i));
         }
 
         assert!(graph_eq(&network1.graph, &graph));
@@ -277,8 +296,8 @@ mod tests {
             graph.add_node(NodeData::new(kind, i));
         }
 
-        for &(a, b) in &[(0, 2), (1, 2), (0, 4), (4, 2)] {
-            graph.add_edge(a.into(), b.into(), EdgeData::new(0.0));
+        for (i, &(a, b)) in [(0, 2), (1, 2), (0, 4), (4, 2)].iter().enumerate() {
+            graph.add_edge(a.into(), b.into(), EdgeData::new(0.0, i));
         }
 
         assert!(graph_eq(&network.graph, &graph));
@@ -292,7 +311,7 @@ mod tests {
         let mut network = NetworkGraph::new(input_number, output_number, &mut innov_record);
         network.add_node(EdgeIndex::new(0), &mut innov_record);
 
-        let result = network.add_connection(1.into(), 4.into(), EdgeData::new(0.0));
+        let result = network.add_connection(1.into(), 4.into(), 0.0, &mut innov_record);
 
         assert_eq!(result, 4.into());
 
@@ -310,8 +329,8 @@ mod tests {
             graph.add_node(NodeData::new(kind, i));
         }
 
-        for &(a, b) in &[(0, 2), (1, 2), (0, 4), (4, 2), (1, 4)] {
-            graph.add_edge(a.into(), b.into(), EdgeData::new(0.0));
+        for (i, &(a, b)) in [(0, 2), (1, 2), (0, 4), (4, 2), (1, 4)].iter().enumerate() {
+            graph.add_edge(a.into(), b.into(), EdgeData::new(0.0, i));
         }
         assert!(graph_eq(&network.graph, &graph));
     }

@@ -39,4 +39,8 @@ impl NodeData {
     pub fn kind(&self) -> NodeKind {
         self.kind
     }
+
+    pub fn id(&self) -> usize {
+        self.id
+    }
 }

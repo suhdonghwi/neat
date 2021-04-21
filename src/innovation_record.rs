@@ -7,9 +7,9 @@ pub struct InnovationRecord {
 }
 
 impl InnovationRecord {
-    pub fn new() -> Self {
+    pub fn new(input_number: usize, output_number: usize) -> Self {
         Self {
-            node_counter: 0,
+            node_counter: input_number + output_number + 1,
             connection_counter: 0,
             connection_record: HashMap::new(),
         }

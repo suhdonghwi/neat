@@ -121,7 +121,9 @@ mod tests {
 
     #[test]
     fn initial_network_activation_should_sum_input_and_squash() {
-        let mut innov_record = InnovationRecord::new();
+        let input_number = 2;
+        let output_number = 1;
+        let mut innov_record = InnovationRecord::new(input_number, output_number);
         let mut network = Feedforward::new(2, 1, &mut innov_record);
         assert_eq!(
             network.activate(vec![1.0, 2.0]),
@@ -131,8 +133,10 @@ mod tests {
 
     #[test]
     fn disabled_connection_should_not_propagate() {
-        let mut innov_record = InnovationRecord::new();
-        let mut network = Feedforward::new(2, 1, &mut innov_record);
+        let input_number = 2;
+        let output_number = 1;
+        let mut innov_record = InnovationRecord::new(input_number, output_number);
+        let mut network = Feedforward::new(input_number, output_number, &mut innov_record);
         assert!(network.mutate_add_node(0.into(), &mut innov_record));
 
         assert_eq!(
@@ -143,8 +147,10 @@ mod tests {
 
     #[test]
     fn bias_node_should_sum_weight_as_is() {
-        let mut innov_record = InnovationRecord::new();
-        let mut network = Feedforward::new(2, 1, &mut innov_record);
+        let input_number = 2;
+        let output_number = 1;
+        let mut innov_record = InnovationRecord::new(input_number, output_number);
+        let mut network = Feedforward::new(input_number, output_number, &mut innov_record);
         assert!(network.mutate_add_connection(3.into(), 2.into(), EdgeData::new(-3.0)));
 
         assert_eq!(
@@ -155,7 +161,9 @@ mod tests {
 
     #[test]
     fn mutate_add_connection_should_connect_nodes() {
-        let mut innov_record = InnovationRecord::new();
+        let input_number = 2;
+        let output_number = 1;
+        let mut innov_record = InnovationRecord::new(input_number, output_number);
         let mut network = Feedforward::new(2, 1, &mut innov_record);
         assert!(network.mutate_add_node(0.into(), &mut innov_record));
         assert!(network.mutate_add_connection(1.into(), 4.into(), EdgeData::new(2.0)));
@@ -168,7 +176,9 @@ mod tests {
 
     #[test]
     fn mutate_add_connection_should_be_unique() {
-        let mut innov_record = InnovationRecord::new();
+        let input_number = 2;
+        let output_number = 1;
+        let mut innov_record = InnovationRecord::new(input_number, output_number);
         let mut network = Feedforward::new(2, 1, &mut innov_record);
         assert_eq!(
             network.mutate_add_connection(0.into(), 2.into(), EdgeData::new(1.0),),
@@ -178,8 +188,10 @@ mod tests {
 
     #[test]
     fn mutate_add_connection_should_not_form_cycle() {
-        let mut innov_record = InnovationRecord::new();
-        let mut network = Feedforward::new(2, 1, &mut innov_record);
+        let input_number = 2;
+        let output_number = 1;
+        let mut innov_record = InnovationRecord::new(input_number, output_number);
+        let mut network = Feedforward::new(input_number, output_number, &mut innov_record);
         assert!(network.mutate_add_node(0.into(), &mut innov_record));
         assert!(network.mutate_add_node(1.into(), &mut innov_record));
         assert!(network.mutate_add_connection(4.into(), 5.into(), EdgeData::new(1.0)));
@@ -191,8 +203,10 @@ mod tests {
 
     #[test]
     fn mutate_add_connection_should_start_or_end_at_valid_node() {
-        let mut innov_record = InnovationRecord::new();
-        let mut network = Feedforward::new(2, 1, &mut innov_record);
+        let input_number = 2;
+        let output_number = 1;
+        let mut innov_record = InnovationRecord::new(input_number, output_number);
+        let mut network = Feedforward::new(input_number, output_number, &mut innov_record);
         assert!(network.mutate_add_node(0.into(), &mut innov_record));
         assert_eq!(
             network.mutate_add_connection(2.into(), 4.into(), EdgeData::new(1.0)),

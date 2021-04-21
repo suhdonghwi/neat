@@ -2,7 +2,6 @@ use petgraph::graph::{EdgeIndex, NodeIndex};
 
 use super::{network_graph::NetworkGraph, Network};
 use crate::{
-    edge_data::EdgeData,
     innovation_record::InnovationRecord,
     node_data::{NodeData, NodeKind},
 };

@@ -29,4 +29,8 @@ impl EdgeData {
     pub fn get_weight(&self) -> f64 {
         self.weight
     }
+
+    pub fn innov_number(&self) -> usize {
+        self.innov_number
+    }
 }

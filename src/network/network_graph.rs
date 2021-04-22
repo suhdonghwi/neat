@@ -1,5 +1,10 @@
-use petgraph::algo::toposort;
-use petgraph::graph::{DiGraph, EdgeIndex, NodeIndex};
+use std::collections::{HashMap, HashSet};
+
+use petgraph::{algo::toposort, graph::Edge, visit::IntoNodeIdentifiers};
+use petgraph::{
+    graph::{DiGraph, EdgeIndex, NodeIndex},
+    Graph,
+};
 use rand::distributions::{Distribution, Uniform};
 
 use crate::node_data::{NodeData, NodeKind};
@@ -14,11 +19,7 @@ pub struct NetworkGraph {
 }
 
 impl NetworkGraph {
-    pub fn new(
-        input_number: usize,
-        output_number: usize,
-        innov_record: &mut InnovationRecord,
-    ) -> Self {
+    fn new_withtout_connections(input_number: usize, output_number: usize) -> Self {
         let mut graph = DiGraph::new();
 
         for i in 0..input_number {
@@ -31,12 +32,27 @@ impl NetworkGraph {
 
         graph.add_node(NodeData::new(NodeKind::Bias, input_number + output_number));
 
+        Self {
+            graph,
+            input_number,
+            output_number,
+            toposort_cache: None,
+        }
+    }
+
+    pub fn new(
+        input_number: usize,
+        output_number: usize,
+        innov_record: &mut InnovationRecord,
+    ) -> Self {
+        let mut network = NetworkGraph::new_withtout_connections(input_number, output_number);
+
         for i in 0..input_number {
             for j in 0..output_number {
                 let innov_number = innov_record.new_connection(i, input_number + j);
                 let edge_data = EdgeData::new(1.0, innov_number);
 
-                graph.add_edge(
+                network.graph.add_edge(
                     NodeIndex::new(i),
                     NodeIndex::new(input_number + j),
                     edge_data,
@@ -44,12 +60,7 @@ impl NetworkGraph {
             }
         }
 
-        return Self {
-            graph,
-            input_number,
-            output_number,
-            toposort_cache: None,
-        };
+        network
     }
 
     pub fn randomize_weights(&mut self, low: f64, high: f64) {
@@ -172,6 +183,84 @@ impl NetworkGraph {
 
     pub fn remove_connetion(&mut self, edge: EdgeIndex) {
         self.graph.remove_edge(edge);
+    }
+
+    fn endpoints(&self, edge: &Edge<EdgeData>) -> (Edge<EdgeData>, &NodeData, &NodeData) {
+        let source = &self.graph[edge.source()];
+        let target = &self.graph[edge.target()];
+        (edge.clone(), source, target)
+    }
+
+    pub fn crossover(
+        &self,
+        other: &NetworkGraph,
+        more_fit: bool,
+        innov_record: &mut InnovationRecord,
+    ) -> Option<NetworkGraph> {
+        if self.input_number != other.input_number || self.output_number != other.output_number {
+            return None;
+        }
+
+        let mut network =
+            NetworkGraph::new_withtout_connections(self.input_number, self.output_number);
+        let mut new_genes = Vec::new();
+
+        let my_edges = self.graph.raw_edges();
+        let mut other_edges: Vec<&Edge<EdgeData>> = other.graph.raw_edges().iter().collect();
+
+        for my_edge in my_edges {
+            dbg!(&new_genes);
+            let mut matched = None;
+
+            for (i, &other_edge) in other_edges.iter().enumerate() {
+                if other_edge.weight.innov_number() == my_edge.weight.innov_number() {
+                    let inherit_edge = my_edge; // 50 : 50 추가하기
+                    new_genes.push(self.endpoints(inherit_edge));
+
+                    matched = Some(i);
+                    break;
+                }
+            }
+
+            if let Some(i) = matched {
+                other_edges.remove(i);
+            } else if more_fit {
+                new_genes.push(self.endpoints(my_edge));
+            }
+        }
+
+        if !more_fit {
+            for edge in other_edges {
+                new_genes.push(other.endpoints(edge));
+            }
+        }
+
+        // Is used to prevent adding nodes with the same innovation number
+        let mut node_map: HashMap<usize, NodeIndex> = HashMap::new();
+        let mut get_index = |data: &NodeData, network: &mut Self| {
+            if data.kind() != NodeKind::Hidden {
+                return NodeIndex::new(data.id());
+            }
+
+            match node_map.get(&data.id()) {
+                None => {
+                    let index = network.graph.add_node(data.clone());
+                    node_map.insert(data.id(), index);
+                    index
+                }
+                Some(&i) => i,
+            }
+        };
+        for (gene, source, target) in new_genes {
+            let source_index = get_index(source, &mut network);
+            let target_index = get_index(target, &mut network);
+
+            network
+                .graph
+                .add_edge(source_index, target_index, gene.weight.clone());
+        }
+
+        Some(network)
     }
 }
 
@@ -349,5 +438,41 @@ mod tests {
             result,
             Some(vec![3.into(), 1.into(), 0.into(), 4.into(), 2.into()])
         );
+    }
+
+    #[test]
+    fn crossover_should_work() {
+        let input_number = 2;
+        let output_number = 1;
+        let mut innov_record = InnovationRecord::new(input_number, output_number);
+
+        let mut network1 = NetworkGraph::new(input_number, output_number, &mut innov_record);
+        let network2 = NetworkGraph::new(input_number, output_number, &mut innov_record);
+
+        network1.add_node(EdgeIndex::new(0), &mut innov_record);
+
+        if let Some(offspring) = network1.crossover(&network2, true, &mut innov_record) {
+            let mut graph = DiGraph::<NodeData, EdgeData>::new();
+            for (i, &kind) in [
+                NodeKind::Input,
+                NodeKind::Input,
+                NodeKind::Output,
+                NodeKind::Bias,
+                NodeKind::Hidden,
+            ]
+            .iter()
+            .enumerate()
+            {
+                graph.add_node(NodeData::new(kind, i));
+            }
+
+            for (i, &(a, b)) in [(0, 2), (1, 2), (0, 4), (4, 2)].iter().enumerate() {
+                graph.add_edge(a.into(), b.into(), EdgeData::new(0.0, i));
+            }
+
+            assert!(graph_eq(&offspring.graph, &graph));
+        } else {
+            panic!("crossover result is None");
+        }
     }
 }

@@ -28,6 +28,10 @@ impl NodeData {
         self.input_sum += input;
     }
 
+    pub fn clear_sum(&mut self) {
+        self.input_sum = 0.0;
+    }
+
     pub fn activate(&self) -> f64 {
         if self.kind == NodeKind::Input || self.kind == NodeKind::Bias {
             self.input_sum

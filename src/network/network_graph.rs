@@ -71,6 +71,12 @@ impl NetworkGraph {
         }
     }
 
+    pub fn clear_sum(&mut self) {
+        for node_data in self.graph.node_weights_mut() {
+            node_data.clear_sum();
+        }
+    }
+
     pub fn input_nodes_mut(&mut self) -> impl Iterator<Item = &mut NodeData> {
         self.graph.node_weights_mut().take(self.input_number)
     }
@@ -82,7 +88,8 @@ impl NetworkGraph {
     pub fn activate_output(&self) -> Vec<f64> {
         let mut result = Vec::new();
         for index in self.input_number..self.input_number + self.output_number {
-            result.push(self.graph[NodeIndex::new(index)].activate());
+            let node = &self.graph[NodeIndex::new(index)];
+            result.push(node.activate());
         }
 
         result

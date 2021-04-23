@@ -24,6 +24,8 @@ impl Network for Feedforward {
     }
 
     fn activate(&mut self, inputs: &Vec<f64>) -> Option<Vec<f64>> {
+        self.graph.clear_sum();
+
         let input_nodes: Vec<&mut NodeData> = self.graph.input_nodes_mut().collect();
         if input_nodes.len() != inputs.len() {
             return None;
@@ -106,7 +108,7 @@ impl Network for Feedforward {
 
 impl Feedforward {
     fn activate_node(&mut self, index: NodeIndex) {
-        let activation = self.graph.node(index).activate();
+        let activation = self.graph.node_mut(index).activate();
         let targets = self.graph.outgoing(index);
 
         for (edge_index, target_index) in targets {
@@ -154,6 +156,23 @@ mod tests {
         assert_eq!(
             network.activate(&vec![1.0, 2.0]),
             Some(vec![sigmoid(sigmoid(1.0) + 2.0)])
+        );
+    }
+
+    #[test]
+    fn activation_result_should_be_consistent() {
+        let input_number = 2;
+        let output_number = 1;
+        let mut innov_record = InnovationRecord::new(input_number, output_number);
+        let mut network = Feedforward::new(2, 1, &mut innov_record);
+
+        assert_eq!(
+            network.activate(&vec![1.0, 2.0]),
+            Some(vec![sigmoid(1.0 + 2.0)])
+        );
+        assert_eq!(
+            network.activate(&vec![1.0, 2.0]),
+            Some(vec![sigmoid(1.0 + 2.0)])
         );
     }
 

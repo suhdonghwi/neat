@@ -16,4 +16,8 @@ impl<T: Network> Pool<T> {
 
         Self { list, innov_record }
     }
+
+    pub fn networks(&mut self) -> impl Iterator<Item = &mut T> {
+        self.list.iter_mut()
+    }
 }

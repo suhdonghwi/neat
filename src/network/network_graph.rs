@@ -1,13 +1,10 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
-use petgraph::{algo::toposort, graph::Edge, visit::IntoNodeIdentifiers};
-use petgraph::{
-    graph::{DiGraph, EdgeIndex, NodeIndex},
-    Graph,
-};
+use petgraph::graph::{DiGraph, EdgeIndex, NodeIndex};
+use petgraph::{algo::toposort, graph::Edge};
 use rand::{
     distributions::{Bernoulli, Distribution, Uniform},
-    RngCore, SeedableRng,
+    RngCore,
 };
 
 use crate::node_data::{NodeData, NodeKind};
@@ -217,8 +214,7 @@ impl NetworkGraph {
 
             for (i, &other_edge) in other_edges.iter().enumerate() {
                 if other_edge.weight.innov_number() == my_edge.weight.innov_number() {
-                    let me = dist.sample(rng);
-                    if me {
+                    if dist.sample(rng) {
                         new_genes.push(self.endpoints(my_edge));
                     } else {
                         new_genes.push(other.endpoints(other_edge));
@@ -273,8 +269,6 @@ impl NetworkGraph {
 
 #[cfg(test)]
 mod tests {
-    use rand::{rngs::mock::StepRng, Rng};
-
     use super::*;
 
     fn graph_eq<N, E, Ty, Ix>(

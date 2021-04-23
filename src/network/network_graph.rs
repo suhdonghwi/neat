@@ -5,7 +5,10 @@ use petgraph::{
     graph::{DiGraph, EdgeIndex, NodeIndex},
     Graph,
 };
-use rand::distributions::{Distribution, Uniform};
+use rand::{
+    distributions::{Bernoulli, Distribution, Uniform},
+    RngCore, SeedableRng,
+};
 
 use crate::node_data::{NodeData, NodeKind};
 use crate::{edge_data::EdgeData, innovation_record::InnovationRecord};
@@ -195,7 +198,7 @@ impl NetworkGraph {
         &self,
         other: &NetworkGraph,
         more_fit: bool,
-        innov_record: &mut InnovationRecord,
+        rng: &mut impl RngCore,
     ) -> Option<NetworkGraph> {
         if self.input_number != other.input_number || self.output_number != other.output_number {
             return None;
@@ -208,14 +211,18 @@ impl NetworkGraph {
         let my_edges = self.graph.raw_edges();
         let mut other_edges: Vec<&Edge<EdgeData>> = other.graph.raw_edges().iter().collect();
 
+        let dist = Bernoulli::new(0.5).unwrap();
         for my_edge in my_edges {
-            dbg!(&new_genes);
             let mut matched = None;
 
             for (i, &other_edge) in other_edges.iter().enumerate() {
                 if other_edge.weight.innov_number() == my_edge.weight.innov_number() {
-                    let inherit_edge = my_edge; // 50 : 50 추가하기
-                    new_genes.push(self.endpoints(inherit_edge));
+                    let me = dist.sample(rng);
+                    if me {
+                        new_genes.push(self.endpoints(my_edge));
+                    } else {
+                        new_genes.push(other.endpoints(other_edge));
+                    }
 
                     matched = Some(i);
                     break;
@@ -239,7 +246,7 @@ impl NetworkGraph {
         let mut node_map: HashMap<usize, NodeIndex> = HashMap::new();
         let mut get_index = |data: &NodeData, network: &mut Self| {
             if data.kind() != NodeKind::Hidden {
-                return NodeIndex::new(data.id());
+                return NodeIndex::new(data.id()); // Index of default nodes is same as ID
             }
 
             match node_map.get(&data.id()) {
@@ -266,6 +273,8 @@ impl NetworkGraph {
 
 #[cfg(test)]
 mod tests {
+    use rand::{rngs::mock::StepRng, Rng};
+
     use super::*;
 
     fn graph_eq<N, E, Ty, Ix>(
@@ -441,17 +450,20 @@ mod tests {
     }
 
     #[test]
-    fn crossover_should_work() {
+    fn crossover_should_pass_only_from_more_fit_parent() {
         let input_number = 2;
         let output_number = 1;
         let mut innov_record = InnovationRecord::new(input_number, output_number);
 
         let mut network1 = NetworkGraph::new(input_number, output_number, &mut innov_record);
-        let network2 = NetworkGraph::new(input_number, output_number, &mut innov_record);
+        let mut network2 = NetworkGraph::new(input_number, output_number, &mut innov_record);
 
         network1.add_node(EdgeIndex::new(0), &mut innov_record);
+        network2.add_node(EdgeIndex::new(1), &mut innov_record);
 
-        if let Some(offspring) = network1.crossover(&network2, true, &mut innov_record) {
+        // Edge weight is same in network1, 2 - so constant seeding is not needed here.
+        let mut rng = rand::thread_rng();
+        if let Some(offspring) = network1.crossover(&network2, true, &mut rng) {
             let mut graph = DiGraph::<NodeData, EdgeData>::new();
             for (i, &kind) in [
                 NodeKind::Input,

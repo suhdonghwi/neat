@@ -12,6 +12,17 @@ pub struct Feedforward {
 }
 
 impl Network for Feedforward {
+    fn new(
+        input_number: usize,
+        output_number: usize,
+        innov_record: &mut InnovationRecord,
+    ) -> Feedforward {
+        Self {
+            graph: NetworkGraph::new(input_number, output_number, innov_record),
+            fitness: None,
+        }
+    }
+
     fn activate(&mut self, inputs: &Vec<f64>) -> Option<Vec<f64>> {
         let input_nodes: Vec<&mut NodeData> = self.graph.input_nodes_mut().collect();
         if input_nodes.len() != inputs.len() {
@@ -94,17 +105,6 @@ impl Network for Feedforward {
 }
 
 impl Feedforward {
-    pub fn new(
-        input_number: usize,
-        output_number: usize,
-        innov_record: &mut InnovationRecord,
-    ) -> Feedforward {
-        Self {
-            graph: NetworkGraph::new(input_number, output_number, innov_record),
-            fitness: None,
-        }
-    }
-
     fn activate_node(&mut self, index: NodeIndex) {
         let activation = self.graph.node(index).activate();
         let targets = self.graph.outgoing(index);

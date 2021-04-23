@@ -6,7 +6,7 @@ pub mod feedforward;
 mod network_graph;
 
 pub trait Network {
-    fn activate(&mut self, inputs: Vec<f64>) -> Option<Vec<f64>>;
+    fn activate(&mut self, inputs: &Vec<f64>) -> Option<Vec<f64>>;
 
     fn randomize_weights(&mut self, low: f64, high: f64);
 

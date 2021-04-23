@@ -6,20 +6,20 @@ use crate::{
     node_data::{NodeData, NodeKind},
 };
 
-struct Feedforward {
+pub struct Feedforward {
     graph: NetworkGraph,
     fitness: Option<f64>,
 }
 
 impl Network for Feedforward {
-    fn activate(&mut self, inputs: Vec<f64>) -> Option<Vec<f64>> {
+    fn activate(&mut self, inputs: &Vec<f64>) -> Option<Vec<f64>> {
         let input_nodes: Vec<&mut NodeData> = self.graph.input_nodes_mut().collect();
         if input_nodes.len() != inputs.len() {
             return None;
         }
 
         // Set input to input nodes
-        for (node_data, input) in input_nodes.into_iter().zip(inputs.into_iter()) {
+        for (node_data, &input) in input_nodes.into_iter().zip(inputs.into_iter()) {
             node_data.add_input(input);
         }
 
@@ -138,7 +138,7 @@ mod tests {
         let mut innov_record = InnovationRecord::new(input_number, output_number);
         let mut network = Feedforward::new(2, 1, &mut innov_record);
         assert_eq!(
-            network.activate(vec![1.0, 2.0]),
+            network.activate(&vec![1.0, 2.0]),
             Some(vec![sigmoid(1.0 + 2.0)])
         );
     }
@@ -152,7 +152,7 @@ mod tests {
         assert!(network.mutate_add_node(0.into(), &mut innov_record));
 
         assert_eq!(
-            network.activate(vec![1.0, 2.0]),
+            network.activate(&vec![1.0, 2.0]),
             Some(vec![sigmoid(sigmoid(1.0) + 2.0)])
         );
     }
@@ -166,7 +166,7 @@ mod tests {
         assert!(network.mutate_add_connection(3.into(), 2.into(), -3.0, &mut innov_record));
 
         assert_eq!(
-            network.activate(vec![1.0, 2.0]),
+            network.activate(&vec![1.0, 2.0]),
             Some(vec![sigmoid(1.0 + 2.0 - 3.0)])
         );
     }
@@ -181,7 +181,7 @@ mod tests {
         assert!(network.mutate_add_connection(1.into(), 4.into(), 2.0, &mut innov_record));
 
         assert_eq!(
-            network.activate(vec![1.0, 2.0]),
+            network.activate(&vec![1.0, 2.0]),
             Some(vec![sigmoid(sigmoid(5.0) + 2.0)])
         );
     }

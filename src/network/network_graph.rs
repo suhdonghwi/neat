@@ -238,7 +238,7 @@ impl NetworkGraph {
             }
         }
 
-        // Is used to prevent adding nodes with the same innovation number
+        // node_map is used to prevent adding nodes with the same innovation number
         let mut node_map: HashMap<usize, NodeIndex> = HashMap::new();
         let mut get_index = |data: &NodeData, network: &mut Self| {
             if data.kind() != NodeKind::Hidden {

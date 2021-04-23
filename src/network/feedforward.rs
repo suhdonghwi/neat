@@ -8,6 +8,7 @@ use crate::{
 
 struct Feedforward {
     graph: NetworkGraph,
+    fitness: Option<f64>,
 }
 
 impl Network for Feedforward {
@@ -82,16 +83,25 @@ impl Network for Feedforward {
         edge.set_weight(edge.get_weight() + delta);
         true
     }
+
+    fn evaluate(&mut self, fitness: f64) {
+        self.fitness = Some(fitness);
+    }
+
+    fn fitness(&self) -> Option<f64> {
+        self.fitness
+    }
 }
 
 impl Feedforward {
-    fn new(
+    pub fn new(
         input_number: usize,
         output_number: usize,
         innov_record: &mut InnovationRecord,
     ) -> Feedforward {
         Self {
             graph: NetworkGraph::new(input_number, output_number, innov_record),
+            fitness: None,
         }
     }
 

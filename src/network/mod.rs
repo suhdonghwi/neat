@@ -1,6 +1,6 @@
 use petgraph::graph::{EdgeIndex, NodeIndex};
 
-use crate::{edge_data::EdgeData, innovation_record::InnovationRecord};
+use crate::innovation_record::InnovationRecord;
 
 pub mod feedforward;
 mod network_graph;
@@ -20,4 +20,7 @@ pub trait Network {
     ) -> bool;
     fn mutate_assign_weight(&mut self, index: EdgeIndex, weight: f64) -> bool;
     fn mutate_perturb_weight(&mut self, index: EdgeIndex, delta: f64) -> bool;
+
+    fn evaluate(&mut self, fitness: f64);
+    fn fitness(&self) -> Option<f64>;
 }

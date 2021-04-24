@@ -1,4 +1,5 @@
 use petgraph::graph::{EdgeIndex, NodeIndex};
+use rand::{distributions::Distribution, distributions::Uniform, RngCore};
 
 use super::{network_graph::NetworkGraph, Network};
 use crate::{
@@ -67,7 +68,8 @@ impl Network for Feedforward {
     ) -> bool {
         let source_kind = self.graph.node(source).kind();
         let target_kind = self.graph.node(target).kind();
-        if source_kind == NodeKind::Output
+        if source == target
+            || source_kind == NodeKind::Output
             || target_kind == NodeKind::Input
             || target_kind == NodeKind::Bias
             || self.graph.has_connection(source, target)
@@ -112,6 +114,16 @@ impl Network for Feedforward {
         } else {
             None
         }
+    }
+
+    fn random_edge(&self, rng: &mut impl RngCore) -> EdgeIndex {
+        let uniform = Uniform::from(0..self.graph.edge_count());
+        EdgeIndex::new(uniform.sample(rng))
+    }
+
+    fn random_node(&self, rng: &mut impl RngCore) -> NodeIndex {
+        let uniform = Uniform::from(0..self.graph.node_count());
+        NodeIndex::new(uniform.sample(rng))
     }
 
     fn evaluate(&mut self, fitness: f64) {

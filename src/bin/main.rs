@@ -14,16 +14,19 @@ fn main() {
         (vec![1.0, 1.0], 0.0),
     ];
 
-    for network in pool.networks() {
-        let mut err = 0.0;
+    for i in 0..1000 {
+        for network in pool.networks() {
+            let mut err = 0.0;
 
-        for (inputs, expected) in &data {
-            let output = network.activate(inputs).unwrap()[0];
-            err += (output - expected).powf(2.0);
+            for (inputs, expected) in &data {
+                let output = network.activate(inputs).unwrap()[0];
+                err += (output - expected).powf(2.0);
+            }
+
+            network.evaluate(4.0 - err);
         }
 
-        network.evaluate(4.0 - err);
+        dbg!(i);
+        pool.evolve();
     }
-
-    pool.evolve();
 }

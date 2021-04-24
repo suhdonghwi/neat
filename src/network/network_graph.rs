@@ -85,6 +85,14 @@ impl NetworkGraph {
         &mut self.graph[NodeIndex::new(self.input_number + self.output_number)]
     }
 
+    pub fn edge_count(&self) -> usize {
+        self.graph.raw_edges().len()
+    }
+
+    pub fn node_count(&self) -> usize {
+        self.graph.raw_nodes().len()
+    }
+
     pub fn activate_output(&self) -> Vec<f64> {
         let mut result = Vec::new();
         for index in self.input_number..self.input_number + self.output_number {

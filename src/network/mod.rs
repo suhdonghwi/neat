@@ -1,4 +1,5 @@
 use petgraph::graph::{EdgeIndex, NodeIndex};
+use rand::RngCore;
 
 use crate::innovation_record::InnovationRecord;
 
@@ -21,6 +22,9 @@ pub trait Network {
     ) -> bool;
     fn mutate_assign_weight(&mut self, index: EdgeIndex, weight: f64) -> bool;
     fn mutate_perturb_weight(&mut self, index: EdgeIndex, delta: f64) -> bool;
+
+    fn random_edge(&self, rng: &mut impl RngCore) -> EdgeIndex;
+    fn random_node(&self, rng: &mut impl RngCore) -> NodeIndex;
 
     fn crossover(&self, other: &Self) -> Option<Self>
     where

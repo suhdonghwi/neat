@@ -22,6 +22,10 @@ pub trait Network {
     fn mutate_assign_weight(&mut self, index: EdgeIndex, weight: f64) -> bool;
     fn mutate_perturb_weight(&mut self, index: EdgeIndex, delta: f64) -> bool;
 
+    fn crossover(&self, other: &Self) -> Option<Self>
+    where
+        Self: Sized;
+
     fn evaluate(&mut self, fitness: f64);
     fn fitness(&self) -> Option<f64>;
 }

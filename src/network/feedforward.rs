@@ -98,6 +98,22 @@ impl Network for Feedforward {
         true
     }
 
+    fn crossover(&self, other: &Self) -> Option<Self> {
+        if let (Some(my_fitness), Some(other_fitness)) = (self.fitness(), other.fitness()) {
+            let rng = &mut rand::thread_rng();
+            let new_graph = self
+                .graph
+                .crossover(&other.graph, my_fitness >= other_fitness, rng)?;
+
+            Some(Self {
+                graph: new_graph,
+                fitness: None,
+            })
+        } else {
+            None
+        }
+    }
+
     fn evaluate(&mut self, fitness: f64) {
         self.fitness = Some(fitness);
     }

@@ -1,3 +1,5 @@
+use rand::distributions::{Distribution, WeightedIndex};
+
 use std::fmt::Debug;
 
 use crate::{innovation_record::InnovationRecord, network::Network};
@@ -25,15 +27,30 @@ impl<T: Network + Debug> Pool<T> {
         self.list.iter_mut()
     }
 
-    pub fn evolve(&mut self) -> Option<Pool<T>> {
+    pub fn evolve(&mut self) -> bool {
         if self.list.iter().any(|n| n.fitness().is_none()) {
-            return None;
+            return false;
         }
 
         self.list
             .sort_by(|a, b| b.fitness().partial_cmp(&a.fitness()).unwrap());
 
-        dbg!(&self.list);
-        None
+        let rng = &mut rand::thread_rng();
+        let dist = WeightedIndex::new(self.list.iter().map(|x| x.fitness().unwrap())).unwrap();
+        let mut new_list = Vec::new();
+
+        for _ in 0..self.list.len() {
+            let parent1 = &self.list[dist.sample(rng)];
+            let parent2 = &self.list[dist.sample(rng)];
+
+            if let Some(offspring) = parent1.crossover(parent2) {
+                new_list.push(offspring);
+            } else {
+                return false;
+            }
+        }
+
+        self.list = new_list;
+        true
     }
 }

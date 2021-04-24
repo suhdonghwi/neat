@@ -6,6 +6,7 @@ use crate::{
     node_data::{NodeData, NodeKind},
 };
 
+#[derive(Debug)]
 pub struct Feedforward {
     graph: NetworkGraph,
     fitness: Option<f64>,

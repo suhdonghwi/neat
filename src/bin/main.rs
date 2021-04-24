@@ -24,4 +24,6 @@ fn main() {
 
         network.evaluate(4.0 - err);
     }
+
+    pool.evolve();
 }

@@ -83,8 +83,8 @@ impl<T: Network + Debug> Pool<T> {
         let mut new_list = Vec::new();
 
         for _ in 0..self.list.len() {
-            let parent1 = &self.list[0];
-            let parent2 = &self.list[1];
+            let parent1 = &self.list[uniform.sample(rng)];
+            let parent2 = &self.list[uniform.sample(rng)];
 
             if let Some(mut offspring) = parent1.crossover(parent2) {
                 self.mutate(&mut offspring, rng);

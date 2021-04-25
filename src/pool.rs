@@ -3,9 +3,12 @@ use rand::{
     RngCore,
 };
 
+use crate::{innovation_record::InnovationRecord, network::Network};
 use std::fmt::Debug;
 
-use crate::{innovation_record::InnovationRecord, network::Network};
+fn random(rng: &mut impl RngCore) -> f64 {
+    Open01.sample(rng)
+}
 
 pub struct Pool<T: Network + Debug> {
     list: Vec<T>,
@@ -36,19 +39,20 @@ impl<T: Network + Debug> Pool<T> {
         let add_connection = 0.5;
         let add_node = 0.2;
 
-        let rand: f64 = Open01.sample(rng);
         let delta_uniform = Uniform::new(-1.0, 1.0);
         let assign_uniform = Uniform::new(-30.0, 30.0);
 
-        if rand < weight_perbutation {
+        if random(rng) < weight_perbutation {
             network
                 .mutate_perturb_weight(network.graph().random_edge(rng), delta_uniform.sample(rng));
         }
-        if rand < weight_assign {
+
+        if random(rng) < weight_assign {
             network
                 .mutate_assign_weight(network.graph().random_edge(rng), delta_uniform.sample(rng));
         }
-        if rand < add_connection {
+
+        if random(rng) < add_connection {
             let source = network.graph().random_node(rng);
             let target = network.graph().random_node(rng);
 
@@ -59,7 +63,8 @@ impl<T: Network + Debug> Pool<T> {
                 &mut self.innov_record,
             );
         }
-        if rand < add_node {
+
+        if random(rng) < add_node {
             network.mutate_add_node(network.graph().random_edge(rng), &mut self.innov_record);
         }
     }
@@ -74,12 +79,12 @@ impl<T: Network + Debug> Pool<T> {
         dbg!(self.list[0].fitness().unwrap());
 
         let rng = &mut rand::thread_rng();
-        let uniform = Uniform::new(0, 30);
+        let uniform = Uniform::new(0, 5);
         let mut new_list = Vec::new();
 
         for _ in 0..self.list.len() {
-            let parent1 = &self.list[uniform.sample(rng)];
-            let parent2 = &self.list[uniform.sample(rng)];
+            let parent1 = &self.list[0];
+            let parent2 = &self.list[1];
 
             if let Some(mut offspring) = parent1.crossover(parent2) {
                 self.mutate(&mut offspring, rng);

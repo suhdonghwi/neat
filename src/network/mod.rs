@@ -44,16 +44,13 @@ pub trait Network {
     where
         Self: Sized,
     {
-        if let (Some(my_fitness), Some(other_fitness)) = (self.fitness(), other.fitness()) {
-            let rng = &mut rand::thread_rng();
-            let new_graph =
-                self.graph()
-                    .crossover(&other.graph(), my_fitness >= other_fitness, rng)?;
+        let (my_fitness, other_fitness) = (self.fitness()?, other.fitness()?);
+        let rng = &mut rand::thread_rng();
+        let new_graph = self
+            .graph()
+            .crossover(&other.graph(), my_fitness >= other_fitness, rng)?;
 
-            Some(Self::from_graph(new_graph))
-        } else {
-            None
-        }
+        Some(Self::from_graph(new_graph))
     }
 
     fn evaluate(&mut self, fitness: f64);

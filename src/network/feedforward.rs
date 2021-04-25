@@ -1,4 +1,4 @@
-use petgraph::graph::{EdgeIndex, NodeIndex};
+use petgraph::graph::NodeIndex;
 
 use super::{network_graph::NetworkGraph, Network};
 use crate::{

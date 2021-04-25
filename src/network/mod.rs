@@ -1,7 +1,7 @@
 use petgraph::graph::{EdgeIndex, NodeIndex};
 use rand::RngCore;
 
-use crate::innovation_record::InnovationRecord;
+use crate::{innovation_record::InnovationRecord, node_data::NodeData};
 
 pub mod feedforward;
 mod network_graph;

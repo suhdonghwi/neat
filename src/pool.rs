@@ -1,5 +1,5 @@
 use rand::{
-    distributions::{Distribution, Open01, Uniform, WeightedIndex},
+    distributions::{Distribution, Open01, Uniform},
     RngCore,
 };
 
@@ -19,7 +19,7 @@ impl<T: Network + Debug> Pool<T> {
 
         for _ in 0..population {
             let mut network = T::new(input_number, output_number, &mut innov_record);
-            network.randomize_weights(-1.0, 1.0);
+            network.randomize_weights(-30.0, 30.0);
             list.push(network);
         }
 
@@ -31,31 +31,29 @@ impl<T: Network + Debug> Pool<T> {
     }
 
     fn mutate(&mut self, network: &mut T, rng: &mut impl RngCore) {
-        let weight_perbutation = 0.6;
+        let weight_perbutation = 0.8;
         let weight_assign = 0.1;
-        let add_connection = 0.2;
+        let add_connection = 0.5;
         let add_node = 0.2;
 
         let rand: f64 = Open01.sample(rng);
-        let weight_uniform = Uniform::new(-1.0, 1.0);
+        let delta_uniform = Uniform::new(-1.0, 1.0);
+        let assign_uniform = Uniform::new(-30.0, 30.0);
 
         if rand < weight_perbutation {
-            network.mutate_perturb_weight(network.random_edge(rng), weight_uniform.sample(rng));
+            network.mutate_perturb_weight(network.random_edge(rng), delta_uniform.sample(rng));
         }
         if rand < weight_assign {
-            network.mutate_assign_weight(network.random_edge(rng), weight_uniform.sample(rng));
+            network.mutate_assign_weight(network.random_edge(rng), delta_uniform.sample(rng));
         }
         if rand < add_connection {
             let source = network.random_node(rng);
-            let mut target = network.random_node(rng);
-            while target == source {
-                target = network.random_node(rng);
-            }
+            let target = network.random_node(rng);
 
             network.mutate_add_connection(
                 source,
                 target,
-                weight_uniform.sample(rng),
+                assign_uniform.sample(rng),
                 &mut self.innov_record,
             );
         }
@@ -71,10 +69,10 @@ impl<T: Network + Debug> Pool<T> {
 
         self.list
             .sort_by(|a, b| b.fitness().partial_cmp(&a.fitness()).unwrap());
-        dbg!(self.list[0].fitness());
+        dbg!(self.list[0].fitness().unwrap());
 
         let rng = &mut rand::thread_rng();
-        let uniform = Uniform::new(0, 10);
+        let uniform = Uniform::new(0, 30);
         let mut new_list = Vec::new();
 
         for _ in 0..self.list.len() {

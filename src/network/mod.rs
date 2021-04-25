@@ -8,6 +8,8 @@ mod network_graph;
 
 pub trait Network {
     fn new(input_number: usize, output_number: usize, innov_record: &mut InnovationRecord) -> Self;
+    fn from_graph(graph: NetworkGraph) -> Self;
+
     fn activate(&mut self, inputs: &Vec<f64>) -> Option<Vec<f64>>;
 
     fn graph(&self) -> &NetworkGraph;
@@ -40,7 +42,19 @@ pub trait Network {
 
     fn crossover(&self, other: &Self) -> Option<Self>
     where
-        Self: Sized;
+        Self: Sized,
+    {
+        if let (Some(my_fitness), Some(other_fitness)) = (self.fitness(), other.fitness()) {
+            let rng = &mut rand::thread_rng();
+            let new_graph =
+                self.graph()
+                    .crossover(&other.graph(), my_fitness >= other_fitness, rng)?;
+
+            Some(Self::from_graph(new_graph))
+        } else {
+            None
+        }
+    }
 
     fn evaluate(&mut self, fitness: f64);
     fn fitness(&self) -> Option<f64>;

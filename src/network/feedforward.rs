@@ -13,13 +13,16 @@ pub struct Feedforward {
 }
 
 impl Network for Feedforward {
-    fn new(
-        input_number: usize,
-        output_number: usize,
-        innov_record: &mut InnovationRecord,
-    ) -> Feedforward {
+    fn new(input_number: usize, output_number: usize, innov_record: &mut InnovationRecord) -> Self {
         Self {
             graph: NetworkGraph::new(input_number, output_number, innov_record),
+            fitness: None,
+        }
+    }
+
+    fn from_graph(graph: NetworkGraph) -> Self {
+        Self {
+            graph,
             fitness: None,
         }
     }
@@ -84,22 +87,6 @@ impl Network for Feedforward {
         }
 
         true
-    }
-
-    fn crossover(&self, other: &Self) -> Option<Self> {
-        if let (Some(my_fitness), Some(other_fitness)) = (self.fitness(), other.fitness()) {
-            let rng = &mut rand::thread_rng();
-            let new_graph = self
-                .graph
-                .crossover(&other.graph, my_fitness >= other_fitness, rng)?;
-
-            Some(Self {
-                graph: new_graph,
-                fitness: None,
-            })
-        } else {
-            None
-        }
     }
 
     fn evaluate(&mut self, fitness: f64) {

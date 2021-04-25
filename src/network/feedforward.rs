@@ -57,11 +57,6 @@ impl Network for Feedforward {
         &mut self.graph
     }
 
-    fn mutate_add_node(&mut self, index: EdgeIndex, innov_record: &mut InnovationRecord) -> bool {
-        self.graph.add_node(index, innov_record);
-        true
-    }
-
     fn mutate_add_connection(
         &mut self,
         source: NodeIndex,
@@ -106,17 +101,6 @@ impl Network for Feedforward {
             None
         }
     }
-
-    /*
-    fn random_edge(&self, rng: &mut impl RngCore) -> EdgeIndex {
-        let uniform = Uniform::from(0..self.graph.edge_count());
-        EdgeIndex::new(uniform.sample(rng))
-    }
-
-    fn random_node(&self, rng: &mut impl RngCore) -> NodeIndex {
-        let uniform = Uniform::from(0..self.graph.node_count());
-        NodeIndex::new(uniform.sample(rng))
-    }*/
 
     fn evaluate(&mut self, fitness: f64) {
         self.fitness = Some(fitness);

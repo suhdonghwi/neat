@@ -13,7 +13,6 @@ pub trait Network {
     fn graph(&self) -> &NetworkGraph;
     fn graph_mut(&mut self) -> &mut NetworkGraph;
 
-    fn mutate_add_node(&mut self, index: EdgeIndex, innov_record: &mut InnovationRecord) -> bool;
     fn mutate_add_connection(
         &mut self,
         source: NodeIndex,
@@ -21,6 +20,11 @@ pub trait Network {
         weight: f64,
         innov_record: &mut InnovationRecord,
     ) -> bool;
+
+    fn mutate_add_node(&mut self, index: EdgeIndex, innov_record: &mut InnovationRecord) -> bool {
+        self.graph_mut().add_node(index, innov_record);
+        true
+    }
 
     fn mutate_assign_weight(&mut self, index: EdgeIndex, weight: f64) -> bool {
         let edge = self.graph_mut().edge_mut(index);

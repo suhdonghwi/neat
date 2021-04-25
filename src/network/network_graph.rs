@@ -85,14 +85,6 @@ impl NetworkGraph {
         &mut self.graph[NodeIndex::new(self.input_number + self.output_number)]
     }
 
-    pub fn edge_count(&self) -> usize {
-        self.graph.raw_edges().len()
-    }
-
-    pub fn node_count(&self) -> usize {
-        self.graph.raw_nodes().len()
-    }
-
     pub fn activate_output(&self) -> Vec<f64> {
         let mut result = Vec::new();
         for index in self.input_number..self.input_number + self.output_number {
@@ -128,6 +120,16 @@ impl NetworkGraph {
         }
 
         result
+    }
+
+    pub fn random_edge(&self, rng: &mut impl RngCore) -> EdgeIndex {
+        let uniform = Uniform::from(0..self.graph.edge_count());
+        EdgeIndex::new(uniform.sample(rng))
+    }
+
+    pub fn random_node(&self, rng: &mut impl RngCore) -> NodeIndex {
+        let uniform = Uniform::from(0..self.graph.node_count());
+        NodeIndex::new(uniform.sample(rng))
     }
 
     pub fn toposort(&mut self) -> Option<Vec<NodeIndex>> {

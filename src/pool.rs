@@ -19,7 +19,7 @@ impl<T: Network + Debug> Pool<T> {
 
         for _ in 0..population {
             let mut network = T::new(input_number, output_number, &mut innov_record);
-            network.randomize_weights(-30.0, 30.0);
+            network.graph_mut().randomize_weights(-30.0, 30.0);
             list.push(network);
         }
 
@@ -41,14 +41,16 @@ impl<T: Network + Debug> Pool<T> {
         let assign_uniform = Uniform::new(-30.0, 30.0);
 
         if rand < weight_perbutation {
-            network.mutate_perturb_weight(network.random_edge(rng), delta_uniform.sample(rng));
+            network
+                .mutate_perturb_weight(network.graph().random_edge(rng), delta_uniform.sample(rng));
         }
         if rand < weight_assign {
-            network.mutate_assign_weight(network.random_edge(rng), delta_uniform.sample(rng));
+            network
+                .mutate_assign_weight(network.graph().random_edge(rng), delta_uniform.sample(rng));
         }
         if rand < add_connection {
-            let source = network.random_node(rng);
-            let target = network.random_node(rng);
+            let source = network.graph().random_node(rng);
+            let target = network.graph().random_node(rng);
 
             network.mutate_add_connection(
                 source,
@@ -58,7 +60,7 @@ impl<T: Network + Debug> Pool<T> {
             );
         }
         if rand < add_node {
-            network.mutate_add_node(network.random_edge(rng), &mut self.innov_record);
+            network.mutate_add_node(network.graph().random_edge(rng), &mut self.innov_record);
         }
     }
 

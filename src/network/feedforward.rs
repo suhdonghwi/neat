@@ -1,5 +1,4 @@
 use petgraph::graph::{EdgeIndex, NodeIndex};
-use rand::{distributions::Distribution, distributions::Uniform, RngCore};
 
 use super::{network_graph::NetworkGraph, Network};
 use crate::{
@@ -50,8 +49,12 @@ impl Network for Feedforward {
         Some(self.graph.activate_output())
     }
 
-    fn randomize_weights(&mut self, low: f64, high: f64) {
-        self.graph.randomize_weights(low, high);
+    fn graph(&self) -> &NetworkGraph {
+        &self.graph
+    }
+
+    fn graph_mut(&mut self) -> &mut NetworkGraph {
+        &mut self.graph
     }
 
     fn mutate_add_node(&mut self, index: EdgeIndex, innov_record: &mut InnovationRecord) -> bool {
@@ -88,18 +91,6 @@ impl Network for Feedforward {
         true
     }
 
-    fn mutate_assign_weight(&mut self, index: EdgeIndex, weight: f64) -> bool {
-        let edge = self.graph.edge_mut(index);
-        edge.set_weight(weight);
-        true
-    }
-
-    fn mutate_perturb_weight(&mut self, index: EdgeIndex, delta: f64) -> bool {
-        let edge = self.graph.edge_mut(index);
-        edge.set_weight(edge.get_weight() + delta);
-        true
-    }
-
     fn crossover(&self, other: &Self) -> Option<Self> {
         if let (Some(my_fitness), Some(other_fitness)) = (self.fitness(), other.fitness()) {
             let rng = &mut rand::thread_rng();
@@ -116,6 +107,7 @@ impl Network for Feedforward {
         }
     }
 
+    /*
     fn random_edge(&self, rng: &mut impl RngCore) -> EdgeIndex {
         let uniform = Uniform::from(0..self.graph.edge_count());
         EdgeIndex::new(uniform.sample(rng))
@@ -124,7 +116,7 @@ impl Network for Feedforward {
     fn random_node(&self, rng: &mut impl RngCore) -> NodeIndex {
         let uniform = Uniform::from(0..self.graph.node_count());
         NodeIndex::new(uniform.sample(rng))
-    }
+    }*/
 
     fn evaluate(&mut self, fitness: f64) {
         self.fitness = Some(fitness);

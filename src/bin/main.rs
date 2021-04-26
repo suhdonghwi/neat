@@ -2,7 +2,7 @@ use neatlib::network::Network;
 use neatlib::{network::feedforward::Feedforward, pool::Pool};
 
 // TODO LISTEN
-// 1. NodeData에 input sum 저장해서 activate 하는거 변경하기 (node data는 stateless한게 좋은 것 같다)
+// [cancel] 1. NodeData에 input sum 저장해서 activate 하는거 변경하기 (node data는 stateless한게 좋은 것 같다)
 // 2. 메소드 하나씩 보면서 리팩토링 하기
 // 3. 모든 메소드에 테스트 케이스 추가하기 (coverage 100%!)
 

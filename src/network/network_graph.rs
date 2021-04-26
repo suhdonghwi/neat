@@ -19,7 +19,7 @@ pub struct NetworkGraph {
 }
 
 impl NetworkGraph {
-    fn new_withtout_connections(input_number: usize, output_number: usize) -> Self {
+    fn new_disconnected(input_number: usize, output_number: usize) -> Self {
         let mut graph = DiGraph::new();
 
         for i in 0..input_number {
@@ -45,7 +45,7 @@ impl NetworkGraph {
         output_number: usize,
         innov_record: &mut InnovationRecord,
     ) -> Self {
-        let mut network = NetworkGraph::new_withtout_connections(input_number, output_number);
+        let mut network = NetworkGraph::new_disconnected(input_number, output_number);
 
         for i in 0..input_number {
             for j in 0..output_number {
@@ -218,8 +218,7 @@ impl NetworkGraph {
             return None;
         }
 
-        let mut network =
-            NetworkGraph::new_withtout_connections(self.input_number, self.output_number);
+        let mut network = NetworkGraph::new_disconnected(self.input_number, self.output_number);
         let mut new_genes = Vec::new();
 
         let my_edges = self.graph.raw_edges();

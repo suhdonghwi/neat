@@ -28,8 +28,6 @@ impl Network for Feedforward {
     }
 
     fn activate(&mut self, inputs: &Vec<f64>) -> Option<Vec<f64>> {
-        self.graph.clear_sum();
-
         let input_nodes: Vec<&mut NodeData> = self.graph.input_nodes_mut().collect();
         if input_nodes.len() != inputs.len() {
             return None;
@@ -49,7 +47,10 @@ impl Network for Feedforward {
             self.activate_node(index);
         }
 
-        Some(self.graph.activate_output())
+        let result = Some(self.graph.activate_output());
+        self.graph.clear_sum();
+
+        result
     }
 
     fn graph(&self) -> &NetworkGraph {

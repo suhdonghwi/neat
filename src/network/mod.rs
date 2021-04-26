@@ -1,7 +1,7 @@
 use petgraph::graph::{EdgeIndex, NodeIndex};
 
 use self::network_graph::NetworkGraph;
-use crate::innovation_record::InnovationRecord;
+use crate::{innovation_record::InnovationRecord, node_data::NodeKind};
 
 pub mod feedforward;
 mod network_graph;
@@ -22,10 +22,23 @@ pub trait Network {
         weight: f64,
         innov_record: &mut InnovationRecord,
     ) -> bool;
+    fn mutate_remove_connection(&mut self, index: EdgeIndex) -> bool {
+        self.graph_mut().remove_connetion(index);
+        true
+    }
 
     fn mutate_add_node(&mut self, index: EdgeIndex, innov_record: &mut InnovationRecord) -> bool {
         self.graph_mut().add_node(index, innov_record);
         true
+    }
+    fn mutate_remove_node(&mut self, index: NodeIndex) -> bool {
+        let node = self.graph().node(index);
+        if node.kind() == NodeKind::Hidden {
+            self.graph_mut().remove_node(index);
+            true
+        } else {
+            false
+        }
     }
 
     fn mutate_assign_weight(&mut self, index: EdgeIndex, weight: f64) -> bool {

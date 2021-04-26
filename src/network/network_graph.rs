@@ -10,7 +10,7 @@ use rand::{
 use crate::node_data::{NodeData, NodeKind};
 use crate::{edge_data::EdgeData, innovation_record::InnovationRecord};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NetworkGraph {
     graph: DiGraph<NodeData, EdgeData>,
     input_number: usize,
@@ -122,9 +122,13 @@ impl NetworkGraph {
         result
     }
 
-    pub fn random_edge(&self, rng: &mut impl RngCore) -> EdgeIndex {
-        let uniform = Uniform::from(0..self.graph.edge_count());
-        EdgeIndex::new(uniform.sample(rng))
+    pub fn random_edge(&self, rng: &mut impl RngCore) -> Option<EdgeIndex> {
+        if self.graph.edge_count() == 0 {
+            None
+        } else {
+            let uniform = Uniform::from(0..self.graph.edge_count());
+            Some(EdgeIndex::new(uniform.sample(rng)))
+        }
     }
 
     pub fn random_node(&self, rng: &mut impl RngCore) -> NodeIndex {
@@ -182,6 +186,10 @@ impl NetworkGraph {
         );
 
         new_node_index
+    }
+
+    pub fn remove_node(&mut self, node: NodeIndex) {
+        self.graph.remove_node(node);
     }
 
     pub fn add_connection(

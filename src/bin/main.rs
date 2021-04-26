@@ -10,7 +10,7 @@ fn main() {
     let input_number = 2;
     let output_number = 1;
 
-    let mut pool = Pool::<Feedforward>::new(input_number, output_number, 200);
+    let mut pool = Pool::<Feedforward>::new(input_number, output_number, 150);
 
     let data = vec![
         (vec![0.0, 0.0], 0.0),
@@ -19,7 +19,7 @@ fn main() {
         (vec![1.0, 1.0], 0.0),
     ];
 
-    for i in 0..1000 {
+    for i in 0..300 {
         for network in pool.networks() {
             let mut err = 0.0;
 

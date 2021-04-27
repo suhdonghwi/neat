@@ -37,7 +37,7 @@ impl<T: Network + Debug + Clone> Pool<T> {
         let weight_perbutation = 0.8;
         let weight_assign = 0.1;
         let add_connection = 0.5;
-        let remove_connection = 0.1;
+        let remove_connection = 0.5;
         let add_node = 0.2;
         let remove_node = 0.2;
 

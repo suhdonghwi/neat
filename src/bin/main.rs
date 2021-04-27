@@ -19,7 +19,7 @@ fn main() {
         (vec![1.0, 1.0], 0.0),
     ];
 
-    for i in 0..300 {
+    for i in 0..100 {
         for network in pool.networks() {
             let mut err = 0.0;
 

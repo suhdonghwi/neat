@@ -200,7 +200,7 @@ impl NetworkGraph {
         innov_record: &mut InnovationRecord,
     ) -> EdgeIndex {
         let source_id = self.graph[source].id();
-        let target_id = self.graph[source].id();
+        let target_id = self.graph[target].id();
         let innov_number = innov_record.new_connection(source_id, target_id);
         let edge_data = EdgeData::new(weight, innov_number);
         self.graph.add_edge(source, target, edge_data)

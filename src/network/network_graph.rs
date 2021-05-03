@@ -159,7 +159,7 @@ impl NetworkGraph {
 
         {
             let edge_data = self.graph.edge_weight_mut(edge).unwrap();
-            edge_data.disable();
+            edge_data.set_disabled(true);
             previous_weight = edge_data.get_weight();
 
             new_node_id = innov_record.new_node();

@@ -22,8 +22,15 @@ pub trait Network {
         weight: f64,
         innov_record: &mut InnovationRecord,
     ) -> bool;
+
     fn mutate_remove_connection(&mut self, index: EdgeIndex) -> bool {
         self.graph_mut().remove_connetion(index);
+        true
+    }
+
+    fn mutate_toggle_connection(&mut self, index: EdgeIndex) -> bool {
+        let edge = self.graph_mut().edge_mut(index);
+        edge.set_disabled(!edge.is_disabled());
         true
     }
 

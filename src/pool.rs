@@ -38,6 +38,7 @@ impl<T: Network + Debug + Clone> Pool<T> {
         let weight_assign = 0.1;
         let add_connection = 0.5;
         let remove_connection = 0.5;
+        let toggle_connection = 0.0;
         let add_node = 0.2;
         let remove_node = 0.2;
 
@@ -74,6 +75,12 @@ impl<T: Network + Debug + Clone> Pool<T> {
             }
         }
 
+        if random(rng) < toggle_connection {
+            if let Some(to_toggle) = network.graph().random_edge(rng) {
+                network.mutate_toggle_connection(to_toggle);
+            }
+        }
+
         if random(rng) < add_node {
             if let Some(to_add) = network.graph().random_edge(rng) {
                 network.mutate_add_node(to_add, &mut self.innov_record);
@@ -100,12 +107,18 @@ impl<T: Network + Debug + Clone> Pool<T> {
         self.sort_by_fitness();
 
         let rng = &mut rand::thread_rng();
-        let uniform = Uniform::new(0, 5);
+        let uniform = Uniform::new(0, 15);
         let mut new_list = Vec::new();
 
-        for _ in 0..self.list.len() {
-            let parent1 = &self.list[uniform.sample(rng)];
-            let parent2 = &self.list[uniform.sample(rng)];
+        for _ in 0..self.list.len() - 2 {
+            let index1 = uniform.sample(rng);
+            let mut index2 = uniform.sample(rng);
+            while index1 == index2 {
+                index2 = uniform.sample(rng);
+            }
+
+            let parent1 = &self.list[index1];
+            let parent2 = &self.list[index2];
 
             if let Some(mut offspring) = parent1.crossover(parent2) {
                 self.mutate(&mut offspring, rng);
@@ -114,6 +127,9 @@ impl<T: Network + Debug + Clone> Pool<T> {
                 return false;
             }
         }
+
+        new_list.push(self.list[0].clone());
+        new_list.push(self.list[1].clone());
 
         self.list = new_list;
         true

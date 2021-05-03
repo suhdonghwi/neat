@@ -14,8 +14,8 @@ impl EdgeData {
         }
     }
 
-    pub fn disable(&mut self) {
-        self.disabled = true;
+    pub fn set_disabled(&mut self, value: bool) {
+        self.disabled = value;
     }
 
     pub fn is_disabled(&self) -> bool {

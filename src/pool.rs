@@ -37,10 +37,10 @@ impl<T: Network + Debug + Clone> Pool<T> {
         let weight_perbutation = 0.8;
         let weight_assign = 0.1;
         let add_connection = 0.5;
-        let remove_connection = 0.5;
+        let remove_connection = 0.1;
         let toggle_connection = 0.0;
-        let add_node = 0.2;
-        let remove_node = 0.2;
+        let add_node = 0.5;
+        let remove_node = 0.1;
 
         let delta_uniform = Uniform::new(-1.0, 1.0);
         let assign_uniform = Uniform::new(-30.0, 30.0);
@@ -55,6 +55,17 @@ impl<T: Network + Debug + Clone> Pool<T> {
             if let Some(to_mutate) = network.graph().random_edge(rng) {
                 network.mutate_assign_weight(to_mutate, assign_uniform.sample(rng));
             }
+        }
+
+        if random(rng) < add_node {
+            if let Some(to_add) = network.graph().random_edge(rng) {
+                network.mutate_add_node(to_add, &mut self.innov_record);
+            }
+        }
+
+        if random(rng) < remove_node {
+            let to_remove = network.graph().random_node(rng);
+            network.mutate_remove_node(to_remove);
         }
 
         if random(rng) < add_connection {
@@ -80,23 +91,12 @@ impl<T: Network + Debug + Clone> Pool<T> {
                 network.mutate_toggle_connection(to_toggle);
             }
         }
-
-        if random(rng) < add_node {
-            if let Some(to_add) = network.graph().random_edge(rng) {
-                network.mutate_add_node(to_add, &mut self.innov_record);
-            }
-        }
-
-        if random(rng) < remove_node {
-            let to_remove = network.graph().random_node(rng);
-            network.mutate_remove_node(to_remove);
-        }
     }
 
     fn sort_by_fitness(&mut self) {
         self.list
             .sort_by(|a, b| b.fitness().partial_cmp(&a.fitness()).unwrap());
-        dbg!(&self.list[0]);
+        dbg!(self.list[0].fitness().unwrap());
     }
 
     pub fn evolve(&mut self) -> bool {
@@ -110,7 +110,7 @@ impl<T: Network + Debug + Clone> Pool<T> {
         let uniform = Uniform::new(0, 15);
         let mut new_list = Vec::new();
 
-        for _ in 0..self.list.len() - 2 {
+        for _ in 0..self.list.len() {
             let index1 = uniform.sample(rng);
             let mut index2 = uniform.sample(rng);
             while index1 == index2 {
@@ -127,9 +127,6 @@ impl<T: Network + Debug + Clone> Pool<T> {
                 return false;
             }
         }
-
-        new_list.push(self.list[0].clone());
-        new_list.push(self.list[1].clone());
 
         self.list = new_list;
         true

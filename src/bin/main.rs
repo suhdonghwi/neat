@@ -19,7 +19,7 @@ fn main() {
         (vec![1.0, 1.0], 0.0),
     ];
 
-    for i in 0..100 {
+    for i in 0..300 {
         for network in pool.networks() {
             let mut err = 0.0;
 
@@ -29,9 +29,13 @@ fn main() {
             }
 
             network.evaluate(4.0 - err);
+
+            if network.fitness().unwrap() >= 3.9 {
+                return;
+            }
         }
 
-        dbg!(i);
+        //dbg!(i);
         pool.evolve();
     }
 }

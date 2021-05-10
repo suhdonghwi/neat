@@ -131,4 +131,12 @@ impl<T: Network + Debug + Clone> Pool<T> {
         self.list = new_list;
         true
     }
+
+    pub fn evolve<F: Fn(&mut Vec<T>) -> ()>(&mut self, generation: usize, evaluate: F) {
+        for current_generation in 0..generation {
+            evaluate(&mut self.list);
+
+            self.reproduce();
+        }
+    }
 }

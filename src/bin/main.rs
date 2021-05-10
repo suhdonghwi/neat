@@ -19,8 +19,8 @@ fn main() {
         (vec![1.0, 1.0], 0.0),
     ];
 
-    for i in 0..300 {
-        for network in pool.networks() {
+    pool.evolve(300, |networks| {
+        for network in networks {
             let mut err = 0.0;
 
             for (inputs, expected) in &data {
@@ -34,7 +34,5 @@ fn main() {
                 return;
             }
         }
-
-        pool.reproduce();
-    }
+    });
 }

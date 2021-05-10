@@ -99,7 +99,7 @@ impl<T: Network + Debug + Clone> Pool<T> {
         dbg!(self.list[0].fitness().unwrap());
     }
 
-    pub fn evolve(&mut self) -> bool {
+    pub fn reproduce(&mut self) -> bool {
         if self.list.iter().any(|n| n.fitness().is_none()) {
             return false;
         }

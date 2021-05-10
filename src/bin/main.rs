@@ -35,7 +35,6 @@ fn main() {
             }
         }
 
-        //dbg!(i);
-        pool.evolve();
+        pool.reproduce();
     }
 }

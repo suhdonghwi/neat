@@ -7,9 +7,10 @@ use neatlib::{network::feedforward::Feedforward, pool::Pool};
 // 3. 모든 메소드에 테스트 케이스 추가하기 (coverage 100%!)
 
 fn main() {
+    env_logger::init();
+
     let input_number = 2;
     let output_number = 1;
-
     let mut pool = Pool::<Feedforward>::new(input_number, output_number, 150);
 
     let data = vec![
@@ -19,7 +20,7 @@ fn main() {
         (vec![1.0, 1.0], 0.0),
     ];
 
-    pool.evolve(300, |networks| {
+    pool.evolve(300, 3.9, |networks| {
         for network in networks {
             let mut err = 0.0;
 
@@ -29,10 +30,6 @@ fn main() {
             }
 
             network.evaluate(4.0 - err);
-
-            if network.fitness().unwrap() >= 3.9 {
-                return;
-            }
         }
     });
 }

@@ -1,3 +1,4 @@
+use log::info;
 use rand::{
     distributions::{Distribution, Open01, Uniform},
     RngCore,
@@ -96,15 +97,10 @@ impl<T: Network + Debug + Clone> Pool<T> {
     fn sort_by_fitness(&mut self) {
         self.list
             .sort_by(|a, b| b.fitness().partial_cmp(&a.fitness()).unwrap());
-        dbg!(self.list[0].fitness().unwrap());
     }
 
     pub fn reproduce(&mut self) -> bool {
-        if self.list.iter().any(|n| n.fitness().is_none()) {
-            return false;
-        }
-
-        self.sort_by_fitness();
+        // assumes gene pool is sorted by fitness correctly
 
         let rng = &mut rand::thread_rng();
         let uniform = Uniform::new(0, 15);
@@ -132,9 +128,25 @@ impl<T: Network + Debug + Clone> Pool<T> {
         true
     }
 
-    pub fn evolve<F: Fn(&mut Vec<T>) -> ()>(&mut self, generation: usize, evaluate: F) {
-        for current_generation in 0..generation {
+    pub fn evolve<F: Fn(&mut Vec<T>) -> ()>(
+        &mut self,
+        generation: usize,
+        fitness_threshold: f64,
+        evaluate: F,
+    ) {
+        for current_generation in 1..=generation {
             evaluate(&mut self.list);
+            self.sort_by_fitness();
+
+            let best_fitness = self.list[0].fitness().unwrap();
+            info!(
+                "Generation {} [best fitness : {}]",
+                current_generation, best_fitness
+            );
+
+            if best_fitness > fitness_threshold {
+                break;
+            }
 
             self.reproduce();
         }

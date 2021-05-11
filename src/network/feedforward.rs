@@ -131,11 +131,25 @@ mod tests {
         let input_number = 2;
         let output_number = 1;
         let mut innov_record = InnovationRecord::new(input_number, output_number);
-        let mut network = Feedforward::new(2, 1, &mut innov_record);
+        let mut network = Feedforward::new(input_number, output_number, &mut innov_record);
         assert_eq!(
             network.activate(&vec![1.0, 2.0]),
             Some(vec![sigmoid(1.0 + 2.0)])
         );
+    }
+
+    #[test]
+    fn disconnected_graph_should_result_zero() {
+        let input_number = 2;
+        let output_number = 1;
+
+        let graph = NetworkGraph::new_disconnected(input_number, output_number);
+        let mut network = Feedforward::from_graph(graph);
+
+        assert_eq!(network.activate(&vec![0.0, 0.0]), Some(vec![0.0]));
+        assert_eq!(network.activate(&vec![0.0, 1.0]), Some(vec![0.0]));
+        assert_eq!(network.activate(&vec![1.0, 0.0]), Some(vec![0.0]));
+        assert_eq!(network.activate(&vec![1.0, 1.0]), Some(vec![0.0]));
     }
 
     #[test]

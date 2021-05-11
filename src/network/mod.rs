@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 use petgraph::graph::{EdgeIndex, NodeIndex};
 
 use self::network_graph::NetworkGraph;
@@ -75,4 +77,8 @@ pub trait Network {
 
     fn evaluate(&mut self, fitness: f64);
     fn fitness(&self) -> Option<f64>;
+
+    fn compare(&self, other: &Self) -> Option<Ordering> {
+        self.fitness().partial_cmp(&other.fitness())
+    }
 }

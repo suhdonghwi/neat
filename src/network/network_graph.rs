@@ -19,7 +19,7 @@ pub struct NetworkGraph {
 }
 
 impl NetworkGraph {
-    fn new_disconnected(input_number: usize, output_number: usize) -> Self {
+    pub fn new_disconnected(input_number: usize, output_number: usize) -> Self {
         let mut graph = DiGraph::new();
 
         for i in 0..input_number {

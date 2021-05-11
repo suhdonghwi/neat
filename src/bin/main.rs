@@ -11,7 +11,7 @@ fn main() {
 
     let input_number = 2;
     let output_number = 1;
-    let mut pool = Pool::<Feedforward>::new(input_number, output_number, 150);
+    let mut pool = Pool::<Feedforward>::new(input_number, output_number, 50);
 
     let data = vec![
         (vec![0.0, 0.0], 0.0),
@@ -20,13 +20,13 @@ fn main() {
         (vec![1.0, 1.0], 0.0),
     ];
 
-    pool.evolve(300, 3.9, |networks| {
+    pool.evolve(1, 3.9, |networks| {
         for network in networks {
             let mut err = 0.0;
 
             for (inputs, expected) in &data {
                 let output = network.activate(inputs).unwrap()[0];
-                err += (output - expected).powf(2.0);
+                err += (output - expected) * (output - expected);
             }
 
             network.evaluate(4.0 - err);

@@ -111,6 +111,14 @@ impl NetworkGraph {
         &mut self.graph[index]
     }
 
+    pub fn node_count(&self) -> usize {
+        self.graph.node_count()
+    }
+
+    pub fn edge_count(&self) -> usize {
+        self.graph.edge_count()
+    }
+
     pub fn outgoing(&self, index: NodeIndex) -> Vec<(EdgeIndex, NodeIndex)> {
         let mut result = Vec::new();
         let mut neighbors = self.graph.neighbors(index).detach();

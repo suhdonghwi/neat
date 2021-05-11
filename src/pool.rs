@@ -140,8 +140,11 @@ impl<T: Network + Debug + Clone> Pool<T> {
 
             let best_fitness = self.list[0].fitness().unwrap();
             info!(
-                "Generation {} [best fitness : {}]",
-                current_generation, best_fitness
+                "Generation {} [best fitness : {}, complexity : ({}, {})]",
+                current_generation,
+                best_fitness,
+                self.list[0].graph().node_count(),
+                self.list[0].graph().edge_count()
             );
 
             if best_fitness > fitness_threshold {

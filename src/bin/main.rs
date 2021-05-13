@@ -11,7 +11,7 @@ fn main() {
 
     let input_number = 2;
     let output_number = 1;
-    let mut pool = Pool::<Feedforward>::new(input_number, output_number, 50);
+    let mut pool = Pool::<Feedforward>::new(input_number, output_number, 150);
 
     let data = vec![
         (vec![0.0, 0.0], 0.0),

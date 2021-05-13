@@ -1,4 +1,4 @@
-use log::info;
+use log::{info, trace};
 use rand::{
     distributions::{Distribution, Open01, Uniform},
     RngCore,
@@ -40,7 +40,7 @@ impl<T: Network + Debug + Clone> Pool<T> {
         let add_connection = 0.5;
         let remove_connection = 0.5;
         let toggle_connection = 0.0;
-        let add_node = 0.3;
+        let add_node = 0.2;
         let remove_node = 0.2;
 
         let delta_uniform = Uniform::new(-1.0, 1.0);
@@ -102,7 +102,7 @@ impl<T: Network + Debug + Clone> Pool<T> {
         // assumes gene pool is sorted by fitness correctly
 
         let rng = &mut rand::thread_rng();
-        let uniform = Uniform::new(0, 10);
+        let uniform = Uniform::new(0, 15);
         let mut new_list = Vec::new();
 
         for _ in 0..self.list.len() {
@@ -145,6 +145,7 @@ impl<T: Network + Debug + Clone> Pool<T> {
                 self.list[0].graph().node_count(),
                 self.list[0].graph().edge_count()
             );
+            trace!("{:#?}", self.list[0]);
 
             if best_fitness > fitness_threshold {
                 break;

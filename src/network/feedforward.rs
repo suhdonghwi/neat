@@ -140,16 +140,18 @@ mod tests {
 
     #[test]
     fn disconnected_graph_should_result_zero() {
-        let input_number = 2;
+        let input_number = 1;
         let output_number = 1;
 
-        let graph = NetworkGraph::new_disconnected(input_number, output_number);
+        let mut innov_record = InnovationRecord::new(input_number, output_number);
+        let mut graph = NetworkGraph::new(input_number, output_number, &mut innov_record);
+        graph.add_node(0.into(), &mut innov_record);
+        graph.remove_connetion(1.into());
+
         let mut network = Feedforward::from_graph(graph);
 
-        assert_eq!(network.activate(&vec![0.0, 0.0]), Some(vec![0.0]));
-        assert_eq!(network.activate(&vec![0.0, 1.0]), Some(vec![0.0]));
-        assert_eq!(network.activate(&vec![1.0, 0.0]), Some(vec![0.0]));
-        assert_eq!(network.activate(&vec![1.0, 1.0]), Some(vec![0.0]));
+        assert_eq!(network.activate(&vec![0.0]), Some(vec![0.0]));
+        assert_eq!(network.activate(&vec![1.0]), Some(vec![0.0]));
     }
 
     #[test]

@@ -20,7 +20,7 @@ fn main() {
         (vec![1.0, 1.0], 0.0),
     ];
 
-    pool.evolve(1, 3.9, |networks| {
+    pool.evolve(300, 3.9, |networks| {
         for network in networks {
             let mut err = 0.0;
 

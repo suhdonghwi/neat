@@ -13,6 +13,7 @@ pub struct NodeData {
     kind: NodeKind,
     id: usize,
     input_sum: f64,
+    activated: bool,
 }
 
 impl NodeData {
@@ -21,22 +22,27 @@ impl NodeData {
             kind,
             id,
             input_sum: 0.0,
+            activated: false,
         }
     }
 
     pub fn add_input(&mut self, input: f64) {
         self.input_sum += input;
+        self.activated = true;
     }
 
     pub fn clear_sum(&mut self) {
         self.input_sum = 0.0;
+        self.activated = false;
     }
 
     pub fn activate(&self) -> f64 {
         if self.kind == NodeKind::Input || self.kind == NodeKind::Bias {
             self.input_sum
-        } else {
+        } else if self.activated {
             activations::sigmoid(self.input_sum)
+        } else {
+            0.0
         }
     }
 

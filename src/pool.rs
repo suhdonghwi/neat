@@ -40,7 +40,7 @@ impl<T: Network + Debug + Clone> Pool<T> {
         let add_connection = 0.5;
         let remove_connection = 0.5;
         let toggle_connection = 0.0;
-        let add_node = 0.2;
+        let add_node = 0.3;
         let remove_node = 0.2;
 
         let delta_uniform = Uniform::new(-1.0, 1.0);

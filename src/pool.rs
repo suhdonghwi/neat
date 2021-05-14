@@ -4,7 +4,7 @@ use rand::{
     RngCore,
 };
 
-use crate::{innovation_record::InnovationRecord, network::Network};
+use crate::{innovation_record::InnovationRecord, network::Network, parameters::Parameters};
 use std::fmt::Debug;
 
 fn random(rng: &mut impl RngCore) -> f64 {
@@ -14,20 +14,25 @@ fn random(rng: &mut impl RngCore) -> f64 {
 pub struct Pool<T: Network + Debug + Clone> {
     list: Vec<T>,
     innov_record: InnovationRecord,
+    params: Parameters,
 }
 
 impl<T: Network + Debug + Clone> Pool<T> {
-    pub fn new(input_number: usize, output_number: usize, population: usize) -> Self {
+    pub fn new(params: Parameters) -> Self {
         let mut list: Vec<T> = Vec::new();
-        let mut innov_record = InnovationRecord::new(input_number, output_number);
+        let mut innov_record = InnovationRecord::new(params.input_number, params.output_number);
 
-        for _ in 0..population {
-            let mut network = T::new(input_number, output_number, &mut innov_record);
+        for _ in 0..params.population {
+            let mut network = T::new(params.input_number, params.output_number, &mut innov_record);
             network.graph_mut().randomize_weights(-30.0, 30.0);
             list.push(network);
         }
 
-        Self { list, innov_record }
+        Self {
+            list,
+            innov_record,
+            params,
+        }
     }
 
     pub fn networks(&mut self) -> impl Iterator<Item = &mut T> {
@@ -35,41 +40,49 @@ impl<T: Network + Debug + Clone> Pool<T> {
     }
 
     fn mutate(&mut self, network: &mut T, rng: &mut impl RngCore) {
-        let weight_perbutation = 0.8;
-        let weight_assign = 0.1;
-        let add_connection = 0.5;
-        let remove_connection = 0.5;
-        let toggle_connection = 0.0;
-        let add_node = 0.2;
-        let remove_node = 0.2;
+        /*
+            let weight_perturbation = 0.8;
+            let weight_assign = 0.1;
+            let add_connection = 0.5;
+            let remove_connection = 0.5;
+            let toggle_connection = 0.0;
+            let add_node = 0.2;
+            let remove_node = 0.2;
+        */
 
-        let delta_uniform = Uniform::new(-1.0, 1.0);
-        let assign_uniform = Uniform::new(-30.0, 30.0);
+        let delta_uniform = Uniform::new(
+            self.params.mutation.perturb_min,
+            self.params.mutation.perturb_max,
+        );
+        let assign_uniform = Uniform::new(
+            self.params.mutation.weight_min,
+            self.params.mutation.weight_max,
+        );
 
-        if random(rng) < weight_perbutation {
+        if random(rng) < self.params.mutation.weight_perturbation {
             if let Some(to_mutate) = network.graph().random_edge(rng) {
                 network.mutate_perturb_weight(to_mutate, delta_uniform.sample(rng));
             }
         }
 
-        if random(rng) < weight_assign {
+        if random(rng) < self.params.mutation.weight_assign {
             if let Some(to_mutate) = network.graph().random_edge(rng) {
                 network.mutate_assign_weight(to_mutate, assign_uniform.sample(rng));
             }
         }
 
-        if random(rng) < add_node {
+        if random(rng) < self.params.mutation.add_node {
             if let Some(to_add) = network.graph().random_edge(rng) {
                 network.mutate_add_node(to_add, &mut self.innov_record);
             }
         }
 
-        if random(rng) < remove_node {
+        if random(rng) < self.params.mutation.remove_node {
             let to_remove = network.graph().random_node(rng);
             network.mutate_remove_node(to_remove);
         }
 
-        if random(rng) < add_connection {
+        if random(rng) < self.params.mutation.add_connection {
             let source = network.graph().random_node(rng);
             let target = network.graph().random_node(rng);
 
@@ -81,13 +94,13 @@ impl<T: Network + Debug + Clone> Pool<T> {
             );
         }
 
-        if random(rng) < remove_connection {
+        if random(rng) < self.params.mutation.remove_connection {
             if let Some(to_remove) = network.graph().random_edge(rng) {
                 network.mutate_remove_connection(to_remove);
             }
         }
 
-        if random(rng) < toggle_connection {
+        if random(rng) < self.params.mutation.toggle_connection {
             if let Some(to_toggle) = network.graph().random_edge(rng) {
                 network.mutate_toggle_connection(to_toggle);
             }

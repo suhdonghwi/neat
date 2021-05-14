@@ -1,5 +1,8 @@
-use neatlib::network::Network;
 use neatlib::{network::feedforward::Feedforward, pool::Pool};
+use neatlib::{
+    network::Network,
+    parameters::{Mutation, Parameters},
+};
 
 // TODO LISTEN
 // [cancel] 1. NodeData에 input sum 저장해서 activate 하는거 변경하기 (node data는 stateless한게 좋은 것 같다)
@@ -9,9 +12,27 @@ use neatlib::{network::feedforward::Feedforward, pool::Pool};
 fn main() {
     env_logger::init();
 
-    let input_number = 2;
-    let output_number = 1;
-    let mut pool = Pool::<Feedforward>::new(input_number, output_number, 150);
+    let params = Parameters {
+        input_number: 2,
+        output_number: 1,
+        population: 150,
+        mutation: Mutation {
+            weight_perturbation: 0.8,
+            weight_assign: 0.1,
+            add_connection: 0.5,
+            remove_connection: 0.5,
+            toggle_connection: 0.0,
+            add_node: 0.2,
+            remove_node: 0.2,
+
+            weight_min: -30.0,
+            weight_max: 30.0,
+
+            perturb_min: -1.0,
+            perturb_max: 1.0,
+        },
+    };
+    let mut pool = Pool::<Feedforward>::new(params);
 
     let data = vec![
         (vec![0.0, 0.0], 0.0),

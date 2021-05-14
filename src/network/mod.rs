@@ -56,9 +56,9 @@ pub trait Network {
         true
     }
 
-    fn mutate_perturb_weight(&mut self, index: EdgeIndex, delta: f64) -> bool {
+    fn mutate_perturb_weight(&mut self, index: EdgeIndex, delta: f64, min: f64, max: f64) -> bool {
         let edge = self.graph_mut().edge_mut(index);
-        edge.set_weight((edge.get_weight() + delta).clamp(-30.0, 30.0));
+        edge.set_weight((edge.get_weight() + delta).clamp(min, max));
         true
     }
 

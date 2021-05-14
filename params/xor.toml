@@ -1,0 +1,18 @@
+input_number = 2
+output_number = 1
+population =  150
+
+[mutation] 
+weight_perturbation = 0.8
+weight_assign = 0.1
+add_connection = 0.5
+remove_connection = 0.5
+toggle_connection = 0.0
+add_node = 0.2
+remove_node = 0.2
+
+weight_min = -15.0
+weight_max = 15.0
+
+perturb_min = -1.0
+perturb_max = 1.0

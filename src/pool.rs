@@ -24,7 +24,9 @@ impl<T: Network + Debug + Clone> Pool<T> {
 
         for _ in 0..params.population {
             let mut network = T::new(params.input_number, params.output_number, &mut innov_record);
-            network.graph_mut().randomize_weights(-30.0, 30.0);
+            network
+                .graph_mut()
+                .randomize_weights(params.mutation.weight_min, params.mutation.weight_max);
             list.push(network);
         }
 
@@ -61,7 +63,12 @@ impl<T: Network + Debug + Clone> Pool<T> {
 
         if random(rng) < self.params.mutation.weight_perturbation {
             if let Some(to_mutate) = network.graph().random_edge(rng) {
-                network.mutate_perturb_weight(to_mutate, delta_uniform.sample(rng));
+                network.mutate_perturb_weight(
+                    to_mutate,
+                    delta_uniform.sample(rng),
+                    self.params.mutation.weight_min,
+                    self.params.mutation.weight_max,
+                );
             }
         }
 

@@ -1,7 +1,9 @@
 use std::collections::HashMap;
 
+use petgraph::graph::Edge;
 use petgraph::graph::{DiGraph, EdgeIndex, NodeIndex};
-use petgraph::{algo::toposort, graph::Edge};
+use petgraph::visit::Topo;
+
 use rand::{
     distributions::{Bernoulli, Distribution, Uniform},
     RngCore,
@@ -15,7 +17,6 @@ pub struct NetworkGraph {
     graph: DiGraph<NodeData, EdgeData>,
     input_number: usize,
     output_number: usize,
-    toposort_cache: Option<Vec<NodeIndex>>,
 }
 
 impl NetworkGraph {
@@ -36,7 +37,6 @@ impl NetworkGraph {
             graph,
             input_number,
             output_number,
-            toposort_cache: None,
         }
     }
 
@@ -89,7 +89,7 @@ impl NetworkGraph {
         let mut result = Vec::new();
         for index in self.input_number..self.input_number + self.output_number {
             let node = &self.graph[NodeIndex::new(index)];
-            result.push(node.activate());
+            result.push(node.activate().unwrap());
         }
 
         result
@@ -119,17 +119,6 @@ impl NetworkGraph {
         self.graph.edge_count()
     }
 
-    pub fn outgoing(&self, index: NodeIndex) -> Vec<(EdgeIndex, NodeIndex)> {
-        let mut result = Vec::new();
-        let mut neighbors = self.graph.neighbors(index).detach();
-
-        while let Some(n) = neighbors.next(&self.graph) {
-            result.push(n);
-        }
-
-        result
-    }
-
     pub fn random_edge(&self, rng: &mut impl RngCore) -> Option<EdgeIndex> {
         if self.graph.edge_count() == 0 {
             None
@@ -144,20 +133,44 @@ impl NetworkGraph {
         NodeIndex::new(uniform.sample(rng))
     }
 
-    pub fn toposort(&mut self) -> Option<Vec<NodeIndex>> {
-        if self.toposort_cache.is_none() {
-            self.toposort_cache = toposort(&self.graph, None).ok();
-        }
-
-        self.toposort_cache.clone()
-    }
-
     pub fn has_connection(&self, source: NodeIndex, target: NodeIndex) -> bool {
         self.graph.contains_edge(source, target)
     }
 
     pub fn has_cycle(&self) -> bool {
         petgraph::algo::is_cyclic_directed(&self.graph)
+    }
+
+    pub fn activate_node(&mut self, index: NodeIndex) {
+        let activation;
+        match self.graph[index].activate() {
+            Some(v) => activation = v,
+            None => return,
+        }
+        let mut neighbors = self.graph.neighbors(index).detach();
+
+        while let Some((edge_index, target_index)) = neighbors.next(&self.graph) {
+            let weight: f64;
+
+            {
+                let edge = &self.graph[edge_index];
+                if edge.is_disabled() {
+                    continue;
+                };
+                weight = edge.get_weight();
+            }
+
+            let target = &mut self.graph[target_index];
+            target.add_input(activation * weight);
+        }
+    }
+
+    // Only for feedforward network (DAG)
+    pub fn activate_topo(&mut self) -> () {
+        let mut topo = Topo::new(&self.graph);
+        while let Some(node) = topo.next(&self.graph) {
+            self.activate_node(node);
+        }
     }
 
     pub fn add_node(&mut self, edge: EdgeIndex, innov_record: &mut InnovationRecord) -> NodeIndex {
@@ -274,7 +287,7 @@ impl NetworkGraph {
         let mut node_map: HashMap<usize, NodeIndex> = HashMap::new();
         let mut get_index = |data: &NodeData, network: &mut Self| {
             if data.kind() != NodeKind::Hidden {
-                return NodeIndex::new(data.id()); // Index of default nodes is same as ID
+                return NodeIndex::new(data.id()); // Index of a default node is same as ID
             }
 
             match node_map.get(&data.id()) {
@@ -457,22 +470,6 @@ mod tests {
             graph.add_edge(a.into(), b.into(), EdgeData::new(0.0, i));
         }
         assert!(graph_eq(&network.graph, &graph));
-    }
-
-    #[test]
-    fn toposort_should_work_on_dag() {
-        let input_number = 2;
-        let output_number = 1;
-        let mut innov_record = InnovationRecord::new(input_number, output_number);
-        let mut network = NetworkGraph::new(input_number, output_number, &mut innov_record);
-        network.add_node(EdgeIndex::new(0), &mut innov_record);
-
-        let result = network.toposort();
-
-        assert_eq!(
-            result,
-            Some(vec![3.into(), 1.into(), 0.into(), 4.into(), 2.into()])
-        );
     }
 
     #[test]

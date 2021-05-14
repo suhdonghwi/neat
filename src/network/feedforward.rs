@@ -42,10 +42,7 @@ impl Network for Feedforward {
         bias_node.add_input(1.0);
 
         // Activate nodes in topological order
-        let sorted = self.graph.toposort();
-        for index in sorted? {
-            self.activate_node(index);
-        }
+        self.graph.activate_topo();
 
         let result = Some(self.graph.activate_output());
         self.graph.clear_sum();
@@ -96,28 +93,6 @@ impl Network for Feedforward {
 
     fn fitness(&self) -> Option<f64> {
         self.fitness
-    }
-}
-
-impl Feedforward {
-    fn activate_node(&mut self, index: NodeIndex) {
-        let activation = self.graph.node_mut(index).activate();
-        let targets = self.graph.outgoing(index);
-
-        for (edge_index, target_index) in targets {
-            let weight: f64;
-
-            {
-                let edge = self.graph.edge(edge_index);
-                if edge.is_disabled() {
-                    continue;
-                };
-                weight = edge.get_weight();
-            }
-
-            let target = self.graph.node_mut(target_index);
-            target.add_input(activation * weight);
-        }
     }
 }
 

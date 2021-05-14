@@ -36,13 +36,17 @@ impl NodeData {
         self.activated = false;
     }
 
-    pub fn activate(&self) -> f64 {
+    pub fn activate(&self) -> Option<f64> {
         if self.kind == NodeKind::Input || self.kind == NodeKind::Bias {
-            self.input_sum
+            Some(self.input_sum)
         } else if self.activated {
-            activations::sigmoid(self.input_sum)
+            Some(activations::sigmoid(self.input_sum))
         } else {
-            0.0
+            if self.kind == NodeKind::Output {
+                Some(0.0)
+            } else {
+                None
+            }
         }
     }
 

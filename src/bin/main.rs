@@ -1,7 +1,7 @@
 use neatlib::{network::feedforward::Feedforward, pool::Pool};
 use neatlib::{
     network::Network,
-    parameters::{Mutation, Parameters},
+    parameters::{MutationParameters, Parameters},
 };
 
 // TODO LISTEN
@@ -16,7 +16,7 @@ fn main() {
         input_number: 2,
         output_number: 1,
         population: 150,
-        mutation: Mutation {
+        mutation: MutationParameters {
             weight_perturbation: 0.8,
             weight_assign: 0.1,
             add_connection: 0.5,

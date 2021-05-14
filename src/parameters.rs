@@ -3,10 +3,10 @@ pub struct Parameters {
     pub output_number: usize,
     pub population: usize,
 
-    pub mutation: Mutation,
+    pub mutation: MutationParameters,
 }
 
-pub struct Mutation {
+pub struct MutationParameters {
     pub weight_perturbation: f64,
     pub weight_assign: f64,
     pub add_connection: f64,

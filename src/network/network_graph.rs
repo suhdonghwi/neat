@@ -141,7 +141,7 @@ impl NetworkGraph {
         petgraph::algo::is_cyclic_directed(&self.graph)
     }
 
-    pub fn activate_node(&mut self, index: NodeIndex) {
+    fn activate_node(&mut self, index: NodeIndex) {
         let activation;
         match self.graph[index].activate() {
             Some(v) => activation = v,

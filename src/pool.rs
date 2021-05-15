@@ -42,16 +42,6 @@ impl<T: Network + Debug + Clone> Pool<T> {
     }
 
     fn mutate(&mut self, network: &mut T, rng: &mut impl RngCore) {
-        /*
-            let weight_perturbation = 0.8;
-            let weight_assign = 0.1;
-            let add_connection = 0.5;
-            let remove_connection = 0.5;
-            let toggle_connection = 0.0;
-            let add_node = 0.2;
-            let remove_node = 0.2;
-        */
-
         let delta_uniform = Uniform::new(
             self.params.mutation.perturb_min,
             self.params.mutation.perturb_max,

@@ -311,10 +311,16 @@ impl NetworkGraph {
         Some(network)
     }
 
-    pub fn compatibility_metric(&self, other: &NetworkGraph, c1: f64, c2: f64) -> f64 {
-        let mut weight_difference = 0.0;
-        let mut disjoint_or_excess: usize = 0;
-        let n = std::cmp::max(self.graph.edge_count(), other.graph.edge_count());
+    fn union_difference<'a>(
+        &self,
+        other: &'a NetworkGraph,
+    ) -> (
+        Vec<(&EdgeData, &'a EdgeData)>,
+        Vec<&EdgeData>,
+        Vec<&'a EdgeData>,
+    ) {
+        let mut matching: Vec<(&EdgeData, &EdgeData)> = Vec::new();
+        let mut my_disjoint_excess: Vec<&EdgeData> = Vec::new();
 
         let my_edges = self.graph.raw_edges();
         let mut other_edges: Vec<&Edge<EdgeData>> = other.graph.raw_edges().iter().collect();
@@ -324,23 +330,35 @@ impl NetworkGraph {
 
             for (i, &other_edge) in other_edges.iter().enumerate() {
                 if my_edge.weight.innov_number() == other_edge.weight.innov_number() {
-                    weight_difference +=
-                        (my_edge.weight.get_weight() - other_edge.weight.get_weight()).abs();
                     matched = Some(i);
                     break;
                 }
             }
 
             if let Some(i) = matched {
+                matching.push((&my_edge.weight, &other_edges[i].weight));
                 other_edges.remove(i);
             } else {
-                // disjoint or excess gene (they are not distinguished)
-                disjoint_or_excess += 1;
+                my_disjoint_excess.push(&my_edge.weight);
             }
         }
 
-        disjoint_or_excess += other_edges.len();
-        return (disjoint_or_excess as f64) * c1 / (n as f64) + weight_difference * c2;
+        let other_mismatch: Vec<&EdgeData> = other_edges.iter().map(|x| &x.weight).collect();
+        (matching, my_disjoint_excess, other_mismatch)
+    }
+
+    pub fn compatibility_metric(&self, other: &NetworkGraph, c1: f64, c2: f64) -> f64 {
+        let (matching, my_mismatch, other_mismatch) = self.union_difference(other);
+        let mut weight_difference = 0.0;
+
+        for (my_edge_data, other_edge_data) in matching {
+            weight_difference += (my_edge_data.get_weight() - other_edge_data.get_weight()).abs();
+        }
+
+        let mismatch_count = my_mismatch.len() + other_mismatch.len();
+        let n = std::cmp::max(self.graph.edge_count(), other.graph.edge_count());
+
+        return (mismatch_count as f64) * c1 / (n as f64) + weight_difference * c2;
     }
 }
 

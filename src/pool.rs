@@ -4,7 +4,9 @@ use rand::{
     RngCore,
 };
 
-use crate::{innovation_record::InnovationRecord, network::Network, parameters::Parameters};
+use crate::{
+    innovation_record::InnovationRecord, network::Network, parameters::Parameters, specie::Specie,
+};
 use std::fmt::Debug;
 
 fn random(rng: &mut impl RngCore) -> f64 {
@@ -137,6 +139,30 @@ impl<T: Network + Debug + Clone> Pool<T> {
         true
     }
 
+    fn speciate(&self) -> Vec<Specie<T>> {
+        // also assumes gene pool is sorted by fitness correctly
+
+        let mut species: Vec<Specie<T>> = Vec::new();
+
+        for network in &self.list {
+            let mut assigned = false;
+
+            for specie in &mut species {
+                if specie.try_assign(network, &self.params) {
+                    assigned = true;
+                    break;
+                }
+            }
+
+            if !assigned {
+                let new_specie = Specie::new(network);
+                species.push(new_specie);
+            }
+        }
+
+        species
+    }
+
     pub fn evolve<F: Fn(&mut Vec<T>) -> ()>(
         &mut self,
         generation: usize,
@@ -160,6 +186,9 @@ impl<T: Network + Debug + Clone> Pool<T> {
             if best_fitness > fitness_threshold {
                 break;
             }
+
+            let species = self.speciate();
+            info!("There are {} species", species.len());
 
             self.reproduce();
         }

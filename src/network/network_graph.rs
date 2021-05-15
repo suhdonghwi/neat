@@ -310,6 +310,38 @@ impl NetworkGraph {
 
         Some(network)
     }
+
+    pub fn compatibility_metric(&self, other: &NetworkGraph, c1: f64, c2: f64) -> f64 {
+        let mut weight_difference = 0.0;
+        let mut disjoint_or_excess: usize = 0;
+        let n = std::cmp::max(self.graph.edge_count(), other.graph.edge_count());
+
+        let my_edges = self.graph.raw_edges();
+        let mut other_edges: Vec<&Edge<EdgeData>> = other.graph.raw_edges().iter().collect();
+
+        for my_edge in my_edges {
+            let mut matched = None;
+
+            for (i, &other_edge) in other_edges.iter().enumerate() {
+                if my_edge.weight.innov_number() == other_edge.weight.innov_number() {
+                    weight_difference +=
+                        (my_edge.weight.get_weight() - other_edge.weight.get_weight()).abs();
+                    matched = Some(i);
+                    break;
+                }
+            }
+
+            if let Some(i) = matched {
+                other_edges.remove(i);
+            } else {
+                // disjoint or excess gene (they are not distinguished)
+                disjoint_or_excess += 1;
+            }
+        }
+
+        disjoint_or_excess += other_edges.len();
+        return (disjoint_or_excess as f64) * c1 / (n as f64) + weight_difference * c2;
+    }
 }
 
 #[cfg(test)]
@@ -486,28 +518,56 @@ mod tests {
 
         // Edge weight is same in network1, 2 - so constant seeding is not needed here.
         let mut rng = rand::thread_rng();
-        if let Some(offspring) = network1.crossover(&network2, true, &mut rng) {
-            let mut graph = DiGraph::<NodeData, EdgeData>::new();
-            for (i, &kind) in [
-                NodeKind::Input,
-                NodeKind::Input,
-                NodeKind::Output,
-                NodeKind::Bias,
-                NodeKind::Hidden,
-            ]
-            .iter()
-            .enumerate()
-            {
-                graph.add_node(NodeData::new(kind, i));
-            }
-
-            for (i, &(a, b)) in [(0, 2), (1, 2), (0, 4), (4, 2)].iter().enumerate() {
-                graph.add_edge(a.into(), b.into(), EdgeData::new(0.0, i));
-            }
-
-            assert!(graph_eq(&offspring.graph, &graph));
-        } else {
-            panic!("crossover result is None");
+        let offspring = network1.crossover(&network2, true, &mut rng).unwrap();
+        let mut graph = DiGraph::<NodeData, EdgeData>::new();
+        for (i, &kind) in [
+            NodeKind::Input,
+            NodeKind::Input,
+            NodeKind::Output,
+            NodeKind::Bias,
+            NodeKind::Hidden,
+        ]
+        .iter()
+        .enumerate()
+        {
+            graph.add_node(NodeData::new(kind, i));
         }
+
+        for (i, &(a, b)) in [(0, 2), (1, 2), (0, 4), (4, 2)].iter().enumerate() {
+            graph.add_edge(a.into(), b.into(), EdgeData::new(0.0, i));
+        }
+
+        assert!(graph_eq(&offspring.graph, &graph));
+    }
+
+    #[test]
+    fn compatibility_metric_of_two_same_networks_is_zero() {
+        let input_number = 2;
+        let output_number = 1;
+        let mut innov_record = InnovationRecord::new(input_number, output_number);
+
+        let network1 = NetworkGraph::new(input_number, output_number, &mut innov_record);
+        let network2 = NetworkGraph::new(input_number, output_number, &mut innov_record);
+
+        assert_eq!(network1.compatibility_metric(&network2, 1.0, 1.0), 0.0);
+    }
+
+    #[test]
+    fn compatibility_metric_should_be_calculated_correctly() {
+        let input_number = 2;
+        let output_number = 1;
+
+        let mut innov_record = InnovationRecord::new(input_number, output_number);
+
+        let network1 = NetworkGraph::new(input_number, output_number, &mut innov_record);
+        let mut network2 = NetworkGraph::new(input_number, output_number, &mut innov_record);
+
+        network2.add_node(0.into(), &mut innov_record);
+        network2.edge_mut(1.into()).set_weight(2.0);
+
+        assert_eq!(
+            network1.compatibility_metric(&network2, 1.0, 2.0),
+            2.0 / 4.0 * 1.0 + 1.0 * 2.0
+        );
     }
 }

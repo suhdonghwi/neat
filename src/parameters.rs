@@ -7,6 +7,7 @@ pub struct Parameters {
     pub population: usize,
 
     pub mutation: MutationParameters,
+    pub speciation: SpeciationParameters,
 }
 
 #[derive(Deserialize)]
@@ -24,4 +25,12 @@ pub struct MutationParameters {
 
     pub perturb_min: f64,
     pub perturb_max: f64,
+}
+
+#[derive(Deserialize)]
+pub struct SpeciationParameters {
+    pub c1: f64, // mismatch gene coefficient
+    pub c2: f64, // weight difference cofficient
+
+    pub compatibility_threshold: f64,
 }

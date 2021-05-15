@@ -556,6 +556,7 @@ mod tests {
         let network2 = NetworkGraph::new(input_number, output_number, &mut innov_record);
 
         assert_eq!(network1.compatibility_metric(&network2, 1.0, 1.0), 0.0);
+        assert_eq!(network2.compatibility_metric(&network1, 1.0, 1.0), 0.0);
     }
 
     #[test]
@@ -573,6 +574,10 @@ mod tests {
 
         assert_eq!(
             network1.compatibility_metric(&network2, 1.0, 2.0),
+            2.0 / 4.0 * 1.0 + 1.0 * 2.0
+        );
+        assert_eq!(
+            network2.compatibility_metric(&network1, 1.0, 2.0),
             2.0 / 4.0 * 1.0 + 1.0 * 2.0
         );
     }

@@ -16,3 +16,8 @@ weight_max = 15.0
 
 perturb_min = -1.0
 perturb_max = 1.0
+
+[speciation]
+c1 = 1.0
+c2 = 1.0
+compatibility_threshold = 20.0

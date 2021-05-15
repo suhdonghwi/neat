@@ -237,6 +237,41 @@ impl NetworkGraph {
         (edge.clone(), source, target)
     }
 
+    fn union_difference<'a>(
+        &self,
+        other: &'a NetworkGraph,
+    ) -> (
+        Vec<(&Edge<EdgeData>, &'a Edge<EdgeData>)>,
+        Vec<&Edge<EdgeData>>,
+        Vec<&'a Edge<EdgeData>>,
+    ) {
+        let mut matching: Vec<(&Edge<EdgeData>, &Edge<EdgeData>)> = Vec::new();
+        let mut my_mismatch: Vec<&Edge<EdgeData>> = Vec::new();
+
+        let my_edges = self.graph.raw_edges();
+        let mut other_edges: Vec<&Edge<EdgeData>> = other.graph.raw_edges().iter().collect();
+
+        for my_edge in my_edges {
+            let mut matched = None;
+
+            for (i, &other_edge) in other_edges.iter().enumerate() {
+                if my_edge.weight.innov_number() == other_edge.weight.innov_number() {
+                    matched = Some(i);
+                    break;
+                }
+            }
+
+            if let Some(i) = matched {
+                matching.push((&my_edge, &other_edges[i]));
+                other_edges.remove(i);
+            } else {
+                my_mismatch.push(&my_edge);
+            }
+        }
+
+        (matching, my_mismatch, other_edges)
+    }
+
     pub fn crossover(
         &self,
         other: &NetworkGraph,
@@ -250,35 +285,23 @@ impl NetworkGraph {
         let mut network = NetworkGraph::new_disconnected(self.input_number, self.output_number);
         let mut new_genes = Vec::new();
 
-        let my_edges = self.graph.raw_edges();
-        let mut other_edges: Vec<&Edge<EdgeData>> = other.graph.raw_edges().iter().collect();
+        let (matching, my_mismatch, other_mismatch) = self.union_difference(other);
 
         let dist = Bernoulli::new(0.5).unwrap();
-        for my_edge in my_edges {
-            let mut matched = None;
-
-            for (i, &other_edge) in other_edges.iter().enumerate() {
-                if other_edge.weight.innov_number() == my_edge.weight.innov_number() {
-                    if dist.sample(rng) {
-                        new_genes.push(self.endpoints(my_edge));
-                    } else {
-                        new_genes.push(other.endpoints(other_edge));
-                    }
-
-                    matched = Some(i);
-                    break;
-                }
-            }
-
-            if let Some(i) = matched {
-                other_edges.remove(i);
-            } else if more_fit {
+        for (my_edge, other_edge) in matching {
+            if dist.sample(rng) {
                 new_genes.push(self.endpoints(my_edge));
+            } else {
+                new_genes.push(other.endpoints(other_edge));
             }
         }
 
-        if !more_fit {
-            for edge in other_edges {
+        if more_fit {
+            for edge in my_mismatch {
+                new_genes.push(self.endpoints(edge));
+            }
+        } else {
+            for edge in other_mismatch {
                 new_genes.push(other.endpoints(edge));
             }
         }
@@ -311,48 +334,13 @@ impl NetworkGraph {
         Some(network)
     }
 
-    fn union_difference<'a>(
-        &self,
-        other: &'a NetworkGraph,
-    ) -> (
-        Vec<(&EdgeData, &'a EdgeData)>,
-        Vec<&EdgeData>,
-        Vec<&'a EdgeData>,
-    ) {
-        let mut matching: Vec<(&EdgeData, &EdgeData)> = Vec::new();
-        let mut my_disjoint_excess: Vec<&EdgeData> = Vec::new();
-
-        let my_edges = self.graph.raw_edges();
-        let mut other_edges: Vec<&Edge<EdgeData>> = other.graph.raw_edges().iter().collect();
-
-        for my_edge in my_edges {
-            let mut matched = None;
-
-            for (i, &other_edge) in other_edges.iter().enumerate() {
-                if my_edge.weight.innov_number() == other_edge.weight.innov_number() {
-                    matched = Some(i);
-                    break;
-                }
-            }
-
-            if let Some(i) = matched {
-                matching.push((&my_edge.weight, &other_edges[i].weight));
-                other_edges.remove(i);
-            } else {
-                my_disjoint_excess.push(&my_edge.weight);
-            }
-        }
-
-        let other_mismatch: Vec<&EdgeData> = other_edges.iter().map(|x| &x.weight).collect();
-        (matching, my_disjoint_excess, other_mismatch)
-    }
-
     pub fn compatibility_metric(&self, other: &NetworkGraph, c1: f64, c2: f64) -> f64 {
         let (matching, my_mismatch, other_mismatch) = self.union_difference(other);
         let mut weight_difference = 0.0;
 
         for (my_edge_data, other_edge_data) in matching {
-            weight_difference += (my_edge_data.get_weight() - other_edge_data.get_weight()).abs();
+            weight_difference +=
+                (my_edge_data.weight.get_weight() - other_edge_data.weight.get_weight()).abs();
         }
 
         let mismatch_count = my_mismatch.len() + other_mismatch.len();

@@ -33,4 +33,5 @@ pub struct SpeciationParameters {
     pub c2: f64, // weight difference cofficient
 
     pub compatibility_threshold: f64,
+    pub survival_rate: f64,
 }

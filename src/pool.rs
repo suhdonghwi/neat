@@ -5,7 +5,7 @@ use rand::{
 };
 
 use crate::{
-    innovation_record::InnovationRecord, network::Network, parameters::Parameters, specie::Specie,
+    innovation_record::InnovationRecord, network::Network, parameters::Parameters, specie::Species,
 };
 use std::fmt::Debug;
 
@@ -139,10 +139,10 @@ impl<T: Network + Debug + Clone> Pool<T> {
         true
     }
 
-    fn speciate(&self) -> Vec<Specie<T>> {
+    fn speciate(&self) -> Vec<Species<T>> {
         // also assumes gene pool is sorted by fitness correctly
 
-        let mut species: Vec<Specie<T>> = Vec::new();
+        let mut species: Vec<Species<T>> = Vec::new();
 
         for network in &self.list {
             let mut assigned = false;
@@ -155,7 +155,7 @@ impl<T: Network + Debug + Clone> Pool<T> {
             }
 
             if !assigned {
-                let new_specie = Specie::new(network);
+                let new_specie = Species::new(network);
                 species.push(new_specie);
             }
         }
@@ -175,7 +175,7 @@ impl<T: Network + Debug + Clone> Pool<T> {
 
             let best_fitness = self.list[0].fitness().unwrap();
             info!(
-                "Generation {} [best fitness : {}, complexity : ({}, {})]",
+                "Generation {} [best fitness : {}, {} node(s), {} edge(s)]",
                 current_generation,
                 best_fitness,
                 self.list[0].graph().node_count(),
@@ -186,9 +186,6 @@ impl<T: Network + Debug + Clone> Pool<T> {
             if best_fitness > fitness_threshold {
                 break;
             }
-
-            let species = self.speciate();
-            info!("There are {} species", species.len());
 
             self.reproduce();
         }

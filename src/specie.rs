@@ -1,14 +1,14 @@
 use crate::{network::Network, parameters::Parameters};
 use std::fmt::Debug;
 
-pub struct Specie<'a, T: Network + Debug + Clone> {
+pub struct Species<'a, T: Network + Debug + Clone> {
     list: Vec<&'a T>,
     representative: &'a T,
 }
 
-impl<'a, T: Network + Debug + Clone> Specie<'a, T> {
-    pub fn new(representative: &'a T) -> Specie<'a, T> {
-        return Specie {
+impl<'a, T: Network + Debug + Clone> Species<'a, T> {
+    pub fn new(representative: &'a T) -> Species<'a, T> {
+        return Species {
             list: vec![representative],
             representative,
         };
@@ -23,9 +23,23 @@ impl<'a, T: Network + Debug + Clone> Specie<'a, T> {
 
         if metric <= params.speciation.compatibility_threshold {
             self.list.push(network);
-            return true;
+            true
         } else {
-            return false;
+            false
         }
+    }
+
+    pub fn kill_worst(&mut self, survival_rate: f64) {
+        self.list
+            .truncate(((self.list.len() as f64) * survival_rate).floor() as usize);
+    }
+
+    pub fn adjusted_fitness_average(&self) -> Option<f64> {
+        let mut sum = 0.0;
+        for network in &self.list {
+            sum += network.fitness()? / self.list.len() as f64;
+        }
+
+        Some(sum / self.list.len() as f64)
     }
 }

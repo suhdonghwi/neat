@@ -21,3 +21,5 @@ perturb_max = 1.0
 c1 = 1.0
 c2 = 1.0
 compatibility_threshold = 20.0
+
+survival_rate = 0.4

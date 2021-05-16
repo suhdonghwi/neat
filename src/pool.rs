@@ -162,6 +162,12 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
                 .filter(|s| s.genome_count() > 2)
                 .collect();
 
+            if species_set.len() == 0 {
+                panic!(
+                    "remaining species_set size is 0; maybe compatibility threshold is too small?"
+                );
+            }
+
             let fitness_list: Vec<f64> = species_set
                 .iter()
                 .map(|s| s.adjusted_fitness_average().unwrap())
@@ -177,8 +183,6 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
             for i in 0..total_count - self.params.population {
                 count_list[i % species_set.len()] -= 1;
             }
-
-            dbg!(&count_list);
 
             let mut offspring_list = Vec::new();
             let rng = &mut rand::thread_rng();

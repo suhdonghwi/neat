@@ -1,21 +1,45 @@
 use crate::{network::Network, parameters::Parameters};
 use std::fmt::Debug;
 
+#[derive(Clone, Debug)]
+pub struct SpeciesInfo<T: Network + Debug + Clone> {
+    representative: T,
+    age: usize,
+}
+
+impl<T: Network + Debug + Clone> SpeciesInfo<T> {
+    pub fn new(representative: T, age: usize) -> Self {
+        Self {
+            representative,
+            age,
+        }
+    }
+
+    pub fn age(&mut self) {
+        self.age += 1;
+    }
+}
+
+#[derive(Clone, Debug)]
 pub struct Species<'a, T: Network + Debug + Clone> {
+    info: SpeciesInfo<T>,
     list: Vec<&'a T>,
-    representative: &'a T,
 }
 
 impl<'a, T: Network + Debug + Clone> Species<'a, T> {
-    pub fn new(representative: &'a T) -> Species<'a, T> {
-        return Species {
-            list: vec![representative],
-            representative,
-        };
+    pub fn new(info: SpeciesInfo<T>) -> Self {
+        Species {
+            list: Vec::new(),
+            info,
+        }
+    }
+
+    pub fn info(self) -> SpeciesInfo<T> {
+        self.info
     }
 
     pub fn try_assign(&mut self, network: &'a T, params: &Parameters) -> bool {
-        let metric = self.representative.graph().compatibility_metric(
+        let metric = self.info.representative.graph().compatibility_metric(
             network.graph(),
             params.speciation.c1,
             params.speciation.c2,

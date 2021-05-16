@@ -5,7 +5,10 @@ use rand::{
 };
 
 use crate::{
-    innovation_record::InnovationRecord, network::Network, parameters::Parameters, specie::Species,
+    innovation_record::InnovationRecord,
+    network::Network,
+    parameters::Parameters,
+    species::{Species, SpeciesInfo},
 };
 use std::fmt::Debug;
 
@@ -19,7 +22,7 @@ pub struct Pool<T: Network + Debug + Clone> {
     params: Parameters,
 }
 
-impl<T: Network + Debug + Clone> Pool<T> {
+impl<'a, T: Network + Debug + Clone> Pool<T> {
     pub fn new(params: Parameters) -> Self {
         let mut list: Vec<T> = Vec::new();
         let mut innov_record = InnovationRecord::new(params.input_number, params.output_number);
@@ -37,10 +40,6 @@ impl<T: Network + Debug + Clone> Pool<T> {
             innov_record,
             params,
         }
-    }
-
-    pub fn networks(&mut self) -> impl Iterator<Item = &mut T> {
-        self.list.iter_mut()
     }
 
     fn mutate(&mut self, network: &mut T, rng: &mut impl RngCore) {
@@ -139,28 +138,30 @@ impl<T: Network + Debug + Clone> Pool<T> {
         true
     }
 
-    fn speciate(&self) -> Vec<Species<T>> {
-        // also assumes gene pool is sorted by fitness correctly
+    fn speciate(&'a self, prev_species_set: Vec<SpeciesInfo<T>>) -> Vec<Species<T>> {
+        let mut new_species_set: Vec<Species<T>> = Vec::new();
 
-        let mut species: Vec<Species<T>> = Vec::new();
+        for mut species_info in prev_species_set {
+            species_info.age();
+            new_species_set.push(Species::new(species_info));
+        }
 
         for network in &self.list {
-            let mut assigned = false;
+            let mut found = false;
 
-            for specie in &mut species {
-                if specie.try_assign(network, &self.params) {
-                    assigned = true;
+            for species in &mut new_species_set {
+                if species.try_assign(network, &self.params) {
+                    found = true;
                     break;
                 }
             }
 
-            if !assigned {
-                let new_specie = Species::new(network);
-                species.push(new_specie);
+            if !found {
+                new_species_set.push(Species::new(SpeciesInfo::new(network.clone(), 0)));
             }
         }
 
-        species
+        new_species_set
     }
 
     pub fn evolve<F: Fn(&mut Vec<T>) -> ()>(
@@ -169,6 +170,8 @@ impl<T: Network + Debug + Clone> Pool<T> {
         fitness_threshold: f64,
         evaluate: F,
     ) {
+        let mut prev_species_info: Vec<SpeciesInfo<T>> = Vec::new();
+
         for current_generation in 1..=generation {
             evaluate(&mut self.list);
             self.sort_by_fitness();
@@ -185,6 +188,15 @@ impl<T: Network + Debug + Clone> Pool<T> {
 
             if best_fitness > fitness_threshold {
                 break;
+            }
+
+            let species_set = self.speciate(prev_species_info);
+
+            // reproduce ...
+
+            prev_species_info = Vec::new();
+            for species in species_set {
+                prev_species_info.push(species.info());
             }
 
             self.reproduce();

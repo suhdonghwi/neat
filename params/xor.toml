@@ -21,5 +21,6 @@ perturb_max = 1.0
 c1 = 1.0
 c2 = 0.5
 compatibility_threshold = 20.0
+elitism = 2
 
 survival_rate = 0.2

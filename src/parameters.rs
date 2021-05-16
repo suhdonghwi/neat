@@ -34,4 +34,6 @@ pub struct SpeciationParameters {
 
     pub compatibility_threshold: f64,
     pub survival_rate: f64,
+
+    pub elitism: usize,
 }

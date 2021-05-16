@@ -99,6 +99,8 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
     }
 
     fn speciate(&'a self, prev_species_set: Vec<SpeciesInfo<T>>) -> Vec<Species<T>> {
+        // assumes genomes are sorted by fitness
+
         let mut new_species_set: Vec<Species<T>> = Vec::new();
 
         for mut species_info in prev_species_set {
@@ -168,6 +170,17 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
                 );
             }
 
+            let mut offspring_list: Vec<T> = Vec::new();
+
+            for species in &species_set {
+                let elites = species.elites(self.params.speciation.elitism);
+                for elite in elites {
+                    offspring_list.push(elite);
+                }
+            }
+
+            let target_count = self.params.population - offspring_list.len();
+
             let fitness_list: Vec<f64> = species_set
                 .iter()
                 .map(|s| s.adjusted_fitness_average().unwrap())
@@ -176,11 +189,11 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
 
             let mut count_list: Vec<usize> = fitness_list
                 .iter()
-                .map(|f| ((self.params.population as f64) * (f / fitness_sum)).ceil() as usize)
+                .map(|f| (target_count as f64 * (f / fitness_sum)).ceil() as usize)
                 .collect();
             let total_count: usize = count_list.iter().sum();
 
-            for i in 0..total_count - self.params.population {
+            for i in 0..total_count - target_count {
                 count_list[i % species_set.len()] -= 1;
             }
 
@@ -190,7 +203,6 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
                 &count_list
             );
 
-            let mut offspring_list = Vec::new();
             let rng = &mut rand::thread_rng();
             for (i, count) in count_list.into_iter().enumerate() {
                 for _ in 0..count {

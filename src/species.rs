@@ -91,4 +91,16 @@ impl<'a, T: Network + Debug + Clone> Species<'a, T> {
 
         parent1.crossover(parent2)
     }
+
+    pub fn elites(&self, count: usize) -> Vec<T> {
+        self.list.iter().take(count).cloned().cloned().collect()
+
+        /*
+        let mut result: Vec<T> = Vec::new();
+        for i in 0..count.min(self.list.len()) {
+            result.push(self.list[i].clone());
+        }
+        result
+        */
+    }
 }

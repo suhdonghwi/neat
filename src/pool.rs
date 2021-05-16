@@ -159,7 +159,7 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
 
             species_set = species_set
                 .into_iter()
-                .filter(|s| s.genome_count() > 1)
+                .filter(|s| s.genome_count() > 2)
                 .collect();
 
             let fitness_list: Vec<f64> = species_set
@@ -173,11 +173,12 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
                 .map(|f| ((self.params.population as f64) * (f / fitness_sum)).ceil() as usize)
                 .collect();
             let total_count: usize = count_list.iter().sum();
-            dbg!(&count_list);
 
             for i in 0..total_count - self.params.population {
                 count_list[i % species_set.len()] -= 1;
             }
+
+            dbg!(&count_list);
 
             let mut offspring_list = Vec::new();
             let rng = &mut rand::thread_rng();

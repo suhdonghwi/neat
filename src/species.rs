@@ -82,10 +82,9 @@ impl<'a, T: Network + Debug + Clone> Species<'a, T> {
 
         let index1 = uniform.sample(rng);
         let mut index2 = uniform.sample(rng);
-        /*
         while index1 == index2 {
             index2 = uniform.sample(rng);
-        }*/
+        }
 
         let parent1 = &self.list[index1];
         let parent2 = &self.list[index2];

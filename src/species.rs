@@ -5,13 +5,15 @@ use std::fmt::Debug;
 
 #[derive(Clone, Debug)]
 pub struct SpeciesInfo<T: Network + Debug + Clone> {
+    id: usize,
     representative: T,
     age: usize,
 }
 
 impl<T: Network + Debug + Clone> SpeciesInfo<T> {
-    pub fn new(representative: T, age: usize) -> Self {
+    pub fn new(id: usize, representative: T, age: usize) -> Self {
         Self {
+            id,
             representative,
             age,
         }
@@ -94,13 +96,5 @@ impl<'a, T: Network + Debug + Clone> Species<'a, T> {
 
     pub fn elites(&self, count: usize) -> Vec<T> {
         self.list.iter().take(count).cloned().cloned().collect()
-
-        /*
-        let mut result: Vec<T> = Vec::new();
-        for i in 0..count.min(self.list.len()) {
-            result.push(self.list[i].clone());
-        }
-        result
-        */
     }
 }

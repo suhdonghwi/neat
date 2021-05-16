@@ -4,6 +4,7 @@ pub struct InnovationRecord {
     node_counter: usize,
     connection_counter: usize,
     connection_record: HashMap<(usize, usize), usize>,
+    species_counter: usize,
 }
 
 impl InnovationRecord {
@@ -12,6 +13,7 @@ impl InnovationRecord {
             node_counter: input_number + output_number + 1,
             connection_counter: 0,
             connection_record: HashMap::new(),
+            species_counter: 0,
         }
     }
 
@@ -30,5 +32,10 @@ impl InnovationRecord {
             }
             Some(&n) => n,
         }
+    }
+
+    pub fn new_species(&mut self) -> usize {
+        self.species_counter += 1;
+        self.species_counter - 1
     }
 }

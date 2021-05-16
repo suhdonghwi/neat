@@ -98,7 +98,11 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
         self.list.sort_by(|a, b| b.compare(a).unwrap());
     }
 
-    fn speciate(&'a self, prev_species_set: Vec<SpeciesInfo<T>>) -> Vec<Species<T>> {
+    fn speciate(
+        &'a self,
+        prev_species_set: Vec<SpeciesInfo<T>>,
+        innov_record: &mut InnovationRecord,
+    ) -> Vec<Species<T>> {
         // assumes genomes are sorted by fitness
 
         let mut new_species_set: Vec<Species<T>> = Vec::new();
@@ -119,7 +123,8 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
             }
 
             if !found {
-                new_species_set.push(Species::new(SpeciesInfo::new(network.clone(), 0)));
+                let id = innov_record.new_species();
+                new_species_set.push(Species::new(SpeciesInfo::new(id, network.clone(), 0)));
             }
         }
 
@@ -153,7 +158,7 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
                 break;
             }
 
-            let mut species_set = self.speciate(prev_species_info);
+            let mut species_set = self.speciate(prev_species_info, innov_record);
 
             for species in &mut species_set {
                 species.kill_worst(self.params.speciation.survival_rate);
@@ -173,10 +178,7 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
             let mut offspring_list: Vec<T> = Vec::new();
 
             for species in &species_set {
-                let elites = species.elites(self.params.speciation.elitism);
-                for elite in elites {
-                    offspring_list.push(elite);
-                }
+                offspring_list.extend(species.elites(self.params.speciation.elitism));
             }
 
             let target_count = self.params.population - offspring_list.len();

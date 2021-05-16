@@ -1,3 +1,5 @@
+use rand::{distributions::Uniform, prelude::Distribution, RngCore};
+
 use crate::{network::Network, parameters::Parameters};
 use std::fmt::Debug;
 
@@ -61,9 +63,33 @@ impl<'a, T: Network + Debug + Clone> Species<'a, T> {
     pub fn adjusted_fitness_average(&self) -> Option<f64> {
         let mut sum = 0.0;
         for network in &self.list {
-            sum += network.fitness()? / self.list.len() as f64;
+            sum += network.fitness()?;
         }
 
-        Some(sum / self.list.len() as f64)
+        if self.list.len() == 0 {
+            Some(0.0)
+        } else {
+            Some(sum / (self.list.len() as f64) / (self.list.len() as f64))
+        }
+    }
+
+    pub fn genome_count(&self) -> usize {
+        self.list.len()
+    }
+
+    pub fn mate(&self, rng: &mut impl RngCore) -> Option<T> {
+        let uniform = Uniform::new(0, self.list.len());
+
+        let index1 = uniform.sample(rng);
+        let mut index2 = uniform.sample(rng);
+        /*
+        while index1 == index2 {
+            index2 = uniform.sample(rng);
+        }*/
+
+        let parent1 = &self.list[index1];
+        let parent2 = &self.list[index2];
+
+        parent1.crossover(parent2)
     }
 }

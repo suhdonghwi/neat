@@ -18,31 +18,25 @@ fn random(rng: &mut impl RngCore) -> f64 {
 
 pub struct Pool<T: Network + Debug + Clone> {
     list: Vec<T>,
-    innov_record: InnovationRecord,
     params: Parameters,
 }
 
 impl<'a, T: Network + Debug + Clone> Pool<T> {
-    pub fn new(params: Parameters) -> Self {
+    pub fn new(params: Parameters, innov_record: &mut InnovationRecord) -> Self {
         let mut list: Vec<T> = Vec::new();
-        let mut innov_record = InnovationRecord::new(params.input_number, params.output_number);
 
         for _ in 0..params.population {
-            let mut network = T::new(params.input_number, params.output_number, &mut innov_record);
+            let mut network = T::new(params.input_number, params.output_number, innov_record);
             network
                 .graph_mut()
                 .randomize_weights(params.mutation.weight_min, params.mutation.weight_max);
             list.push(network);
         }
 
-        Self {
-            list,
-            innov_record,
-            params,
-        }
+        Self { list, params }
     }
 
-    fn mutate(&mut self, network: &mut T, rng: &mut impl RngCore) {
+    fn mutate(&self, network: &mut T, innov_record: &mut InnovationRecord, rng: &mut impl RngCore) {
         let delta_uniform = Uniform::new(
             self.params.mutation.perturb_min,
             self.params.mutation.perturb_max,
@@ -71,7 +65,7 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
 
         if random(rng) < self.params.mutation.add_node {
             if let Some(to_add) = network.graph().random_edge(rng) {
-                network.mutate_add_node(to_add, &mut self.innov_record);
+                network.mutate_add_node(to_add, innov_record);
             }
         }
 
@@ -84,12 +78,7 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
             let source = network.graph().random_node(rng);
             let target = network.graph().random_node(rng);
 
-            network.mutate_add_connection(
-                source,
-                target,
-                assign_uniform.sample(rng),
-                &mut self.innov_record,
-            );
+            network.mutate_add_connection(source, target, assign_uniform.sample(rng), innov_record);
         }
 
         if random(rng) < self.params.mutation.remove_connection {
@@ -107,35 +96,6 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
 
     fn sort_by_fitness(&mut self) {
         self.list.sort_by(|a, b| b.compare(a).unwrap());
-    }
-
-    pub fn reproduce(&mut self) -> bool {
-        // assumes gene pool is sorted by fitness correctly
-
-        let rng = &mut rand::thread_rng();
-        let uniform = Uniform::new(0, 15);
-        let mut new_list = Vec::new();
-
-        for _ in 0..self.list.len() {
-            let index1 = uniform.sample(rng);
-            let mut index2 = uniform.sample(rng);
-            while index1 == index2 {
-                index2 = uniform.sample(rng);
-            }
-
-            let parent1 = &self.list[index1];
-            let parent2 = &self.list[index2];
-
-            if let Some(mut offspring) = parent1.crossover(parent2) {
-                self.mutate(&mut offspring, rng);
-                new_list.push(offspring);
-            } else {
-                return false;
-            }
-        }
-
-        self.list = new_list;
-        true
     }
 
     fn speciate(&'a self, prev_species_set: Vec<SpeciesInfo<T>>) -> Vec<Species<T>> {
@@ -168,6 +128,7 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
         &mut self,
         generation: usize,
         fitness_threshold: f64,
+        innov_record: &mut InnovationRecord,
         evaluate: F,
     ) {
         let mut prev_species_info: Vec<SpeciesInfo<T>> = Vec::new();
@@ -190,16 +151,51 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
                 break;
             }
 
-            let species_set = self.speciate(prev_species_info);
+            let mut species_set = self.speciate(prev_species_info);
 
-            // reproduce ...
+            for species in &mut species_set {
+                species.kill_worst(self.params.speciation.survival_rate);
+            }
+
+            species_set = species_set
+                .into_iter()
+                .filter(|s| s.genome_count() > 1)
+                .collect();
+
+            let fitness_list: Vec<f64> = species_set
+                .iter()
+                .map(|s| s.adjusted_fitness_average().unwrap())
+                .collect();
+            let fitness_sum: f64 = fitness_list.iter().sum();
+
+            let mut count_list: Vec<usize> = fitness_list
+                .iter()
+                .map(|f| ((self.params.population as f64) * (f / fitness_sum)).ceil() as usize)
+                .collect();
+            let total_count: usize = count_list.iter().sum();
+            dbg!(&count_list);
+
+            for i in 0..total_count - self.params.population {
+                count_list[i % species_set.len()] -= 1;
+            }
+
+            let mut offspring_list = Vec::new();
+            let rng = &mut rand::thread_rng();
+            for (i, count) in count_list.into_iter().enumerate() {
+                for _ in 0..count {
+                    let mut offspring = species_set[i].mate(rng).unwrap();
+                    self.mutate(&mut offspring, innov_record, rng);
+
+                    offspring_list.push(offspring);
+                }
+            }
 
             prev_species_info = Vec::new();
             for species in species_set {
                 prev_species_info.push(species.info());
             }
 
-            self.reproduce();
+            self.list = offspring_list;
         }
     }
 }

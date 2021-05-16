@@ -1,6 +1,6 @@
 use std::fs;
 
-use neatlib::{network::feedforward::Feedforward, pool::Pool};
+use neatlib::{innovation_record::InnovationRecord, network::feedforward::Feedforward, pool::Pool};
 use neatlib::{network::Network, parameters::Parameters};
 
 fn main() {
@@ -15,7 +15,8 @@ fn main() {
     }
 
     let params: Parameters = toml::from_str(&params_str).unwrap();
-    let mut pool = Pool::<Feedforward>::new(params);
+    let mut innov_record = InnovationRecord::new(params.input_number, params.output_number);
+    let mut pool = Pool::<Feedforward>::new(params, &mut innov_record);
 
     let data = vec![
         (vec![0.0, 0.0], 0.0),
@@ -24,7 +25,7 @@ fn main() {
         (vec![1.0, 1.0], 0.0),
     ];
 
-    pool.evolve(300, 3.9, |networks| {
+    pool.evolve(300, 3.9, &mut innov_record, |networks| {
         for network in networks {
             let mut err = 0.0;
 

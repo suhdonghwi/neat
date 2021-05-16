@@ -139,13 +139,13 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
 
             let best_fitness = self.list[0].fitness().unwrap();
             info!(
-                "Generation {} [best fitness : {}, {} node(s), {} edge(s)]",
+                "[eval] generation {}, best fitness : {}, {} node(s), {} edge(s)",
                 current_generation,
                 best_fitness,
                 self.list[0].graph().node_count(),
                 self.list[0].graph().edge_count()
             );
-            trace!("{:#?}", self.list[0]);
+            trace!("[eval] best genome : {:#?}", self.list[0]);
 
             if best_fitness > fitness_threshold {
                 break;
@@ -183,6 +183,12 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
             for i in 0..total_count - self.params.population {
                 count_list[i % species_set.len()] -= 1;
             }
+
+            info!(
+                "[spec] {} species, assigned list : {:?}",
+                species_set.len(),
+                &count_list
+            );
 
             let mut offspring_list = Vec::new();
             let rng = &mut rand::thread_rng();

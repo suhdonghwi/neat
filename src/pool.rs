@@ -141,6 +141,22 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
         }
     }
 
+    fn list_stats(&self, list: &Vec<f64>) -> (f64, f64) {
+        let mut sum = 0.0;
+        for element in list {
+            sum += element;
+        }
+        let mean = sum / list.len() as f64;
+
+        let mut delta_sum = 0.0;
+        for element in list {
+            delta_sum += (mean - element).powf(2.0) as f64;
+        }
+        let std_deviation = (delta_sum / list.len() as f64).sqrt();
+
+        (mean, std_deviation)
+    }
+
     pub fn evolve<F: Fn(&mut Vec<T>)>(
         &mut self,
         generation: usize,
@@ -159,21 +175,23 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
             evaluate(&mut self.list);
             self.sort_by_fitness();
 
-            let best_fitness = self.list[0].fitness().unwrap();
-            let fitness_list = self.list.iter().map(|g| g.fitness().unwrap());
+            let fitness_list: Vec<f64> = self.list.iter().map(|g| g.fitness().unwrap()).collect();
+            let (fitness_mean, fitness_std_deviation) = self.list_stats(&fitness_list);
 
             self.log(
                 1,
                 format!(
-                    "[Evaluation result]\n- best fitness: {} ({} nodes, {} edges)",
-                    best_fitness,
+                    "[Evaluation result]\n- fitness max: {} ({} nodes, {} edges)\n- fitness mean: {} (σ = {})",
+                    fitness_list[0],
                     self.list[0].graph().node_count(),
-                    self.list[0].graph().edge_count()
+                    self.list[0].graph().edge_count(),
+                    fitness_mean,
+                    fitness_std_deviation,
                 ),
             );
             self.log(2, format!("- best genome: {:#?}", self.list[0]));
 
-            if best_fitness > fitness_threshold {
+            if fitness_list[0] > fitness_threshold {
                 break;
             }
 
@@ -195,13 +213,11 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
             }
 
             let mut offspring_list: Vec<T> = Vec::new();
-
             for species in &species_set {
                 offspring_list.extend(species.elites(self.params.speciation.elitism).to_owned());
             }
 
             let target_count = self.params.population - offspring_list.len();
-
             let adj_fitness_list: Vec<f64> = species_set
                 .iter()
                 .map(|s| s.adjusted_fitness_average().unwrap())
@@ -236,11 +252,7 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
                 }
             }
 
-            prev_species_info = Vec::new();
-            for species in species_set {
-                prev_species_info.push(species.info());
-            }
-
+            prev_species_info = species_set.into_iter().map(|s| s.info()).collect();
             self.list = offspring_list;
         }
     }

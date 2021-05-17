@@ -42,6 +42,7 @@ impl Network for Feedforward {
         bias_node.add_input(1.0);
 
         // Activate nodes in topological order
+        // TODO: Cache toposort result?
         self.graph.activate_topo();
 
         let result = Some(self.graph.activate_output());

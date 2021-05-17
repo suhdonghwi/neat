@@ -29,6 +29,7 @@ type DiffResult<'a> = (
 );
 
 impl NetworkGraph {
+    // Creates a new network graph, without connections
     pub fn new_disconnected(input_number: usize, output_number: usize) -> Self {
         let mut graph = DiGraph::new();
 
@@ -49,6 +50,7 @@ impl NetworkGraph {
         }
     }
 
+    // Creates a new network graph, fully connecting input and output nodes
     pub fn new(
         input_number: usize,
         output_number: usize,
@@ -80,6 +82,7 @@ impl NetworkGraph {
         }
     }
 
+    // Deactivates every node in the network graph
     pub fn clear_sum(&mut self) {
         for node_data in self.graph.node_weights_mut() {
             node_data.clear_sum();
@@ -94,6 +97,7 @@ impl NetworkGraph {
         &mut self.graph[NodeIndex::new(self.input_number + self.output_number)]
     }
 
+    // Collect activation results of output nodes and return them
     pub fn activate_output(&self) -> Vec<f64> {
         let mut result = Vec::new();
         for index in self.input_number..self.input_number + self.output_number {
@@ -150,9 +154,11 @@ impl NetworkGraph {
         petgraph::algo::is_cyclic_directed(&self.graph)
     }
 
+    // Propagate output of the node to outgoing connections
     fn activate_node(&mut self, index: NodeIndex) {
         let activation;
         match self.graph[index].activate() {
+            // Check if every incoming connection has been propagated
             Some(v) => activation = v,
             None => return,
         }

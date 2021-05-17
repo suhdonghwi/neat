@@ -19,7 +19,7 @@ impl<T: Network + Debug + Clone> SpeciesInfo<T> {
         }
     }
 
-    pub fn age(&mut self) {
+    pub fn add_age(&mut self) {
         self.age += 1;
     }
 }
@@ -102,5 +102,13 @@ impl<'a, T: Network + Debug + Clone> Species<'a, T> {
         }
 
         result
+    }
+
+    pub fn age(&self) -> usize {
+        self.info.age
+    }
+
+    pub fn id(&self) -> usize {
+        self.info.id
     }
 }

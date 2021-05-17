@@ -112,7 +112,7 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
         let mut new_species_set: Vec<Species<T>> = Vec::new();
 
         for mut species_info in prev_species_set {
-            species_info.age();
+            species_info.add_age();
             new_species_set.push(Species::new(species_info));
         }
 
@@ -196,7 +196,6 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
             }
 
             let mut species_set = self.speciate(prev_species_info, innov_record);
-
             for species in &mut species_set {
                 species.kill_worst(self.params.speciation.survival_rate);
             }
@@ -205,7 +204,6 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
                 .into_iter()
                 .filter(|s| s.genome_count() > 2)
                 .collect();
-
             if species_set.is_empty() {
                 panic!(
                     "remaining species_set size is 0; maybe compatibility threshold is too small?"
@@ -222,11 +220,11 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
                 .iter()
                 .map(|s| s.adjusted_fitness_average().unwrap())
                 .collect();
-            let fitness_sum: f64 = adj_fitness_list.iter().sum();
+            let adj_fitness_sum: f64 = adj_fitness_list.iter().sum();
 
             let mut count_list: Vec<usize> = adj_fitness_list
                 .iter()
-                .map(|f| (target_count as f64 * (f / fitness_sum)).ceil() as usize)
+                .map(|f| (target_count as f64 * (f / adj_fitness_sum)).ceil() as usize)
                 .collect();
             let total_count: usize = count_list.iter().sum();
 
@@ -234,13 +232,20 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
                 count_list[i % species_set.len()] -= 1;
             }
 
-            /*
-            info!(
-                "[spec] {} species, assigned list : {:?}",
-                species_set.len(),
-                &count_list
+            let mut speciation_log = format!(
+                "[Speciation result]\n{:^6} | {:^5} | {:^6} | {:^10}\n======================================\n",
+                "id", "age", "size", "adj fit avg."
             );
-            */
+            for i in 0..species_set.len() {
+                speciation_log += &format!(
+                    "{:^6} | {:^5} | {:^6} | {:^10.4}\n",
+                    species_set[i].id(),
+                    species_set[i].age(),
+                    count_list[i],
+                    adj_fitness_list[i]
+                );
+            }
+            self.log(1, speciation_log);
 
             let rng = &mut rand::thread_rng();
             for (i, count) in count_list.into_iter().enumerate() {

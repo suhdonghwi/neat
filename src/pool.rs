@@ -135,7 +135,7 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
         new_species_set
     }
 
-    fn log(&self, verbosity: usize, message: String) {
+    fn log(&self, verbosity: usize, message: &str) {
         if verbosity <= self.verbosity {
             println!("{}", message);
         }
@@ -165,12 +165,10 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
         evaluate: F,
     ) {
         let mut prev_species_info: Vec<SpeciesInfo<T>> = Vec::new();
+        let mut meets_threshold = false;
 
         for current_generation in 1..=generation {
-            self.log(
-                1,
-                format!("\n===== Generation {} =====", current_generation),
-            );
+            self.log(1, &format!("\n[Generation {}]", current_generation));
 
             evaluate(&mut self.list);
             self.sort_by_fitness();
@@ -180,8 +178,8 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
 
             self.log(
                 1,
-                format!(
-                    "[Evaluation result]\n- fitness max: {} ({} nodes, {} edges)\n- fitness mean: {} (σ = {})",
+                &format!(
+                    "# Evaluation result\n  - fitness max: {} ({} nodes, {} edges)\n  - fitness mean: {} (σ = {})",
                     fitness_list[0],
                     self.list[0].graph().node_count(),
                     self.list[0].graph().edge_count(),
@@ -189,9 +187,10 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
                     fitness_std_deviation,
                 ),
             );
-            self.log(2, format!("- best genome: {:#?}", self.list[0]));
+            self.log(2, &format!("  - best genome: {:#?}", self.list[0]));
 
             if fitness_list[0] > fitness_threshold {
+                meets_threshold = true;
                 break;
             }
 
@@ -233,19 +232,20 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
             }
 
             let mut speciation_log = format!(
-                "[Speciation result]\n{:^6} | {:^5} | {:^6} | {:^10}\n======================================\n",
-                "id", "age", "size", "adj fit avg."
+                "# Speciation result\n  {:^6} | {:^5} | {:^6} | {:^11} | {:^10}\n  ====================================================\n",
+                "id", "age", "size", "offspring", "adj fit avg."
             );
             for i in 0..species_set.len() {
                 speciation_log += &format!(
-                    "{:^6} | {:^5} | {:^6} | {:^10.4}\n",
+                    "  {:^6} | {:^5} | {:^6} | {:^11} | {:^10.4}\n",
                     species_set[i].id(),
                     species_set[i].age(),
+                    species_set[i].genome_count(),
                     count_list[i],
                     adj_fitness_list[i]
                 );
             }
-            self.log(1, speciation_log);
+            self.log(1, &speciation_log);
 
             let rng = &mut rand::thread_rng();
             for (i, count) in count_list.into_iter().enumerate() {
@@ -259,6 +259,19 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
 
             prev_species_info = species_set.into_iter().map(|s| s.info()).collect();
             self.list = offspring_list;
+        }
+
+        self.log(1, "\n---------------------------------\n");
+        if meets_threshold {
+            self.log(
+                1,
+                &format!(
+                    "Best genome meets fitness threshold!\n{}",
+                    self.list[0].graph()
+                ),
+            );
+        } else {
+            self.log(1, "Generations ended without meeting threshold");
         }
     }
 }

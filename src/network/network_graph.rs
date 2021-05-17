@@ -1,4 +1,7 @@
-use std::collections::HashMap;
+use std::{
+    collections::HashMap,
+    fmt::{self, Display},
+};
 
 use petgraph::graph::Edge;
 use petgraph::graph::{DiGraph, EdgeIndex, NodeIndex};
@@ -346,6 +349,50 @@ impl NetworkGraph {
         let n = std::cmp::max(self.graph.edge_count(), other.graph.edge_count());
 
         (mismatch_count as f64) * c1 / (n as f64) + weight_difference * c2
+    }
+}
+
+impl Display for NetworkGraph {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        writeln!(f, "# Structure")?;
+        writeln!(
+            f,
+            "  - {} input(s), {} output(s), 1 bias",
+            self.input_number, self.output_number
+        )?;
+        writeln!(
+            f,
+            "  - {} hidden node(s), {} edge(s)",
+            self.node_count() - self.input_number - self.output_number - 1,
+            self.edge_count()
+        )?;
+
+        writeln!(f, "# Nodes")?;
+        for node in self.graph.raw_nodes() {
+            writeln!(
+                f,
+                "  - {:?} (id = {})",
+                node.weight.kind(),
+                node.weight.id()
+            )?;
+        }
+        writeln!(f, "# Edges")?;
+        for edge in self.graph.raw_edges() {
+            let source_data = &self.graph[edge.source()];
+            let target_data = &self.graph[edge.target()];
+
+            writeln!(
+                f,
+                "  - {} -> {} (weight = {}, disabled = {}, innov_number = {})",
+                source_data.id(),
+                target_data.id(),
+                edge.weight.get_weight(),
+                edge.weight.is_disabled(),
+                edge.weight.innov_number(),
+            )?;
+        }
+
+        Ok(())
     }
 }
 

@@ -292,7 +292,7 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
                 ),
             );
         } else {
-            self.log(1, "Generations ended without meeting threshold");
+            self.log(1, "Evolution ended without meeting threshold");
         }
     }
 }

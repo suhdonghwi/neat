@@ -141,7 +141,7 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
         }
     }
 
-    fn list_stats(&self, list: &Vec<f64>) -> (f64, f64) {
+    fn list_stats(&self, list: &[f64]) -> (f64, f64) {
         let mut sum = 0.0;
         for element in list {
             sum += element;

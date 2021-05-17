@@ -141,7 +141,7 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
         }
     }
 
-    pub fn evolve<F: Fn(&mut Vec<T>) -> ()>(
+    pub fn evolve<F: Fn(&mut Vec<T>)>(
         &mut self,
         generation: usize,
         fitness_threshold: f64,
@@ -160,6 +160,8 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
             self.sort_by_fitness();
 
             let best_fitness = self.list[0].fitness().unwrap();
+            let fitness_list = self.list.iter().map(|g| g.fitness().unwrap());
+
             self.log(
                 1,
                 format!(
@@ -186,7 +188,7 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
                 .filter(|s| s.genome_count() > 2)
                 .collect();
 
-            if species_set.len() == 0 {
+            if species_set.is_empty() {
                 panic!(
                     "remaining species_set size is 0; maybe compatibility threshold is too small?"
                 );
@@ -195,18 +197,18 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
             let mut offspring_list: Vec<T> = Vec::new();
 
             for species in &species_set {
-                offspring_list.extend(species.elites(self.params.speciation.elitism));
+                offspring_list.extend(species.elites(self.params.speciation.elitism).to_owned());
             }
 
             let target_count = self.params.population - offspring_list.len();
 
-            let fitness_list: Vec<f64> = species_set
+            let adj_fitness_list: Vec<f64> = species_set
                 .iter()
                 .map(|s| s.adjusted_fitness_average().unwrap())
                 .collect();
-            let fitness_sum: f64 = fitness_list.iter().sum();
+            let fitness_sum: f64 = adj_fitness_list.iter().sum();
 
-            let mut count_list: Vec<usize> = fitness_list
+            let mut count_list: Vec<usize> = adj_fitness_list
                 .iter()
                 .map(|f| (target_count as f64 * (f / fitness_sum)).ceil() as usize)
                 .collect();

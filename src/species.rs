@@ -68,7 +68,7 @@ impl<'a, T: Network + Debug + Clone> Species<'a, T> {
             sum += network.fitness()?;
         }
 
-        if self.list.len() == 0 {
+        if self.list.is_empty() {
             Some(0.0)
         } else {
             Some(sum / (self.list.len() as f64) / (self.list.len() as f64))
@@ -95,6 +95,12 @@ impl<'a, T: Network + Debug + Clone> Species<'a, T> {
     }
 
     pub fn elites(&self, count: usize) -> Vec<T> {
-        self.list.iter().take(count).cloned().cloned().collect()
+        let mut result = Vec::new();
+
+        for i in 0..count.min(self.list.len()) {
+            result.push(self.list[i].clone());
+        }
+
+        result
     }
 }

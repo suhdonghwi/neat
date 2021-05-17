@@ -12,7 +12,7 @@ pub trait Network {
     fn new(input_number: usize, output_number: usize, innov_record: &mut InnovationRecord) -> Self;
     fn from_graph(graph: NetworkGraph) -> Self;
 
-    fn activate(&mut self, inputs: &Vec<f64>) -> Option<Vec<f64>>;
+    fn activate(&mut self, inputs: &[f64]) -> Option<Vec<f64>>;
 
     fn graph(&self) -> &NetworkGraph;
     fn graph_mut(&mut self) -> &mut NetworkGraph;

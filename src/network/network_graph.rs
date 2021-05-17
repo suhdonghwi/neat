@@ -19,6 +19,12 @@ pub struct NetworkGraph {
     output_number: usize,
 }
 
+type DiffResult<'a> = (
+    Vec<(&'a Edge<EdgeData>, &'a Edge<EdgeData>)>,
+    Vec<&'a Edge<EdgeData>>,
+    Vec<&'a Edge<EdgeData>>,
+);
+
 impl NetworkGraph {
     pub fn new_disconnected(input_number: usize, output_number: usize) -> Self {
         let mut graph = DiGraph::new();
@@ -166,7 +172,7 @@ impl NetworkGraph {
     }
 
     // Only for feedforward network (DAG)
-    pub fn activate_topo(&mut self) -> () {
+    pub fn activate_topo(&mut self) {
         let mut topo = Topo::new(&self.graph);
         while let Some(node) = topo.next(&self.graph) {
             self.activate_node(node);
@@ -237,14 +243,7 @@ impl NetworkGraph {
         (edge.clone(), source, target)
     }
 
-    fn union_difference<'a>(
-        &self,
-        other: &'a NetworkGraph,
-    ) -> (
-        Vec<(&Edge<EdgeData>, &'a Edge<EdgeData>)>,
-        Vec<&Edge<EdgeData>>,
-        Vec<&'a Edge<EdgeData>>,
-    ) {
+    fn union_difference<'a>(&'a self, other: &'a NetworkGraph) -> DiffResult<'a> {
         let mut matching: Vec<(&Edge<EdgeData>, &Edge<EdgeData>)> = Vec::new();
         let mut my_mismatch: Vec<&Edge<EdgeData>> = Vec::new();
 
@@ -346,13 +345,14 @@ impl NetworkGraph {
         let mismatch_count = my_mismatch.len() + other_mismatch.len();
         let n = std::cmp::max(self.graph.edge_count(), other.graph.edge_count());
 
-        return (mismatch_count as f64) * c1 / (n as f64) + weight_difference * c2;
+        (mismatch_count as f64) * c1 / (n as f64) + weight_difference * c2
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use float_cmp::approx_eq;
 
     fn graph_eq<N, E, Ty, Ix>(
         a: &petgraph::Graph<N, E, Ty, Ix>,
@@ -555,8 +555,16 @@ mod tests {
         let network1 = NetworkGraph::new(input_number, output_number, &mut innov_record);
         let network2 = NetworkGraph::new(input_number, output_number, &mut innov_record);
 
-        assert_eq!(network1.compatibility_metric(&network2, 1.0, 1.0), 0.0);
-        assert_eq!(network2.compatibility_metric(&network1, 1.0, 1.0), 0.0);
+        assert!(approx_eq!(
+            f64,
+            network1.compatibility_metric(&network2, 1.0, 1.0),
+            0.0
+        ));
+        assert!(approx_eq!(
+            f64,
+            network2.compatibility_metric(&network1, 1.0, 1.0),
+            0.0
+        ));
     }
 
     #[test]
@@ -572,13 +580,15 @@ mod tests {
         network2.add_node(0.into(), &mut innov_record);
         network2.edge_mut(1.into()).set_weight(2.0);
 
-        assert_eq!(
+        assert!(approx_eq!(
+            f64,
             network1.compatibility_metric(&network2, 1.0, 2.0),
             2.0 / 4.0 * 1.0 + 1.0 * 2.0
-        );
-        assert_eq!(
+        ));
+        assert!(approx_eq!(
+            f64,
             network2.compatibility_metric(&network1, 1.0, 2.0),
             2.0 / 4.0 * 1.0 + 1.0 * 2.0
-        );
+        ));
     }
 }

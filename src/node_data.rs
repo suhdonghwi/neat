@@ -41,12 +41,10 @@ impl NodeData {
             Some(self.input_sum)
         } else if self.activated {
             Some(activations::sigmoid(self.input_sum))
+        } else if self.kind == NodeKind::Output {
+            Some(0.0)
         } else {
-            if self.kind == NodeKind::Output {
-                Some(0.0)
-            } else {
-                None
-            }
+            None
         }
     }
 

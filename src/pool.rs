@@ -1,4 +1,3 @@
-use log::{info, trace};
 use rand::{
     distributions::{Distribution, Open01, Uniform},
     RngCore,
@@ -19,10 +18,11 @@ fn random(rng: &mut impl RngCore) -> f64 {
 pub struct Pool<T: Network + Debug + Clone> {
     list: Vec<T>,
     params: Parameters,
+    verbosity: usize,
 }
 
 impl<'a, T: Network + Debug + Clone> Pool<T> {
-    pub fn new(params: Parameters, innov_record: &mut InnovationRecord) -> Self {
+    pub fn new(params: Parameters, verbosity: usize, innov_record: &mut InnovationRecord) -> Self {
         let mut list: Vec<T> = Vec::new();
 
         for _ in 0..params.population {
@@ -33,7 +33,11 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
             list.push(network);
         }
 
-        Self { list, params }
+        Self {
+            list,
+            params,
+            verbosity,
+        }
     }
 
     fn mutate(&self, network: &mut T, innov_record: &mut InnovationRecord, rng: &mut impl RngCore) {
@@ -131,6 +135,12 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
         new_species_set
     }
 
+    fn log(&self, verbosity: usize, message: String) {
+        if verbosity <= self.verbosity {
+            println!("{}", message);
+        }
+    }
+
     pub fn evolve<F: Fn(&mut Vec<T>) -> ()>(
         &mut self,
         generation: usize,
@@ -141,18 +151,25 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
         let mut prev_species_info: Vec<SpeciesInfo<T>> = Vec::new();
 
         for current_generation in 1..=generation {
+            self.log(
+                1,
+                format!("\n===== Generation {} =====", current_generation),
+            );
+
             evaluate(&mut self.list);
             self.sort_by_fitness();
 
             let best_fitness = self.list[0].fitness().unwrap();
-            info!(
-                "[eval] generation {}, best fitness : {}, {} node(s), {} edge(s)",
-                current_generation,
-                best_fitness,
-                self.list[0].graph().node_count(),
-                self.list[0].graph().edge_count()
+            self.log(
+                1,
+                format!(
+                    "[Evaluation result]\n- best fitness: {} ({} nodes, {} edges)",
+                    best_fitness,
+                    self.list[0].graph().node_count(),
+                    self.list[0].graph().edge_count()
+                ),
             );
-            trace!("[eval] best genome : {:#?}", self.list[0]);
+            self.log(2, format!("- best genome: {:#?}", self.list[0]));
 
             if best_fitness > fitness_threshold {
                 break;
@@ -199,11 +216,13 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
                 count_list[i % species_set.len()] -= 1;
             }
 
+            /*
             info!(
                 "[spec] {} species, assigned list : {:?}",
                 species_set.len(),
                 &count_list
             );
+            */
 
             let rng = &mut rand::thread_rng();
             for (i, count) in count_list.into_iter().enumerate() {

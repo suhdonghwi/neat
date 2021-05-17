@@ -1,3 +1,4 @@
+use indoc::indoc;
 use rand::{
     distributions::{Distribution, Open01, Uniform},
     RngCore,
@@ -157,6 +158,52 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
         (mean, std_deviation)
     }
 
+    fn log_evaluation(&self, fitness_list: &[f64]) {
+        let (fitness_mean, fitness_std_deviation) = self.list_stats(&fitness_list);
+
+        let message = &format!(
+            indoc! {"
+        # Evaluation result
+          - fitness max: {} ({} nodes, {} edges)
+          - fitness mean: {} (σ = {})
+        "},
+            fitness_list[0],
+            self.list[0].graph().node_count(),
+            self.list[0].graph().edge_count(),
+            fitness_mean,
+            fitness_std_deviation
+        );
+        self.log(1, message);
+        self.log(2, &format!("  - best genome: {:#?}", self.list[0]));
+    }
+
+    fn log_speciation(
+        &self,
+        species_set: &[Species<T>],
+        adj_fitness_list: &[f64],
+        count_list: &[usize],
+    ) {
+        let mut speciation_log = format!(
+            indoc! {"
+            # Speciation result:
+              {:^6} | {:^5} | {:^6} | {:^11} | {:^10}
+              ====================================================
+            "},
+            "id", "age", "size", "offspring", "adj fit avg."
+        );
+        for i in 0..species_set.len() {
+            speciation_log += &format!(
+                "  {:^6} | {:^5} | {:^6} | {:^11} | {:^10.4}\n",
+                species_set[i].id(),
+                species_set[i].age(),
+                species_set[i].genome_count(),
+                count_list[i],
+                adj_fitness_list[i]
+            );
+        }
+        self.log(1, &speciation_log);
+    }
+
     pub fn evolve<F: Fn(&mut Vec<T>)>(
         &mut self,
         generation: usize,
@@ -174,20 +221,7 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
             self.sort_by_fitness();
 
             let fitness_list: Vec<f64> = self.list.iter().map(|g| g.fitness().unwrap()).collect();
-            let (fitness_mean, fitness_std_deviation) = self.list_stats(&fitness_list);
-
-            self.log(
-                1,
-                &format!(
-                    "# Evaluation result\n  - fitness max: {} ({} nodes, {} edges)\n  - fitness mean: {} (σ = {})",
-                    fitness_list[0],
-                    self.list[0].graph().node_count(),
-                    self.list[0].graph().edge_count(),
-                    fitness_mean,
-                    fitness_std_deviation,
-                ),
-            );
-            self.log(2, &format!("  - best genome: {:#?}", self.list[0]));
+            self.log_evaluation(&fitness_list);
 
             if fitness_list[0] > fitness_threshold {
                 meets_threshold = true;
@@ -230,22 +264,7 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
             for i in 0..total_count - target_count {
                 count_list[i % species_set.len()] -= 1;
             }
-
-            let mut speciation_log = format!(
-                "# Speciation result\n  {:^6} | {:^5} | {:^6} | {:^11} | {:^10}\n  ====================================================\n",
-                "id", "age", "size", "offspring", "adj fit avg."
-            );
-            for i in 0..species_set.len() {
-                speciation_log += &format!(
-                    "  {:^6} | {:^5} | {:^6} | {:^11} | {:^10.4}\n",
-                    species_set[i].id(),
-                    species_set[i].age(),
-                    species_set[i].genome_count(),
-                    count_list[i],
-                    adj_fitness_list[i]
-                );
-            }
-            self.log(1, &speciation_log);
+            self.log_speciation(&species_set, &adj_fitness_list, &count_list);
 
             let rng = &mut rand::thread_rng();
             for (i, count) in count_list.into_iter().enumerate() {
@@ -266,7 +285,9 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
             self.log(
                 1,
                 &format!(
-                    "Best genome meets fitness threshold!\n{}",
+                    "Best genome meets fitness threshold! ({} >= {})\n\n{}",
+                    self.list[0].fitness().unwrap(),
+                    fitness_threshold,
                     self.list[0].graph()
                 ),
             );

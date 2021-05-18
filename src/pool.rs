@@ -20,6 +20,8 @@ pub struct Pool<T: Network + Debug + Clone> {
     list: Vec<T>,
     params: Parameters,
     verbosity: usize,
+    prev_species_info: Vec<SpeciesInfo<T>>,
+    generation: usize,
 }
 
 impl<'a, T: Network + Debug + Clone> Pool<T> {
@@ -38,6 +40,8 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
             list,
             params,
             verbosity,
+            prev_species_info: Vec::new(),
+            generation: 0,
         }
     }
 
@@ -103,16 +107,11 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
         self.list.sort_by(|a, b| b.compare(a).unwrap());
     }
 
-    fn speciate(
-        &'a self,
-        prev_species_set: Vec<SpeciesInfo<T>>,
-        innov_record: &mut InnovationRecord,
-    ) -> Vec<Species<T>> {
+    fn speciate(&'a self, innov_record: &mut InnovationRecord) -> Vec<Species<T>> {
         // assumes genomes are sorted by fitness
-
         let mut new_species_set: Vec<Species<T>> = Vec::new();
 
-        for mut species_info in prev_species_set {
+        for mut species_info in self.prev_species_info.clone() {
             species_info.add_age();
             new_species_set.push(Species::new(species_info));
         }
@@ -206,81 +205,72 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
 
     pub fn evolve<F: Fn(&mut Vec<T>)>(
         &mut self,
-        generation: usize,
-        fitness_threshold: f64,
         innov_record: &mut InnovationRecord,
         evaluate: F,
-    ) {
-        let mut prev_species_info: Vec<SpeciesInfo<T>> = Vec::new();
-        let mut meets_threshold = false;
+    ) -> &T {
+        //let mut prev_species_info: Vec<SpeciesInfo<T>> = Vec::new();
+        self.log(1, &format!("[Generation {}]", self.generation));
 
-        for current_generation in 1..=generation {
-            self.log(1, &format!("\n[Generation {}]", current_generation));
+        evaluate(&mut self.list);
+        self.sort_by_fitness();
 
-            evaluate(&mut self.list);
-            self.sort_by_fitness();
+        let fitness_list: Vec<f64> = self.list.iter().map(|g| g.fitness().unwrap()).collect();
+        self.log_evaluation(&fitness_list);
 
-            let fitness_list: Vec<f64> = self.list.iter().map(|g| g.fitness().unwrap()).collect();
-            self.log_evaluation(&fitness_list);
-
-            if fitness_list[0] > fitness_threshold {
-                meets_threshold = true;
-                break;
-            }
-
-            let mut species_set = self.speciate(prev_species_info, innov_record);
-            for species in &mut species_set {
-                species.kill_worst(self.params.speciation.survival_rate);
-            }
-
-            species_set = species_set
-                .into_iter()
-                .filter(|s| s.genome_count() > 2)
-                .collect();
-            if species_set.is_empty() {
-                panic!(
-                    "remaining species_set size is 0; maybe compatibility threshold is too small?"
-                );
-            }
-
-            let mut offspring_list: Vec<T> = Vec::new();
-            for species in &species_set {
-                offspring_list.extend(species.elites(self.params.speciation.elitism).to_owned());
-            }
-
-            let target_count = self.params.population - offspring_list.len();
-            let adj_fitness_list: Vec<f64> = species_set
-                .iter()
-                .map(|s| s.adjusted_fitness_average().unwrap())
-                .collect();
-            let adj_fitness_sum: f64 = adj_fitness_list.iter().sum();
-
-            let mut count_list: Vec<usize> = adj_fitness_list
-                .iter()
-                .map(|f| (target_count as f64 * (f / adj_fitness_sum)).ceil() as usize)
-                .collect();
-            let total_count: usize = count_list.iter().sum();
-
-            for i in 0..total_count - target_count {
-                count_list[i % species_set.len()] -= 1;
-            }
-            self.log_speciation(&species_set, &adj_fitness_list, &count_list);
-
-            let rng = &mut rand::thread_rng();
-            for (i, count) in count_list.into_iter().enumerate() {
-                for _ in 0..count {
-                    let mut offspring = species_set[i].mate(rng).unwrap();
-                    self.mutate(&mut offspring, innov_record, rng);
-
-                    offspring_list.push(offspring);
-                }
-            }
-
-            prev_species_info = species_set.into_iter().map(|s| s.info()).collect();
-            self.list = offspring_list;
+        let mut species_set = self.speciate(innov_record);
+        for species in &mut species_set {
+            species.kill_worst(self.params.speciation.survival_rate);
         }
 
+        species_set = species_set
+            .into_iter()
+            .filter(|s| s.genome_count() > 2)
+            .collect();
+        if species_set.is_empty() {
+            panic!("remaining species_set size is 0; maybe compatibility threshold is too small?");
+        }
+
+        let mut offspring_list: Vec<T> = Vec::new();
+        for species in &species_set {
+            offspring_list.extend(species.elites(self.params.speciation.elitism).to_owned());
+        }
+
+        let target_count = self.params.population - offspring_list.len();
+        let adj_fitness_list: Vec<f64> = species_set
+            .iter()
+            .map(|s| s.adjusted_fitness_average().unwrap())
+            .collect();
+        let adj_fitness_sum: f64 = adj_fitness_list.iter().sum();
+
+        let mut count_list: Vec<usize> = adj_fitness_list
+            .iter()
+            .map(|f| (target_count as f64 * (f / adj_fitness_sum)).ceil() as usize)
+            .collect();
+        let total_count: usize = count_list.iter().sum();
+
+        for i in 0..total_count - target_count {
+            count_list[i % species_set.len()] -= 1;
+        }
+        self.log_speciation(&species_set, &adj_fitness_list, &count_list);
+
+        let rng = &mut rand::thread_rng();
+        for (i, count) in count_list.into_iter().enumerate() {
+            for _ in 0..count {
+                let mut offspring = species_set[i].mate(rng).unwrap();
+                self.mutate(&mut offspring, innov_record, rng);
+
+                offspring_list.push(offspring);
+            }
+        }
+
+        self.prev_species_info = species_set.into_iter().map(|s| s.info()).collect();
+        self.list = offspring_list;
+
         self.log(1, "\n---------------------------------\n");
+        self.generation += 1;
+
+        &self.list[0]
+        /*
         if meets_threshold {
             self.log(
                 1,
@@ -293,6 +283,6 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
             );
         } else {
             self.log(1, "Evolution ended without meeting threshold");
-        }
+        }*/
     }
 }

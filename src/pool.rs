@@ -103,10 +103,6 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
         }
     }
 
-    fn sort_by_fitness(&mut self) {
-        self.list.sort_by(|a, b| b.compare(a).unwrap());
-    }
-
     fn speciate(&'a self, innov_record: &mut InnovationRecord) -> Vec<Species<T>> {
         // assumes genomes are sorted by fitness
         let mut new_species_set: Vec<Species<T>> = Vec::new();
@@ -203,16 +199,18 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
         self.log(1, &speciation_log);
     }
 
-    pub fn evolve<F: Fn(&mut Vec<T>)>(
-        &mut self,
-        innov_record: &mut InnovationRecord,
-        evaluate: F,
-    ) -> &T {
+    pub fn evaluate<F: Fn(usize, &mut T)>(&mut self, evaluate: F) {
+        for (i, network) in self.list.iter_mut().enumerate() {
+            evaluate(i, network);
+            assert!(network.fitness().is_some());
+        }
+
+        self.list.sort_by(|a, b| b.compare(a).unwrap());
+    }
+
+    pub fn evolve(&mut self, innov_record: &mut InnovationRecord) -> &T {
         //let mut prev_species_info: Vec<SpeciesInfo<T>> = Vec::new();
         self.log(1, &format!("[Generation {}]", self.generation));
-
-        evaluate(&mut self.list);
-        self.sort_by_fitness();
 
         let fitness_list: Vec<f64> = self.list.iter().map(|g| g.fitness().unwrap()).collect();
         self.log_evaluation(&fitness_list);
@@ -270,19 +268,5 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
         self.generation += 1;
 
         &self.list[0]
-        /*
-        if meets_threshold {
-            self.log(
-                1,
-                &format!(
-                    "Best genome meets fitness threshold! ({} >= {})\n\n{}",
-                    self.list[0].fitness().unwrap(),
-                    fitness_threshold,
-                    self.list[0].graph()
-                ),
-            );
-        } else {
-            self.log(1, "Evolution ended without meeting threshold");
-        }*/
     }
 }

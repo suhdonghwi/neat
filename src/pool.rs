@@ -199,19 +199,20 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
         self.log(1, &speciation_log);
     }
 
-    pub fn evaluate<F: Fn(usize, &mut T)>(&mut self, evaluate: F) {
+    pub fn evaluate<F: Fn(usize, &mut T)>(&mut self, evaluate: F) -> &T {
         for (i, network) in self.list.iter_mut().enumerate() {
             evaluate(i, network);
             assert!(network.fitness().is_some());
         }
-    }
-
-    pub fn evolve(&mut self, innov_record: &mut InnovationRecord) -> &T {
-        self.log(1, &format!("[Generation {}]", self.generation));
 
         self.list.sort_by(|a, b| b.compare(a).unwrap());
-        let fitness_list: Vec<f64> = self.list.iter().map(|g| g.fitness().unwrap()).collect();
+        &self.list[0]
+    }
 
+    pub fn evolve(&mut self, innov_record: &mut InnovationRecord) {
+        self.log(1, &format!("[Generation {}]", self.generation));
+
+        let fitness_list: Vec<f64> = self.list.iter().map(|g| g.fitness().unwrap()).collect();
         self.log_evaluation(&fitness_list);
 
         let mut species_set = self.speciate(innov_record);
@@ -265,7 +266,9 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
 
         self.log(1, "\n---------------------------------\n");
         self.generation += 1;
+    }
 
-        &self.list[0]
+    pub fn generation(&self) -> usize {
+        self.generation
     }
 }

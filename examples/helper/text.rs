@@ -17,7 +17,7 @@ impl Text {
     pub fn draw(
         &self,
         ctx: &mut ggez::Context,
-        point: ggez::mint::Point2<f32>,
+        point: ggez::nalgebra::Point2<f32>,
         color: graphics::Color,
     ) -> ggez::GameResult {
         graphics::draw(

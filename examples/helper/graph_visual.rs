@@ -115,6 +115,8 @@ impl GraphVisual {
         graph: NetworkGraph,
         rect: graphics::Rect,
         max_weight: f64,
+        generation: usize,
+        fitness: f64,
     ) -> GraphVisual {
         let mut node_info_map = HashMap::new();
         let mut edge_draw_info_list = Vec::new();
@@ -143,7 +145,17 @@ impl GraphVisual {
             ));
         }
 
-        let text = Text::new(ctx, "Best genome", 48.0);
+        let text = Text::new(
+            ctx,
+            &format!(
+                "#{} Best genome (fitness : {:.5})\n{} node(s), {} edge(s)",
+                generation,
+                fitness,
+                graph.node_count(),
+                graph.edge_count(),
+            ),
+            35.0,
+        );
 
         GraphVisual {
             rect,
@@ -183,6 +195,10 @@ impl GraphVisual {
             graphics::draw(ctx, &circle, (info.pos,))?;
         }
 
-        self.text.draw(ctx, self.rect.point(), graphics::BLACK)
+        self.text.draw(
+            ctx,
+            na::Point2::new(self.rect.x + 10.0, self.rect.y + 10.0),
+            graphics::BLACK,
+        )
     }
 }

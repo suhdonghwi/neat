@@ -40,7 +40,7 @@ impl event::EventHandler for MainState {
     fn update(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
         self.timer += ggez::timer::delta(ctx);
 
-        if self.timer >= Duration::from_secs_f64(0.2) {
+        if self.timer >= Duration::from_secs_f64(0.3) {
             let data = vec![
                 (vec![0.0, 0.0], 0.0),
                 (vec![0.0, 1.0], 1.0),
@@ -48,7 +48,8 @@ impl event::EventHandler for MainState {
                 (vec![1.0, 1.0], 0.0),
             ];
 
-            self.pool.evaluate(|_, network| {
+            let generation = self.pool.generation();
+            let best_network = self.pool.evaluate(|_, network| {
                 let mut err = 0.0;
 
                 for (inputs, expected) in &data {
@@ -59,14 +60,16 @@ impl event::EventHandler for MainState {
                 network.evaluate(4.0 - err);
             });
 
-            let best_network = self.pool.evolve(&mut self.innov_record);
             self.graph_visual = Some(GraphVisual::new(
                 ctx,
                 best_network.graph().clone(),
                 [600.0, 0.0, 350.0, 350.0].into(),
                 self.params.mutation.weight_max.abs(),
+                generation,
+                best_network.fitness().unwrap(),
             ));
 
+            self.pool.evolve(&mut self.innov_record);
             self.timer = Duration::new(0, 0);
         }
 

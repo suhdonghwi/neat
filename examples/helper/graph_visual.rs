@@ -1,12 +1,8 @@
 use std::collections::HashMap;
 
 use neat::network::network_graph::NetworkGraph;
-use neat::{
-    edge_data::EdgeData, innovation_record::InnovationRecord, node_data::NodeData,
-    node_kind::NodeKind,
-};
+use neat::{node_data::NodeData, node_kind::NodeKind};
 
-use ggez::event;
 use ggez::graphics;
 use ggez::nalgebra as na;
 use rand::Rng;
@@ -25,7 +21,7 @@ struct NodeDrawInfo {
 
 impl NodeDrawInfo {
     fn new(node_data: &NodeData, graph: &NetworkGraph, rect: &graphics::Rect) -> NodeDrawInfo {
-        let left_right_space = 60.0;
+        let left_right_space = 40.0;
         let mut rng = rand::thread_rng();
 
         match node_data.kind() {

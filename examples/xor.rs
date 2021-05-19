@@ -1,5 +1,135 @@
 mod helper;
 
+use neat::network::network_graph::NetworkGraph;
+use neat::{innovation_record::InnovationRecord, node_data::NodeData, node_kind::NodeKind};
+
+use ggez::event;
+use ggez::graphics;
+use ggez::nalgebra as na;
+
+struct GraphVisual {
+    graph: NetworkGraph,
+    rect: graphics::Rect,
+}
+
+impl GraphVisual {
+    pub fn new(graph: NetworkGraph, rect: graphics::Rect) -> GraphVisual {
+        GraphVisual { graph, rect }
+    }
+
+    fn calculate_y(&self, total_count: usize, nth: usize) -> f32 {
+        let delta = 40.0;
+        let height = delta * (total_count - 1) as f32;
+        (self.rect.h as f32 - height) / 2.0 + delta * nth as f32
+    }
+
+    fn node_draw_info(&self, node_data: &NodeData) -> ggez::mint::Point2<f32> {
+        match node_data.kind() {
+            NodeKind::Input | NodeKind::Bias => {
+                let nth = if node_data.kind() == NodeKind::Bias {
+                    0
+                } else {
+                    node_data.id() + 1
+                };
+
+                let total_count = self.graph.input_number() + 1;
+                ggez::mint::Point2 {
+                    x: self.rect.x as f32 + 60.0,
+                    y: self.calculate_y(total_count, nth),
+                }
+            }
+            NodeKind::Output => {
+                let nth = node_data.id() - self.graph.input_number();
+                let total_count = self.graph.output_number();
+                ggez::mint::Point2 {
+                    x: self.rect.x as f32 + self.rect.w as f32 - 60.0,
+                    y: self.calculate_y(total_count, nth),
+                }
+            }
+            _ => ggez::mint::Point2 { x: 0.0, y: 0.0 },
+        }
+    }
+
+    fn draw(&self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {
+        let rectangle = graphics::Mesh::new_rectangle(
+            ctx,
+            graphics::DrawMode::fill(),
+            self.rect,
+            graphics::Color::from_rgb(233, 236, 239),
+        )?;
+        graphics::draw(ctx, &rectangle, (ggez::mint::Point2 { x: 0.0, y: 0.0 },))?;
+
+        let node_radius = 5.0;
+        for node in self.graph.inner_data().raw_nodes() {
+            let circle = graphics::Mesh::new_circle(
+                ctx,
+                graphics::DrawMode::fill(),
+                [0.0, 0.0],
+                node_radius,
+                1.0,
+                graphics::BLACK,
+            )?;
+
+            let point = self.node_draw_info(&node.weight);
+            graphics::draw(ctx, &circle, (point,))?;
+        }
+
+        Ok(())
+    }
+}
+
+struct MainState {
+    graph_visual: GraphVisual,
+    innov_record: InnovationRecord,
+}
+
+impl MainState {
+    fn new() -> ggez::GameResult<MainState> {
+        let mut innov_record = InnovationRecord::new(4, 1);
+        let network = NetworkGraph::new(4, 1, &mut innov_record);
+
+        Ok(MainState {
+            graph_visual: GraphVisual::new(network, [600.0, 0.0, 350.0, 350.0].into()),
+            innov_record,
+        })
+    }
+}
+
+impl event::EventHandler for MainState {
+    fn update(&mut self, _ctx: &mut ggez::Context) -> ggez::GameResult {
+        Ok(())
+    }
+
+    fn draw(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
+        graphics::clear(ctx, graphics::Color::from_rgb(248, 249, 250));
+
+        self.graph_visual.draw(ctx)?;
+        /*
+        let circle = graphics::Mesh::new_circle(
+            ctx,
+            graphics::DrawMode::fill(),
+            na::Point2::new(self.pos_x, 380.0),
+            100.0,
+            2.0,
+            graphics::BLACK,
+        )?;
+        graphics::draw(ctx, &circle, (na::Point2::new(0.0, 0.0),))?;
+        */
+
+        graphics::present(ctx)?;
+        Ok(())
+    }
+}
+
+pub fn main() -> ggez::GameResult {
+    let cb = ggez::ContextBuilder::new("neat", "suhdonghwi")
+        .window_mode(ggez::conf::WindowMode::default().dimensions(950.0, 650.0));
+    let (ctx, event_loop) = &mut cb.build()?;
+    let state = &mut MainState::new()?;
+    event::run(ctx, event_loop, state)
+}
+
+/*
 use neat::network::Network;
 use neat::{innovation_record::InnovationRecord, network::feedforward::Feedforward, pool::Pool};
 
@@ -31,3 +161,4 @@ fn main() {
         pool.evolve(&mut innov_record);
     }
 }
+*/

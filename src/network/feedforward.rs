@@ -1,10 +1,7 @@
 use petgraph::graph::NodeIndex;
 
 use super::{network_graph::NetworkGraph, Network};
-use crate::{
-    innovation_record::InnovationRecord,
-    node_data::{NodeData, NodeKind},
-};
+use crate::{innovation_record::InnovationRecord, node_data::NodeData, node_kind::NodeKind};
 
 #[derive(Debug, Clone)]
 pub struct Feedforward {

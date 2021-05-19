@@ -12,7 +12,8 @@ use rand::{
     RngCore,
 };
 
-use crate::node_data::{NodeData, NodeKind};
+use crate::node_data::NodeData;
+use crate::node_kind::NodeKind;
 use crate::{edge_data::EdgeData, innovation_record::InnovationRecord};
 
 #[derive(Debug, Clone)]
@@ -72,6 +73,18 @@ impl NetworkGraph {
         }
 
         network
+    }
+
+    pub fn inner_data(&self) -> &DiGraph<NodeData, EdgeData> {
+        &self.graph
+    }
+
+    pub fn input_number(&self) -> usize {
+        self.input_number
+    }
+
+    pub fn output_number(&self) -> usize {
+        self.output_number
     }
 
     pub fn randomize_weights(&mut self, low: f64, high: f64) {

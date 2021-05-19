@@ -1,12 +1,5 @@
 use crate::activations;
-
-#[derive(Debug, PartialEq, Clone, Copy)]
-pub enum NodeKind {
-    Input,
-    Output,
-    Hidden,
-    Bias,
-}
+use crate::node_kind::NodeKind;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct NodeData {

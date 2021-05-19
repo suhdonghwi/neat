@@ -3,10 +3,11 @@ use std::cmp::Ordering;
 use petgraph::graph::{EdgeIndex, NodeIndex};
 
 use self::network_graph::NetworkGraph;
-use crate::{innovation_record::InnovationRecord, node_data::NodeKind};
+use crate::innovation_record::InnovationRecord;
+use crate::node_kind::NodeKind;
 
 pub mod feedforward;
-mod network_graph;
+pub mod network_graph;
 
 pub trait Network {
     fn new(input_number: usize, output_number: usize, innov_record: &mut InnovationRecord) -> Self;

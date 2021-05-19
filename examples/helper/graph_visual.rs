@@ -34,9 +34,9 @@ impl NodeDrawInfo {
 
                 let total_count = graph.input_number() + 1;
                 let color = if node_data.kind() == NodeKind::Input {
-                    graphics::Color::from_rgb(255, 107, 107)
+                    graphics::Color::from_rgb(73, 80, 87)
                 } else {
-                    graphics::Color::from_rgb(252, 196, 25)
+                    graphics::Color::from_rgb(173, 181, 189)
                 };
 
                 NodeDrawInfo {
@@ -56,7 +56,7 @@ impl NodeDrawInfo {
                         rect.x as f32 + rect.w as f32 - left_right_space,
                         calculate_y(total_count, nth, rect),
                     ),
-                    color: graphics::Color::from_rgb(92, 124, 250),
+                    color: graphics::Color::from_rgb(73, 80, 87),
                 }
             }
             NodeKind::Hidden => NodeDrawInfo {
@@ -66,7 +66,7 @@ impl NodeDrawInfo {
                     ),
                     rng.gen_range(rect.y + 60.0..rect.y + rect.h - 60.0),
                 ),
-                color: graphics::Color::from_rgb(32, 201, 151),
+                color: graphics::Color::from_rgb(134, 142, 150),
             },
         }
     }
@@ -81,12 +81,16 @@ struct EdgeDrawInfo {
 }
 
 impl EdgeDrawInfo {
-    fn new(from: na::Point2<f32>, to: na::Point2<f32>) -> EdgeDrawInfo {
+    fn new(from: na::Point2<f32>, to: na::Point2<f32>, weight: f64) -> EdgeDrawInfo {
         EdgeDrawInfo {
             from,
             to,
             width: 2.0,
-            color: graphics::Color::from_rgba(73, 80, 87, 150),
+            color: if weight > 0.0 {
+                graphics::Color::from_rgba(81, 207, 102, 150)
+            } else {
+                graphics::Color::from_rgba(255, 107, 107, 150)
+            },
         }
     }
 }
@@ -118,7 +122,11 @@ impl GraphVisual {
             let from_pos = node_info_map.get(&from_id).unwrap().pos;
             let to_pos = node_info_map.get(&to_id).unwrap().pos;
 
-            edge_draw_info_list.push(EdgeDrawInfo::new(from_pos, to_pos));
+            edge_draw_info_list.push(EdgeDrawInfo::new(
+                from_pos,
+                to_pos,
+                edge.weight.get_weight(),
+            ));
         }
 
         GraphVisual {

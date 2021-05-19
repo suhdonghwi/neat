@@ -13,11 +13,16 @@ fn calculate_y(total_count: usize, nth: usize, rect: &graphics::Rect) -> f32 {
     (rect.h as f32 - height) / 2.0 + delta * nth as f32
 }
 
+struct NodeDrawInfo {
+    pos: na::Point2<f32>,
+    color: graphics::Color,
+}
+
 fn node_draw_info(
     node_data: &NodeData,
     graph: &NetworkGraph,
     rect: &graphics::Rect,
-) -> (na::Point2<f32>, graphics::Color) {
+) -> NodeDrawInfo {
     let left_right_space = 60.0;
 
     match node_data.kind() {
@@ -35,46 +40,50 @@ fn node_draw_info(
                 graphics::Color::from_rgb(252, 196, 25)
             };
 
-            (
-                na::Point2::new(
+            NodeDrawInfo {
+                pos: na::Point2::new(
                     rect.x as f32 + left_right_space,
                     calculate_y(total_count, nth, rect),
                 ),
                 color,
-            )
+            }
         }
         NodeKind::Output => {
             let nth = node_data.id() - graph.input_number();
             let total_count = graph.output_number();
-            (
-                na::Point2::new(
+
+            NodeDrawInfo {
+                pos: na::Point2::new(
                     rect.x as f32 + rect.w as f32 - left_right_space,
                     calculate_y(total_count, nth, rect),
                 ),
-                graphics::Color::from_rgb(92, 124, 250),
-            )
+                color: graphics::Color::from_rgb(92, 124, 250),
+            }
         }
-        _ => (na::Point2::new(0.0, 0.0), graphics::WHITE),
+        NodeKind::Hidden => NodeDrawInfo {
+            pos: na::Point2::new(0.0, 0.0),
+            color: graphics::WHITE,
+        },
     }
 }
 
 struct GraphVisual {
     rect: graphics::Rect,
 
-    node_draw_points: Vec<(na::Point2<f32>, graphics::Color)>,
+    node_draw_info_list: Vec<NodeDrawInfo>,
 }
 
 impl GraphVisual {
     pub fn new(graph: NetworkGraph, rect: graphics::Rect) -> GraphVisual {
-        let mut node_draw_points = Vec::new();
+        let mut node_draw_info_list = Vec::new();
 
         for node in graph.inner_data().raw_nodes() {
-            node_draw_points.push(node_draw_info(&node.weight, &graph, &rect));
+            node_draw_info_list.push(node_draw_info(&node.weight, &graph, &rect));
         }
 
         GraphVisual {
             rect,
-            node_draw_points,
+            node_draw_info_list,
         }
     }
 
@@ -88,17 +97,17 @@ impl GraphVisual {
         graphics::draw(ctx, &rectangle, (ggez::mint::Point2 { x: 0.0, y: 0.0 },))?;
 
         let node_radius = 6.0;
-        for (point, color) in &self.node_draw_points {
+        for info in &self.node_draw_info_list {
             let circle = graphics::Mesh::new_circle(
                 ctx,
                 graphics::DrawMode::fill(),
                 [0.0, 0.0],
                 node_radius,
                 0.5,
-                *color,
+                info.color,
             )?;
 
-            graphics::draw(ctx, &circle, (*point,))?;
+            graphics::draw(ctx, &circle, (info.pos,))?;
         }
 
         Ok(())

@@ -41,7 +41,7 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
             params,
             verbosity,
             prev_species_info: Vec::new(),
-            generation: 0,
+            generation: 1,
         }
     }
 

@@ -18,7 +18,7 @@ fn main() {
     ];
 
     for _ in 0..50 {
-        pool.evaluate(|_i, network| {
+        pool.evaluate(|_, network| {
             let mut err = 0.0;
 
             for (inputs, expected) in &data {

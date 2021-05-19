@@ -1,11 +1,13 @@
-use std::{collections::HashMap, path::Path};
+use std::collections::HashMap;
 
 use neat::network::network_graph::NetworkGraph;
 use neat::{node_data::NodeData, node_kind::NodeKind};
 
-use ggez::graphics::{self, Drawable};
+use ggez::graphics::{self};
 use ggez::nalgebra as na;
 use rand::Rng;
+
+use super::text::Text;
 
 fn calculate_y(total_count: usize, nth: usize, rect: &graphics::Rect) -> f32 {
     let delta = 40.0;
@@ -104,7 +106,7 @@ pub struct GraphVisual {
     rect: graphics::Rect,
     node_draw_info_list: Vec<NodeDrawInfo>,
     edge_draw_info_list: Vec<EdgeDrawInfo>,
-    text: graphics::Text,
+    text: Text,
 }
 
 impl GraphVisual {
@@ -141,9 +143,7 @@ impl GraphVisual {
             ));
         }
 
-        let text_font = graphics::Font::new(ctx, Path::new("/LiberationMono-Regular.ttf")).unwrap();
-        let mut text = graphics::Text::new("Best genome");
-        text.set_font(text_font, graphics::Scale::uniform(48.0));
+        let text = Text::new(ctx, "Best genome", 48.0);
 
         GraphVisual {
             rect,
@@ -183,15 +183,6 @@ impl GraphVisual {
             graphics::draw(ctx, &circle, (info.pos,))?;
         }
 
-        graphics::draw(
-            ctx,
-            &self.text,
-            graphics::DrawParam::default()
-                .dest(self.rect.point())
-                .scale([0.5, 0.5])
-                .color(graphics::BLACK),
-        )?;
-
-        Ok(())
+        self.text.draw(ctx, self.rect.point(), graphics::BLACK)
     }
 }

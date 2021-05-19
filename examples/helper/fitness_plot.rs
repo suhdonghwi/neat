@@ -7,13 +7,20 @@ use super::text::Text;
 pub struct FitnessPlot {
     rect: graphics::Rect,
     fitness_list: Vec<f64>,
+
+    fitness_max: f32,
+    fitness_min: f32,
+    fitness_delta: f32,
 }
 
 impl FitnessPlot {
-    pub fn new(rect: graphics::Rect) -> FitnessPlot {
+    pub fn new(rect: graphics::Rect, max: f32, min: f32, delta: f32) -> FitnessPlot {
         FitnessPlot {
             rect,
             fitness_list: Vec::new(),
+            fitness_max: max,
+            fitness_min: min,
+            fitness_delta: delta,
         }
     }
 
@@ -121,15 +128,10 @@ impl FitnessPlot {
             .cloned()
             .collect();
 
-        let max = 4.0;
-        let min = 2.0;
-        let current_gen = self.fitness_list.len();
-
         self.draw_axis(ctx, &actual_rect)?;
 
+        let current_gen = self.fitness_list.len();
         let gen_delta = (to_show.len() as f64 / 4.0).ceil() as usize;
-        let fitness_delta = 1.0;
-
         let gen_start = if self.fitness_list.len() < max_points {
             0
         } else {
@@ -144,16 +146,16 @@ impl FitnessPlot {
         self.draw_vertical(ctx, current_gen, actual_rect.w, &actual_rect)?;
 
         let mut fitness: f32 = 0.0;
-        while !fitness.approx_eq(max, (0.0, 2)) {
+        while !fitness.approx_eq(self.fitness_max, (0.0, 2)) {
             self.draw_horizontal(
                 ctx,
-                actual_rect.h - actual_rect.h * fitness / max,
+                actual_rect.h - actual_rect.h * fitness / self.fitness_max,
                 fitness,
                 &actual_rect,
             )?;
-            fitness += fitness_delta;
+            fitness += self.fitness_delta;
         }
-        self.draw_horizontal(ctx, 0.0, max, &actual_rect)?;
+        self.draw_horizontal(ctx, 0.0, self.fitness_max, &actual_rect)?;
 
         let delta = if to_show.len() <= 1 {
             0.0
@@ -165,10 +167,10 @@ impl FitnessPlot {
             .iter()
             .enumerate()
             .map(|(i, &y)| {
-                na::Point2::new(
-                    i as f32 * delta,
-                    actual_rect.h - (actual_rect.h * (y as f32 - min) / (max - min)) as f32,
-                )
+                let y = actual_rect.h
+                    - (actual_rect.h * (y as f32 - self.fitness_min)
+                        / (self.fitness_max - self.fitness_min)) as f32;
+                na::Point2::new(i as f32 * delta, y)
             })
             .collect();
 

@@ -29,7 +29,7 @@ impl MainState {
 
         MainState {
             graph_visual: None,
-            fitness_plot: FitnessPlot::new([600.0, 350.0, 350.0, 300.0].into()),
+            fitness_plot: FitnessPlot::new([600.0, 350.0, 350.0, 300.0].into(), 4.0, 1.0, 1.0),
             innov_record,
             pool,
             timer: Duration::new(0, 0),

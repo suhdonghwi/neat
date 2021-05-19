@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone, Copy)]
 pub struct Parameters {
     pub input_number: usize,
     pub output_number: usize,
@@ -10,7 +10,7 @@ pub struct Parameters {
     pub speciation: SpeciationParameters,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone, Copy)]
 pub struct MutationParameters {
     pub weight_perturbation: f64,
     pub weight_assign: f64,
@@ -27,7 +27,7 @@ pub struct MutationParameters {
     pub perturb_max: f64,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone, Copy)]
 pub struct SpeciationParameters {
     pub c1: f64, // mismatch gene coefficient
     pub c2: f64, // weight difference cofficient

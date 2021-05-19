@@ -5,8 +5,8 @@ use std::time::Duration;
 use ggez::event;
 use ggez::graphics;
 
-use neat::network::Network;
 use neat::{innovation_record::InnovationRecord, network::feedforward::Feedforward, pool::Pool};
+use neat::{network::Network, parameters::Parameters};
 
 use helper::graph_visual::GraphVisual;
 
@@ -15,6 +15,7 @@ struct MainState {
     innov_record: InnovationRecord,
     pool: Pool<Feedforward>,
     timer: Duration,
+    params: Parameters,
 }
 
 impl MainState {
@@ -30,6 +31,7 @@ impl MainState {
             innov_record,
             pool,
             timer: Duration::new(0, 0),
+            params,
         }
     }
 }
@@ -61,6 +63,7 @@ impl event::EventHandler for MainState {
             self.graph_visual = Some(GraphVisual::new(
                 best_network.graph().clone(),
                 [600.0, 0.0, 350.0, 350.0].into(),
+                self.params.mutation.weight_max.abs(),
             ));
 
             self.timer = Duration::new(0, 0);

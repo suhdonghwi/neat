@@ -81,11 +81,16 @@ struct EdgeDrawInfo {
 }
 
 impl EdgeDrawInfo {
-    fn new(from: na::Point2<f32>, to: na::Point2<f32>, weight: f64) -> EdgeDrawInfo {
+    fn new(
+        from: na::Point2<f32>,
+        to: na::Point2<f32>,
+        weight: f64,
+        max_weight: f64,
+    ) -> EdgeDrawInfo {
         EdgeDrawInfo {
             from,
             to,
-            width: 2.0,
+            width: (7.0 * weight.abs() / max_weight) as f32,
             color: if weight > 0.0 {
                 graphics::Color::from_rgba(81, 207, 102, 150)
             } else {
@@ -102,7 +107,7 @@ pub struct GraphVisual {
 }
 
 impl GraphVisual {
-    pub fn new(graph: NetworkGraph, rect: graphics::Rect) -> GraphVisual {
+    pub fn new(graph: NetworkGraph, rect: graphics::Rect, max_weight: f64) -> GraphVisual {
         let mut node_info_map = HashMap::new();
         let mut edge_draw_info_list = Vec::new();
 
@@ -126,6 +131,7 @@ impl GraphVisual {
                 from_pos,
                 to_pos,
                 edge.weight.get_weight(),
+                max_weight,
             ));
         }
 

@@ -7,46 +7,68 @@ use ggez::event;
 use ggez::graphics;
 use ggez::nalgebra as na;
 
+fn calculate_y(total_count: usize, nth: usize, rect: &graphics::Rect) -> f32 {
+    let delta = 40.0;
+    let height = delta * (total_count - 1) as f32;
+    (rect.h as f32 - height) / 2.0 + delta * nth as f32
+}
+
+fn node_draw_info(
+    node_data: &NodeData,
+    graph: &NetworkGraph,
+    rect: &graphics::Rect,
+) -> (na::Point2<f32>, graphics::Color) {
+    let left_right_space = 60.0;
+
+    match node_data.kind() {
+        NodeKind::Input | NodeKind::Bias => {
+            let nth = if node_data.kind() == NodeKind::Bias {
+                0
+            } else {
+                node_data.id() + 1
+            };
+
+            let total_count = graph.input_number() + 1;
+            (
+                na::Point2::new(
+                    rect.x as f32 + left_right_space,
+                    calculate_y(total_count, nth, rect),
+                ),
+                graphics::BLACK,
+            )
+        }
+        NodeKind::Output => {
+            let nth = node_data.id() - graph.input_number();
+            let total_count = graph.output_number();
+            (
+                na::Point2::new(
+                    rect.x as f32 + rect.w as f32 - left_right_space,
+                    calculate_y(total_count, nth, rect),
+                ),
+                graphics::WHITE,
+            )
+        }
+        _ => (na::Point2::new(0.0, 0.0), graphics::WHITE),
+    }
+}
+
 struct GraphVisual {
-    graph: NetworkGraph,
     rect: graphics::Rect,
+
+    node_draw_points: Vec<(na::Point2<f32>, graphics::Color)>,
 }
 
 impl GraphVisual {
     pub fn new(graph: NetworkGraph, rect: graphics::Rect) -> GraphVisual {
-        GraphVisual { graph, rect }
-    }
+        let mut node_draw_points = Vec::new();
 
-    fn calculate_y(&self, total_count: usize, nth: usize) -> f32 {
-        let delta = 40.0;
-        let height = delta * (total_count - 1) as f32;
-        (self.rect.h as f32 - height) / 2.0 + delta * nth as f32
-    }
+        for node in graph.inner_data().raw_nodes() {
+            node_draw_points.push(node_draw_info(&node.weight, &graph, &rect));
+        }
 
-    fn node_draw_info(&self, node_data: &NodeData) -> ggez::mint::Point2<f32> {
-        match node_data.kind() {
-            NodeKind::Input | NodeKind::Bias => {
-                let nth = if node_data.kind() == NodeKind::Bias {
-                    0
-                } else {
-                    node_data.id() + 1
-                };
-
-                let total_count = self.graph.input_number() + 1;
-                ggez::mint::Point2 {
-                    x: self.rect.x as f32 + 60.0,
-                    y: self.calculate_y(total_count, nth),
-                }
-            }
-            NodeKind::Output => {
-                let nth = node_data.id() - self.graph.input_number();
-                let total_count = self.graph.output_number();
-                ggez::mint::Point2 {
-                    x: self.rect.x as f32 + self.rect.w as f32 - 60.0,
-                    y: self.calculate_y(total_count, nth),
-                }
-            }
-            _ => ggez::mint::Point2 { x: 0.0, y: 0.0 },
+        GraphVisual {
+            rect,
+            node_draw_points,
         }
     }
 
@@ -60,18 +82,17 @@ impl GraphVisual {
         graphics::draw(ctx, &rectangle, (ggez::mint::Point2 { x: 0.0, y: 0.0 },))?;
 
         let node_radius = 5.0;
-        for node in self.graph.inner_data().raw_nodes() {
+        for (point, color) in &self.node_draw_points {
             let circle = graphics::Mesh::new_circle(
                 ctx,
                 graphics::DrawMode::fill(),
                 [0.0, 0.0],
                 node_radius,
                 1.0,
-                graphics::BLACK,
+                *color,
             )?;
 
-            let point = self.node_draw_info(&node.weight);
-            graphics::draw(ctx, &circle, (point,))?;
+            graphics::draw(ctx, &circle, (*point,))?;
         }
 
         Ok(())

@@ -20,31 +20,50 @@ impl FitnessPlot {
         self.fitness_list.push(v);
     }
 
+    fn draw_axis(&self, ctx: &mut ggez::Context, rect: &graphics::Rect) -> ggez::GameResult<()> {
+        let vertical = graphics::Mesh::new_line(
+            ctx,
+            &[na::Point2::new(0.0, 0.0), na::Point2::new(0.0, rect.h)],
+            1.5,
+            graphics::BLACK,
+        )?;
+
+        graphics::draw(ctx, &vertical, (rect.point(),))?;
+
+        let horizontal = graphics::Mesh::new_line(
+            ctx,
+            &[
+                na::Point2::new(0.0, rect.h),
+                na::Point2::new(rect.w, rect.h),
+            ],
+            1.5,
+            graphics::BLACK,
+        )?;
+
+        graphics::draw(ctx, &horizontal, (rect.point(),))
+    }
+
     fn draw_vertical(
         &self,
         ctx: &mut ggez::Context,
         gen: usize,
         x: f32,
-        actual_height: f32,
-        offset_pos: mint::Point2<f32>,
+        rect: &graphics::Rect,
     ) -> ggez::GameResult<()> {
         let line = graphics::Mesh::new_line(
             ctx,
-            &[na::Point2::new(x, actual_height), na::Point2::new(x, 0.0)],
+            &[na::Point2::new(x, rect.h), na::Point2::new(x, 0.0)],
             1.5,
             graphics::Color::from_rgba(0, 0, 0, 50),
         )?;
 
-        graphics::draw(ctx, &line, (offset_pos,))?;
+        graphics::draw(ctx, &line, (rect.point(),))?;
 
         let text = Text::new(ctx, &format!("{}", gen + 1), 28.0);
         let width = text.width(ctx) as f32;
         text.draw(
             ctx,
-            na::Point2::new(
-                offset_pos.x + x - width / 4.0,
-                offset_pos.y + actual_height + 4.0,
-            ),
+            na::Point2::new(rect.x + x - width / 4.0, rect.y + rect.h + 8.0),
             graphics::BLACK,
         )
     }
@@ -86,6 +105,8 @@ impl FitnessPlot {
         let min = 2.0;
         let current_gen = self.fitness_list.len();
 
+        self.draw_axis(ctx, &actual_rect)?;
+
         let gen_delta = (to_show.len() as f64 / 4.0).ceil() as usize;
         let y_delta = 0.5;
 
@@ -97,16 +118,10 @@ impl FitnessPlot {
         let mut gen = gen_start;
         while gen < current_gen {
             let x = (gen - gen_start) as f32 / to_show.len() as f32 * actual_rect.w;
-            self.draw_vertical(ctx, gen, x, actual_rect.h, actual_rect.point())?;
+            self.draw_vertical(ctx, gen, x, &actual_rect)?;
             gen += gen_delta;
         }
-        self.draw_vertical(
-            ctx,
-            current_gen,
-            actual_rect.w,
-            actual_rect.h,
-            actual_rect.point(),
-        )?;
+        self.draw_vertical(ctx, current_gen, actual_rect.w, &actual_rect)?;
 
         let points: Vec<na::Point2<f32>> = to_show
             .iter()

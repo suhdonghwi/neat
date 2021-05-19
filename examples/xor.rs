@@ -6,6 +6,7 @@ use neat::{innovation_record::InnovationRecord, node_data::NodeData, node_kind::
 use ggez::event;
 use ggez::graphics;
 use ggez::nalgebra as na;
+use rand::Rng;
 
 fn calculate_y(total_count: usize, nth: usize, rect: &graphics::Rect) -> f32 {
     let delta = 40.0;
@@ -24,6 +25,7 @@ fn node_draw_info(
     rect: &graphics::Rect,
 ) -> NodeDrawInfo {
     let left_right_space = 60.0;
+    let mut rng = rand::thread_rng();
 
     match node_data.kind() {
         NodeKind::Input | NodeKind::Bias => {
@@ -61,15 +63,19 @@ fn node_draw_info(
             }
         }
         NodeKind::Hidden => NodeDrawInfo {
-            pos: na::Point2::new(0.0, 0.0),
-            color: graphics::WHITE,
+            pos: na::Point2::new(
+                rng.gen_range(
+                    rect.x + left_right_space + 30.0..rect.x + rect.w - left_right_space - 30.0,
+                ),
+                rng.gen_range(rect.y + 60.0..rect.y + rect.h - 60.0),
+            ),
+            color: graphics::Color::from_rgb(32, 201, 151),
         },
     }
 }
 
 struct GraphVisual {
     rect: graphics::Rect,
-
     node_draw_info_list: Vec<NodeDrawInfo>,
 }
 
@@ -94,7 +100,7 @@ impl GraphVisual {
             self.rect,
             graphics::Color::from_rgb(233, 236, 239),
         )?;
-        graphics::draw(ctx, &rectangle, (ggez::mint::Point2 { x: 0.0, y: 0.0 },))?;
+        graphics::draw(ctx, &rectangle, (na::Point2::new(0.0, 0.0),))?;
 
         let node_radius = 6.0;
         for info in &self.node_draw_info_list {
@@ -103,7 +109,7 @@ impl GraphVisual {
                 graphics::DrawMode::fill(),
                 [0.0, 0.0],
                 node_radius,
-                0.5,
+                0.3,
                 info.color,
             )?;
 
@@ -122,7 +128,11 @@ struct MainState {
 impl MainState {
     fn new() -> ggez::GameResult<MainState> {
         let mut innov_record = InnovationRecord::new(4, 3);
-        let network = NetworkGraph::new(4, 3, &mut innov_record);
+        let mut network = NetworkGraph::new(4, 3, &mut innov_record);
+        network.add_node(0.into(), &mut innov_record);
+        network.add_node(1.into(), &mut innov_record);
+        network.add_node(2.into(), &mut innov_record);
+        network.add_node(3.into(), &mut innov_record);
 
         Ok(MainState {
             graph_visual: GraphVisual::new(network, [600.0, 0.0, 350.0, 350.0].into()),

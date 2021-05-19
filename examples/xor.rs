@@ -14,18 +14,14 @@ struct MainState {
 }
 
 impl MainState {
-    fn new() -> ggez::GameResult<MainState> {
-        let mut innov_record = InnovationRecord::new(4, 3);
-        let mut network = NetworkGraph::new(4, 3, &mut innov_record);
-        network.add_node(0.into(), &mut innov_record);
-        network.add_node(1.into(), &mut innov_record);
-        network.add_node(2.into(), &mut innov_record);
-        network.add_node(3.into(), &mut innov_record);
+    fn new() -> Self {
+        let mut innov_record = InnovationRecord::new(2, 1);
+        let network = NetworkGraph::new(2, 1, &mut innov_record);
 
-        Ok(MainState {
+        MainState {
             graph_visual: GraphVisual::new(network, [600.0, 0.0, 350.0, 350.0].into()),
             innov_record,
-        })
+        }
     }
 }
 
@@ -59,7 +55,7 @@ pub fn main() -> ggez::GameResult {
     let cb = ggez::ContextBuilder::new("neat", "suhdonghwi")
         .window_mode(ggez::conf::WindowMode::default().dimensions(950.0, 650.0));
     let (ctx, event_loop) = &mut cb.build()?;
-    let state = &mut MainState::new()?;
+    let state = &mut MainState::new();
     event::run(ctx, event_loop, state)
 }
 

@@ -2,6 +2,7 @@ use neat::parameters::Parameters;
 use std::fs;
 
 pub mod cli;
+pub mod graph_visual;
 
 pub fn read_parameters_file(path: &str) -> Parameters {
     let params_str;

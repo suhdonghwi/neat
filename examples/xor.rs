@@ -2,16 +2,17 @@ mod helper;
 
 use std::{path::Path, time::Duration};
 
-use ggez::event;
 use ggez::graphics;
+use ggez::{conf::WindowSetup, event};
 
 use neat::{innovation_record::InnovationRecord, network::feedforward::Feedforward, pool::Pool};
 use neat::{network::Network, parameters::Parameters};
 
-use helper::graph_visual::GraphVisual;
+use helper::{fitness_plot::FitnessPlot, graph_visual::GraphVisual};
 
 struct MainState {
     graph_visual: Option<GraphVisual>,
+    fitness_plot: FitnessPlot,
     innov_record: InnovationRecord,
     pool: Pool<Feedforward>,
     timer: Duration,
@@ -28,6 +29,7 @@ impl MainState {
 
         MainState {
             graph_visual: None,
+            fitness_plot: FitnessPlot::new([600.0, 350.0, 350.0, 300.0].into()),
             innov_record,
             pool,
             timer: Duration::new(0, 0),
@@ -59,14 +61,16 @@ impl event::EventHandler for MainState {
 
                 network.evaluate(4.0 - err);
             });
+            let best_fitness = best_network.fitness().unwrap();
 
+            self.fitness_plot.add_data(best_fitness);
             self.graph_visual = Some(GraphVisual::new(
                 ctx,
                 best_network.graph().clone(),
                 [600.0, 0.0, 350.0, 350.0].into(),
                 self.params.mutation.weight_max.abs(),
                 generation,
-                best_network.fitness().unwrap(),
+                best_fitness,
             ));
 
             self.pool.evolve(&mut self.innov_record);
@@ -83,6 +87,8 @@ impl event::EventHandler for MainState {
             graph.draw(ctx)?;
         }
 
+        self.fitness_plot.draw(ctx)?;
+
         graphics::present(ctx)
     }
 }
@@ -90,6 +96,7 @@ impl event::EventHandler for MainState {
 pub fn main() -> ggez::GameResult {
     let cb = ggez::ContextBuilder::new("neat", "suhdonghwi")
         .window_mode(ggez::conf::WindowMode::default().dimensions(950.0, 650.0))
+        .window_setup(WindowSetup::default().title("XOR"))
         .add_resource_path(Path::new("./resources"));
     let (ctx, event_loop) = &mut cb.build()?;
     let state = &mut MainState::new();

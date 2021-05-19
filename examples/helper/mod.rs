@@ -2,6 +2,7 @@ use neat::parameters::Parameters;
 use std::fs;
 
 pub mod cli;
+pub mod fitness_plot;
 pub mod graph_visual;
 pub mod text;
 

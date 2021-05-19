@@ -32,7 +32,7 @@ impl MainState {
             fitness_plot: FitnessPlot::new([600.0, 350.0, 350.0, 300.0].into(), 4.0, 1.0, 1.0),
             innov_record,
             pool,
-            timer: Duration::new(0, 0),
+            timer: Duration::new(1, 0),
             params,
         }
     }
@@ -42,7 +42,7 @@ impl event::EventHandler for MainState {
     fn update(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
         self.timer += ggez::timer::delta(ctx);
 
-        if self.timer >= Duration::from_secs_f64(0.3) {
+        if self.timer >= Duration::from_secs_f64(0.5) {
             let data = vec![
                 (vec![0.0, 0.0], 0.0),
                 (vec![0.0, 1.0], 1.0),

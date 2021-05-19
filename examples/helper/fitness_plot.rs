@@ -1,6 +1,6 @@
 use float_cmp::ApproxEq;
+use ggez::graphics;
 use ggez::nalgebra as na;
-use ggez::{graphics, mint};
 
 use super::text::Text;
 
@@ -67,7 +67,7 @@ impl FitnessPlot {
 
         graphics::draw(ctx, &line, (rect.point(),))?;
 
-        let text = Text::new(ctx, &format!("{}", gen + 1), 28.0);
+        let text = Text::new(ctx, &format!("{}", gen), 28.0);
         let width = text.width(ctx) as f32;
         text.draw(
             ctx,
@@ -102,10 +102,6 @@ impl FitnessPlot {
     }
 
     pub fn draw(&self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {
-        if self.fitness_list.len() < 2 {
-            return Ok(());
-        }
-
         let top_padding = 60.0;
         let right_padding = 40.0;
         let bottom_padding = 40.0;
@@ -132,8 +128,8 @@ impl FitnessPlot {
 
         let current_gen = self.fitness_list.len();
         let gen_delta = (to_show.len() as f64 / 4.0).ceil() as usize;
-        let gen_start = if self.fitness_list.len() < max_points {
-            0
+        let gen_start = if self.fitness_list.len() <= max_points {
+            1
         } else {
             self.fitness_list.len() - max_points
         };
@@ -146,7 +142,7 @@ impl FitnessPlot {
         self.draw_vertical(ctx, current_gen, actual_rect.w, &actual_rect)?;
 
         let mut fitness: f32 = 0.0;
-        while !fitness.approx_eq(self.fitness_max, (0.0, 2)) {
+        while fitness <= self.fitness_max {
             self.draw_horizontal(
                 ctx,
                 actual_rect.h - actual_rect.h * fitness / self.fitness_max,
@@ -155,13 +151,17 @@ impl FitnessPlot {
             )?;
             fitness += self.fitness_delta;
         }
-        self.draw_horizontal(ctx, 0.0, self.fitness_max, &actual_rect)?;
+        //self.draw_horizontal(ctx, 0.0, self.fitness_max, &actual_rect)?;
 
         let delta = if to_show.len() <= 1 {
             0.0
         } else {
             actual_rect.w / (to_show.len() - 1) as f32
         };
+
+        if self.fitness_list.len() < 2 {
+            return Ok(());
+        }
 
         let points: Vec<na::Point2<f32>> = to_show
             .iter()
@@ -174,7 +174,8 @@ impl FitnessPlot {
             })
             .collect();
 
-        let line = graphics::Mesh::new_line(ctx, &points, 2.0, graphics::BLACK)?;
+        let line =
+            graphics::Mesh::new_line(ctx, &points, 2.0, graphics::Color::from_rgb(92, 124, 250))?;
         graphics::draw(ctx, &line, (actual_rect.point(),))?;
 
         Ok(())

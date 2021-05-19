@@ -1,6 +1,6 @@
 mod helper;
 
-use std::time::Duration;
+use std::{path::Path, time::Duration};
 
 use ggez::event;
 use ggez::graphics;
@@ -61,6 +61,7 @@ impl event::EventHandler for MainState {
 
             let best_network = self.pool.evolve(&mut self.innov_record);
             self.graph_visual = Some(GraphVisual::new(
+                ctx,
                 best_network.graph().clone(),
                 [600.0, 0.0, 350.0, 350.0].into(),
                 self.params.mutation.weight_max.abs(),
@@ -85,7 +86,8 @@ impl event::EventHandler for MainState {
 
 pub fn main() -> ggez::GameResult {
     let cb = ggez::ContextBuilder::new("neat", "suhdonghwi")
-        .window_mode(ggez::conf::WindowMode::default().dimensions(950.0, 650.0));
+        .window_mode(ggez::conf::WindowMode::default().dimensions(950.0, 650.0))
+        .add_resource_path(Path::new("./resources"));
     let (ctx, event_loop) = &mut cb.build()?;
     let state = &mut MainState::new();
     event::run(ctx, event_loop, state)

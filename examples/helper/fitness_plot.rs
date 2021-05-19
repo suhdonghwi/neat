@@ -1,4 +1,3 @@
-use float_cmp::ApproxEq;
 use ggez::graphics;
 use ggez::nalgebra as na;
 

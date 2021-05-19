@@ -29,12 +29,18 @@ fn node_draw_info(
             };
 
             let total_count = graph.input_number() + 1;
+            let color = if node_data.kind() == NodeKind::Input {
+                graphics::Color::from_rgb(255, 107, 107)
+            } else {
+                graphics::Color::from_rgb(252, 196, 25)
+            };
+
             (
                 na::Point2::new(
                     rect.x as f32 + left_right_space,
                     calculate_y(total_count, nth, rect),
                 ),
-                graphics::BLACK,
+                color,
             )
         }
         NodeKind::Output => {
@@ -45,7 +51,7 @@ fn node_draw_info(
                     rect.x as f32 + rect.w as f32 - left_right_space,
                     calculate_y(total_count, nth, rect),
                 ),
-                graphics::WHITE,
+                graphics::Color::from_rgb(92, 124, 250),
             )
         }
         _ => (na::Point2::new(0.0, 0.0), graphics::WHITE),
@@ -81,14 +87,14 @@ impl GraphVisual {
         )?;
         graphics::draw(ctx, &rectangle, (ggez::mint::Point2 { x: 0.0, y: 0.0 },))?;
 
-        let node_radius = 5.0;
+        let node_radius = 6.0;
         for (point, color) in &self.node_draw_points {
             let circle = graphics::Mesh::new_circle(
                 ctx,
                 graphics::DrawMode::fill(),
                 [0.0, 0.0],
                 node_radius,
-                1.0,
+                0.5,
                 *color,
             )?;
 
@@ -106,8 +112,8 @@ struct MainState {
 
 impl MainState {
     fn new() -> ggez::GameResult<MainState> {
-        let mut innov_record = InnovationRecord::new(4, 1);
-        let network = NetworkGraph::new(4, 1, &mut innov_record);
+        let mut innov_record = InnovationRecord::new(4, 3);
+        let network = NetworkGraph::new(4, 3, &mut innov_record);
 
         Ok(MainState {
             graph_visual: GraphVisual::new(network, [600.0, 0.0, 350.0, 350.0].into()),

@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Install libasound2-dev
         run: sudo apt install libasound2-dev
+      - name: Install libudev-dev
+        run: sudo apt install libudev-dev
       - uses: actions/checkout@v2
       - name: Build
         run: cargo build --verbose

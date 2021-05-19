@@ -1,8 +1,8 @@
 use std::fs;
 
 use clap::{clap_app, value_t};
-use neatlib::{innovation_record::InnovationRecord, network::feedforward::Feedforward, pool::Pool};
-use neatlib::{network::Network, parameters::Parameters};
+use neat::{innovation_record::InnovationRecord, network::feedforward::Feedforward, pool::Pool};
+use neat::{network::Network, parameters::Parameters};
 
 fn main() {
     let matches = clap_app!(neat =>
@@ -22,8 +22,8 @@ fn main() {
     } else {
         panic!("Couldn't read params file path: {}", params_file_path);
     }
-
     let params: Parameters = toml::from_str(&params_str).unwrap();
+
     let mut innov_record = InnovationRecord::new(params.input_number, params.output_number);
     let mut pool = Pool::<Feedforward>::new(params, verbosity, &mut innov_record);
 

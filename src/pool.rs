@@ -204,15 +204,14 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
             evaluate(i, network);
             assert!(network.fitness().is_some());
         }
-
-        self.list.sort_by(|a, b| b.compare(a).unwrap());
     }
 
     pub fn evolve(&mut self, innov_record: &mut InnovationRecord) -> &T {
-        //let mut prev_species_info: Vec<SpeciesInfo<T>> = Vec::new();
         self.log(1, &format!("[Generation {}]", self.generation));
 
+        self.list.sort_by(|a, b| b.compare(a).unwrap());
         let fitness_list: Vec<f64> = self.list.iter().map(|g| g.fitness().unwrap()).collect();
+
         self.log_evaluation(&fitness_list);
 
         let mut species_set = self.speciate(innov_record);

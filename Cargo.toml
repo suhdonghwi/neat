@@ -15,10 +15,12 @@ clap = "2.33.3"
 float-cmp = "0.8.0"
 indoc = "1.0"
 
+[dev-dependencies]
+ggez = "0.5"
+
 [lib]
-name = "neatlib"
+name = "neat"
 path = "src/lib.rs"
 
-[[bin]]
-name = "neatbin"
-path = "src/bin/main.rs"
+[[example]]
+name = "xor"

@@ -1,5 +1,5 @@
-use ggez::graphics;
 use ggez::nalgebra as na;
+use ggez::{graphics, mint};
 
 use super::text::Text;
 
@@ -26,7 +26,7 @@ impl FitnessPlot {
         gen: usize,
         x: f32,
         actual_height: f32,
-        offset_pos: na::Point2<f32>,
+        offset_pos: mint::Point2<f32>,
     ) -> ggez::GameResult<()> {
         let line = graphics::Mesh::new_line(
             ctx,
@@ -59,9 +59,12 @@ impl FitnessPlot {
         let bottom_padding = 40.0;
         let left_padding = 40.0;
 
-        let actual_width = self.rect.w - left_padding - right_padding;
-        let actual_height = self.rect.h - top_padding - bottom_padding;
-        let offset_pos = na::Point2::new(self.rect.x + left_padding, self.rect.y + top_padding);
+        let actual_rect = graphics::Rect::new(
+            self.rect.x + left_padding,
+            self.rect.y + top_padding,
+            self.rect.w - left_padding - right_padding,
+            self.rect.h - top_padding - bottom_padding,
+        );
 
         let max_points = 40;
         let to_show: Vec<f64> = self
@@ -76,7 +79,7 @@ impl FitnessPlot {
         let delta = if to_show.len() <= 1 {
             0.0
         } else {
-            actual_width / (to_show.len() - 1) as f32
+            actual_rect.w / (to_show.len() - 1) as f32
         };
 
         let max = 4.0;
@@ -93,11 +96,17 @@ impl FitnessPlot {
         };
         let mut gen = gen_start;
         while gen < current_gen {
-            let x = (gen - gen_start) as f32 / to_show.len() as f32 * actual_width;
-            self.draw_vertical(ctx, gen, x, actual_height, offset_pos)?;
+            let x = (gen - gen_start) as f32 / to_show.len() as f32 * actual_rect.w;
+            self.draw_vertical(ctx, gen, x, actual_rect.h, actual_rect.point())?;
             gen += gen_delta;
         }
-        self.draw_vertical(ctx, current_gen, actual_width, actual_height, offset_pos)?;
+        self.draw_vertical(
+            ctx,
+            current_gen,
+            actual_rect.w,
+            actual_rect.h,
+            actual_rect.point(),
+        )?;
 
         let points: Vec<na::Point2<f32>> = to_show
             .iter()
@@ -105,13 +114,13 @@ impl FitnessPlot {
             .map(|(i, &y)| {
                 na::Point2::new(
                     i as f32 * delta,
-                    actual_height - (actual_height * (y as f32 - min) / (max - min)) as f32,
+                    actual_rect.h - (actual_rect.h * (y as f32 - min) / (max - min)) as f32,
                 )
             })
             .collect();
 
         let line = graphics::Mesh::new_line(ctx, &points, 2.0, graphics::BLACK)?;
-        graphics::draw(ctx, &line, (offset_pos,))?;
+        graphics::draw(ctx, &line, (actual_rect.point(),))?;
 
         Ok(())
     }

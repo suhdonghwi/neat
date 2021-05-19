@@ -42,7 +42,7 @@ impl event::EventHandler for MainState {
     fn update(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
         self.timer += ggez::timer::delta(ctx);
 
-        if self.timer >= Duration::from_secs_f64(0.5) {
+        if self.timer >= Duration::from_secs_f64(0.2) {
             let data = vec![
                 (vec![0.0, 0.0], 0.0),
                 (vec![0.0, 1.0], 1.0),

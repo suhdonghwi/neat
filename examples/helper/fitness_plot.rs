@@ -114,7 +114,7 @@ impl FitnessPlot {
             self.rect.h - top_padding - bottom_padding,
         );
 
-        let max_points = 40;
+        let max_points = 50;
         let to_show: Vec<f64> = self
             .fitness_list
             .iter()
@@ -127,7 +127,7 @@ impl FitnessPlot {
         self.draw_axis(ctx, &actual_rect)?;
 
         let current_gen = self.fitness_list.len();
-        let gen_delta = (to_show.len() as f64 / 4.0).ceil() as usize;
+        let gen_delta = (to_show.len() as f64 / 5.0).ceil() as usize;
         let gen_start = if self.fitness_list.len() <= max_points {
             1
         } else {
@@ -142,7 +142,7 @@ impl FitnessPlot {
         self.draw_vertical(ctx, current_gen, actual_rect.w, &actual_rect)?;
 
         let mut fitness: f32 = 0.0;
-        while fitness <= self.fitness_max {
+        while fitness < self.fitness_max - self.fitness_delta / 2.0 {
             self.draw_horizontal(
                 ctx,
                 actual_rect.h - actual_rect.h * fitness / self.fitness_max,
@@ -151,7 +151,7 @@ impl FitnessPlot {
             )?;
             fitness += self.fitness_delta;
         }
-        //self.draw_horizontal(ctx, 0.0, self.fitness_max, &actual_rect)?;
+        self.draw_horizontal(ctx, 0.0, self.fitness_max, &actual_rect)?;
 
         let delta = if to_show.len() <= 1 {
             0.0

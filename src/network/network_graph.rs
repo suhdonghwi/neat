@@ -237,11 +237,13 @@ impl NetworkGraph {
             EdgeData::new(1.0, innov_record.new_connection(new_node_id, target_id)),
         );
 
+        self.toposort_cache = None;
         new_node_index
     }
 
     pub fn remove_node(&mut self, node: NodeIndex) {
         self.graph.remove_node(node);
+        self.toposort_cache = None;
     }
 
     pub fn add_connection(
@@ -255,11 +257,15 @@ impl NetworkGraph {
         let target_id = self.graph[target].id();
         let innov_number = innov_record.new_connection(source_id, target_id);
         let edge_data = EdgeData::new(weight, innov_number);
+
+        self.toposort_cache = None;
+
         self.graph.add_edge(source, target, edge_data)
     }
 
     pub fn remove_connetion(&mut self, edge: EdgeIndex) {
         self.graph.remove_edge(edge);
+        self.toposort_cache = None;
     }
 
     fn endpoints(&self, edge: &Edge<EdgeData>) -> (Edge<EdgeData>, &NodeData, &NodeData) {

@@ -23,7 +23,7 @@ struct NodeDrawInfo {
 
 impl NodeDrawInfo {
     fn new(node_data: &NodeData, graph: &NetworkGraph, rect: &graphics::Rect) -> NodeDrawInfo {
-        let left_right_space = 40.0;
+        let left_right_space = 60.0;
         let mut rng = rand::thread_rng();
 
         match node_data.kind() {
@@ -154,7 +154,7 @@ impl GraphVisual {
                 graph.node_count(),
                 graph.edge_count(),
             ),
-            35.0,
+            32.0,
         );
 
         GraphVisual {

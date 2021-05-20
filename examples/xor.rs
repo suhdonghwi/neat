@@ -29,7 +29,7 @@ impl MainState {
 
         MainState {
             graph_visual: None,
-            fitness_plot: FitnessPlot::new([600.0, 350.0, 350.0, 300.0].into(), 4.0, 1.0, 1.0),
+            fitness_plot: FitnessPlot::new([550.0, 300.0, 400.0, 300.0].into(), 4.0, 1.0, 1.0),
             innov_record,
             pool,
             timer: Duration::new(1, 0),
@@ -67,7 +67,7 @@ impl event::EventHandler for MainState {
             self.graph_visual = Some(GraphVisual::new(
                 ctx,
                 best_network.graph().clone(),
-                [600.0, 0.0, 350.0, 350.0].into(),
+                [550.0, 0.0, 400.0, 300.0].into(),
                 self.params.mutation.weight_max.abs(),
                 generation,
                 best_fitness,
@@ -95,7 +95,7 @@ impl event::EventHandler for MainState {
 
 pub fn main() -> ggez::GameResult {
     let cb = ggez::ContextBuilder::new("neat", "suhdonghwi")
-        .window_mode(ggez::conf::WindowMode::default().dimensions(950.0, 650.0))
+        .window_mode(ggez::conf::WindowMode::default().dimensions(950.0, 600.0))
         .window_setup(WindowSetup::default().title("XOR"))
         .add_resource_path(Path::new("./resources"));
     let (ctx, event_loop) = &mut cb.build()?;

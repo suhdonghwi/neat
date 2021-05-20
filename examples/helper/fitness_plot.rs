@@ -11,11 +11,19 @@ pub struct FitnessPlot {
     fitness_max: f32,
     fitness_min: f32,
     fitness_delta: f32,
+
+    font: graphics::Font,
 }
 
 impl FitnessPlot {
-    pub fn new(rect: graphics::Rect, max: f32, min: f32, delta: f32) -> FitnessPlot {
-        let text = Text::new("fitness-generation graph", 35.0);
+    pub fn new(
+        rect: graphics::Rect,
+        max: f32,
+        min: f32,
+        delta: f32,
+        font: graphics::Font,
+    ) -> FitnessPlot {
+        let text = Text::new("fitness-generation graph", font, 35.0);
 
         FitnessPlot {
             rect,
@@ -24,6 +32,7 @@ impl FitnessPlot {
             fitness_max: max,
             fitness_min: min,
             fitness_delta: delta,
+            font,
         }
     }
 
@@ -70,7 +79,7 @@ impl FitnessPlot {
 
         graphics::draw(ctx, &line, (rect.point(),))?;
 
-        let text = Text::new(&format!("{}", gen), 28.0);
+        let text = Text::new(&format!("{}", gen), self.font, 28.0);
         let width = text.width(ctx) as f32;
         text.draw(
             ctx,
@@ -95,7 +104,7 @@ impl FitnessPlot {
 
         graphics::draw(ctx, &line, (rect.point(),))?;
 
-        let text = Text::new(&format!("{:.1}", fitness), 28.0);
+        let text = Text::new(&format!("{:.1}", fitness), self.font, 28.0);
         let width = text.width(ctx);
         text.draw(
             ctx,
@@ -130,7 +139,7 @@ impl FitnessPlot {
         self.draw_axis(ctx, &actual_rect)?;
         self.text.draw(
             ctx,
-            na::Point2::new(self.rect.x + 110.0, self.rect.y + 20.0),
+            na::Point2::new(self.rect.x + 90.0, self.rect.y + 20.0),
             graphics::BLACK,
         )?;
 

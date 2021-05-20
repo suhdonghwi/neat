@@ -116,6 +116,7 @@ impl GraphVisual {
         max_weight: f64,
         generation: usize,
         fitness: f64,
+        font: graphics::Font,
     ) -> GraphVisual {
         let mut node_info_map = HashMap::new();
         let mut edge_draw_info_list = Vec::new();
@@ -152,6 +153,7 @@ impl GraphVisual {
                 graph.node_count(),
                 graph.edge_count(),
             ),
+            font,
             32.0,
         );
 

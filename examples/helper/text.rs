@@ -4,9 +4,9 @@ pub struct Text {
 }
 
 impl Text {
-    pub fn new(text: &str, scale: f32) -> Self {
+    pub fn new(text: &str, font: graphics::Font, scale: f32) -> Self {
         let mut text = graphics::Text::new(text);
-        text.set_font(graphics::Font::default(), graphics::Scale::uniform(scale));
+        text.set_font(font, graphics::Scale::uniform(scale));
 
         Text { text }
     }

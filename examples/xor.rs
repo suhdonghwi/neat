@@ -18,10 +18,13 @@ struct MainState {
     pool: Pool<Feedforward>,
     timer: Duration,
     params: Parameters,
+    font: graphics::Font,
 }
 
 impl MainState {
-    fn new(_ctx: &mut ggez::Context) -> Self {
+    fn new(ctx: &mut ggez::Context) -> Self {
+        let font = graphics::Font::new(ctx, Path::new("/LiberationMono-Regular.ttf")).unwrap();
+
         let args = helper::cli::get_arguments();
         let params = helper::read_parameters_file("./params/xor.toml");
 
@@ -30,11 +33,18 @@ impl MainState {
 
         MainState {
             graph_visual: None,
-            fitness_plot: FitnessPlot::new([550.0, 300.0, 400.0, 300.0].into(), 4.0, 1.0, 1.0),
+            fitness_plot: FitnessPlot::new(
+                [550.0, 300.0, 400.0, 300.0].into(),
+                4.0,
+                1.0,
+                1.0,
+                font,
+            ),
             innov_record,
             pool,
             timer: Duration::new(1, 0),
             params,
+            font,
         }
     }
 
@@ -89,6 +99,7 @@ impl event::EventHandler for MainState {
                 self.params.mutation.weight_max.abs(),
                 generation,
                 best_fitness,
+                self.font,
             ));
 
             self.pool.evolve(&mut self.innov_record);
@@ -117,7 +128,9 @@ pub fn main() -> ggez::GameResult {
         .window_mode(ggez::conf::WindowMode::default().dimensions(950.0, 600.0))
         .window_setup(WindowSetup::default().title("XOR"))
         .add_resource_path(Path::new("./resources"));
+
     let (ctx, event_loop) = &mut cb.build()?;
     let state = &mut MainState::new(ctx);
+
     event::run(ctx, event_loop, state)
 }

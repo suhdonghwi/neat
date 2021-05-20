@@ -115,9 +115,9 @@ impl FitnessPlot {
 
     pub fn draw(&self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {
         let top_padding = 60.0;
-        let right_padding = 40.0;
+        let right_padding = 30.0;
         let bottom_padding = 50.0;
-        let left_padding = 50.0;
+        let left_padding = 60.0;
 
         let actual_rect = graphics::Rect::new(
             self.rect.x + left_padding,

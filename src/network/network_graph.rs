@@ -21,6 +21,7 @@ pub struct NetworkGraph {
     graph: DiGraph<NodeData, EdgeData>,
     input_number: usize,
     output_number: usize,
+    toposort_cache: Option<Vec<NodeIndex>>,
 }
 
 type DiffResult<'a> = (
@@ -48,6 +49,7 @@ impl NetworkGraph {
             graph,
             input_number,
             output_number,
+            toposort_cache: None,
         }
     }
 
@@ -168,7 +170,7 @@ impl NetworkGraph {
     }
 
     // Propagate output of the node to outgoing connections
-    fn activate_node(&mut self, index: NodeIndex) {
+    pub fn activate_node(&mut self, index: NodeIndex) {
         let activation;
         match self.graph[index].activate() {
             // Check if every incoming connection has been propagated
@@ -193,12 +195,13 @@ impl NetworkGraph {
         }
     }
 
-    // Only for feedforward network (DAG)
-    pub fn activate_topo(&mut self) {
-        let sorted = algo::toposort(&self.graph, None).unwrap();
-        for node in sorted {
-            self.activate_node(node);
+    // Only for DAG(Directed Acyclic Graph) network
+    pub fn toposort(&mut self) -> Option<Vec<NodeIndex>> {
+        if self.toposort_cache.is_none() {
+            self.toposort_cache = algo::toposort(&self.graph, None).ok();
         }
+
+        self.toposort_cache.clone()
     }
 
     pub fn add_node(&mut self, edge: EdgeIndex, innov_record: &mut InnovationRecord) -> NodeIndex {

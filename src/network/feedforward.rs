@@ -39,8 +39,10 @@ impl Network for Feedforward {
         bias_node.add_input(1.0);
 
         // Activate nodes in topological order
-        // TODO: Cache toposort result?
-        self.graph.activate_topo();
+        let toposort = self.graph.toposort().unwrap();
+        for node_index in toposort {
+            self.graph.activate_node(node_index);
+        }
 
         let result = Some(self.graph.activate_output());
         self.graph.clear_sum();

@@ -6,6 +6,7 @@ use super::text::Text;
 pub struct FitnessPlot {
     rect: graphics::Rect,
     fitness_list: Vec<f64>,
+    text: Text,
 
     fitness_max: f32,
     fitness_min: f32,
@@ -13,9 +14,18 @@ pub struct FitnessPlot {
 }
 
 impl FitnessPlot {
-    pub fn new(rect: graphics::Rect, max: f32, min: f32, delta: f32) -> FitnessPlot {
+    pub fn new(
+        ctx: &mut ggez::Context,
+        rect: graphics::Rect,
+        max: f32,
+        min: f32,
+        delta: f32,
+    ) -> FitnessPlot {
+        let text = Text::new(ctx, "fitness-generation graph", 35.0);
+
         FitnessPlot {
             rect,
+            text,
             fitness_list: Vec::new(),
             fitness_max: max,
             fitness_min: min,
@@ -134,6 +144,11 @@ impl FitnessPlot {
             .collect();
 
         self.draw_axis(ctx, &actual_rect)?;
+        self.text.draw(
+            ctx,
+            na::Point2::new(self.rect.x + 95.0, self.rect.y + 20.0),
+            graphics::BLACK,
+        )?;
 
         let current_gen = self.fitness_list.len();
         let gen_delta = (to_show.len() as f64 / 5.0).ceil() as usize;

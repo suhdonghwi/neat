@@ -20,7 +20,7 @@ struct MainState {
 }
 
 impl MainState {
-    fn new() -> Self {
+    fn new(ctx: &mut ggez::Context) -> Self {
         let args = helper::cli::get_arguments();
         let params = helper::read_parameters_file("./params/xor.toml");
 
@@ -29,7 +29,7 @@ impl MainState {
 
         MainState {
             graph_visual: None,
-            fitness_plot: FitnessPlot::new([550.0, 300.0, 400.0, 300.0].into(), 4.0, 1.0, 1.0),
+            fitness_plot: FitnessPlot::new(ctx, [550.0, 300.0, 400.0, 300.0].into(), 4.0, 1.0, 1.0),
             innov_record,
             pool,
             timer: Duration::new(1, 0),
@@ -42,7 +42,7 @@ impl event::EventHandler for MainState {
     fn update(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
         self.timer += ggez::timer::delta(ctx);
 
-        if self.timer >= Duration::from_secs_f64(0.2) {
+        if self.timer >= Duration::from_secs_f64(0.5) {
             let data = vec![
                 (vec![0.0, 0.0], 0.0),
                 (vec![0.0, 1.0], 1.0),
@@ -99,6 +99,6 @@ pub fn main() -> ggez::GameResult {
         .window_setup(WindowSetup::default().title("XOR"))
         .add_resource_path(Path::new("./resources"));
     let (ctx, event_loop) = &mut cb.build()?;
-    let state = &mut MainState::new();
+    let state = &mut MainState::new(ctx);
     event::run(ctx, event_loop, state)
 }

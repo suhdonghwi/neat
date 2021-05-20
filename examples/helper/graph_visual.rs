@@ -166,14 +166,6 @@ impl GraphVisual {
     }
 
     pub fn draw(&self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {
-        let rectangle = graphics::Mesh::new_rectangle(
-            ctx,
-            graphics::DrawMode::fill(),
-            self.rect,
-            graphics::Color::from_rgb(233, 236, 239),
-        )?;
-        graphics::draw(ctx, &rectangle, (na::Point2::new(0.0, 0.0),))?;
-
         for info in &self.edge_draw_info_list {
             let line =
                 graphics::Mesh::new_line(ctx, &[info.from, info.to], info.width, info.color)?;
@@ -186,18 +178,18 @@ impl GraphVisual {
             let circle = graphics::Mesh::new_circle(
                 ctx,
                 graphics::DrawMode::fill(),
-                [0.0, 0.0],
+                info.pos,
                 node_radius,
                 0.3,
                 info.color,
             )?;
 
-            graphics::draw(ctx, &circle, (info.pos,))?;
+            graphics::draw(ctx, &circle, (na::Point2::new(0.0, 0.0),))?;
         }
 
         self.text.draw(
             ctx,
-            na::Point2::new(self.rect.x + 10.0, self.rect.y + 10.0),
+            na::Point2::new(self.rect.x + 15.0, self.rect.y + 15.0),
             graphics::BLACK,
         )
     }

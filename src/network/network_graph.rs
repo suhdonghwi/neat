@@ -3,9 +3,9 @@ use std::{
     fmt::{self, Display},
 };
 
+use petgraph::algo;
 use petgraph::graph::Edge;
 use petgraph::graph::{DiGraph, EdgeIndex, NodeIndex};
-use petgraph::visit::Topo;
 
 use rand::{
     distributions::{Bernoulli, Distribution, Uniform},
@@ -195,8 +195,8 @@ impl NetworkGraph {
 
     // Only for feedforward network (DAG)
     pub fn activate_topo(&mut self) {
-        let mut topo = Topo::new(&self.graph);
-        while let Some(node) = topo.next(&self.graph) {
+        let sorted = algo::toposort(&self.graph, None).unwrap();
+        for node in sorted {
             self.activate_node(node);
         }
     }

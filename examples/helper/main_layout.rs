@@ -6,12 +6,12 @@ use ggez::nalgebra as na;
 
 use neat::network::network_graph::NetworkGraph;
 
-use super::fitness_plot::FitnessPlot;
 use super::graph_visual::GraphVisual;
+use super::plot::Plot;
 
 pub struct MainLayout {
     graph_visual: Option<GraphVisual>,
-    fitness_plot: FitnessPlot,
+    fitness_plot: Plot,
     font: graphics::Font,
     max_weight: f64,
 }
@@ -22,13 +22,7 @@ impl MainLayout {
 
         MainLayout {
             graph_visual: None,
-            fitness_plot: FitnessPlot::new(
-                [550.0, 300.0, 400.0, 300.0].into(),
-                4.0,
-                1.0,
-                1.0,
-                font,
-            ),
+            fitness_plot: Plot::new([550.0, 300.0, 400.0, 300.0].into(), 4.0, 1.0, 1.0, font),
             font,
             max_weight,
         }

@@ -2,10 +2,10 @@ use neat::parameters::Parameters;
 use std::fs;
 
 pub mod cli;
-pub mod fitness_plot;
 pub mod graph_visual;
-pub mod text;
 pub mod main_layout;
+pub mod plot;
+pub mod text;
 
 pub fn read_parameters_file(path: &str) -> Parameters {
     let params_str;

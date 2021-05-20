@@ -3,7 +3,7 @@ use ggez::nalgebra as na;
 
 use super::text::Text;
 
-pub struct FitnessPlot {
+pub struct Plot {
     rect: graphics::Rect,
     fitness_list: Vec<f64>,
     text: Text,
@@ -15,17 +15,11 @@ pub struct FitnessPlot {
     font: graphics::Font,
 }
 
-impl FitnessPlot {
-    pub fn new(
-        rect: graphics::Rect,
-        max: f32,
-        min: f32,
-        delta: f32,
-        font: graphics::Font,
-    ) -> FitnessPlot {
+impl Plot {
+    pub fn new(rect: graphics::Rect, max: f32, min: f32, delta: f32, font: graphics::Font) -> Plot {
         let text = Text::new("fitness-generation graph", font, 35.0);
 
-        FitnessPlot {
+        Plot {
             rect,
             text,
             fitness_list: Vec::new(),

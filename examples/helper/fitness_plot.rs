@@ -14,14 +14,8 @@ pub struct FitnessPlot {
 }
 
 impl FitnessPlot {
-    pub fn new(
-        ctx: &mut ggez::Context,
-        rect: graphics::Rect,
-        max: f32,
-        min: f32,
-        delta: f32,
-    ) -> FitnessPlot {
-        let text = Text::new(ctx, "fitness-generation graph", 35.0);
+    pub fn new(rect: graphics::Rect, max: f32, min: f32, delta: f32) -> FitnessPlot {
+        let text = Text::new("fitness-generation graph", 35.0);
 
         FitnessPlot {
             rect,
@@ -76,7 +70,7 @@ impl FitnessPlot {
 
         graphics::draw(ctx, &line, (rect.point(),))?;
 
-        let text = Text::new(ctx, &format!("{}", gen), 28.0);
+        let text = Text::new(&format!("{}", gen), 28.0);
         let width = text.width(ctx) as f32;
         text.draw(
             ctx,
@@ -101,7 +95,7 @@ impl FitnessPlot {
 
         graphics::draw(ctx, &line, (rect.point(),))?;
 
-        let text = Text::new(ctx, &format!("{:.1}", fitness), 28.0);
+        let text = Text::new(&format!("{:.1}", fitness), 28.0);
         let width = text.width(ctx);
         text.draw(
             ctx,
@@ -111,19 +105,9 @@ impl FitnessPlot {
     }
 
     pub fn draw(&self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {
-        /*
-        let rectangle = graphics::Mesh::new_rectangle(
-            ctx,
-            graphics::DrawMode::fill(),
-            self.rect,
-            graphics::Color::from_rgb(0, 236, 239),
-        )?;
-        graphics::draw(ctx, &rectangle, (na::Point2::new(0.0, 0.0),))?;
-        */
-
         let top_padding = 60.0;
         let right_padding = 40.0;
-        let bottom_padding = 40.0;
+        let bottom_padding = 50.0;
         let left_padding = 50.0;
 
         let actual_rect = graphics::Rect::new(
@@ -146,7 +130,7 @@ impl FitnessPlot {
         self.draw_axis(ctx, &actual_rect)?;
         self.text.draw(
             ctx,
-            na::Point2::new(self.rect.x + 95.0, self.rect.y + 20.0),
+            na::Point2::new(self.rect.x + 110.0, self.rect.y + 20.0),
             graphics::BLACK,
         )?;
 
@@ -199,7 +183,7 @@ impl FitnessPlot {
             .collect();
 
         let line =
-            graphics::Mesh::new_line(ctx, &points, 2.0, graphics::Color::from_rgb(92, 124, 250))?;
+            graphics::Mesh::new_line(ctx, &points, 3.0, graphics::Color::from_rgb(92, 124, 250))?;
         graphics::draw(ctx, &line, (actual_rect.point(),))?;
 
         Ok(())

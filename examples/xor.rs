@@ -3,6 +3,7 @@ mod helper;
 use std::{path::Path, time::Duration};
 
 use ggez::graphics;
+use ggez::nalgebra as na;
 use ggez::{conf::WindowSetup, event};
 
 use neat::{innovation_record::InnovationRecord, network::feedforward::Feedforward, pool::Pool};
@@ -20,7 +21,7 @@ struct MainState {
 }
 
 impl MainState {
-    fn new(ctx: &mut ggez::Context) -> Self {
+    fn new(_ctx: &mut ggez::Context) -> Self {
         let args = helper::cli::get_arguments();
         let params = helper::read_parameters_file("./params/xor.toml");
 
@@ -29,12 +30,30 @@ impl MainState {
 
         MainState {
             graph_visual: None,
-            fitness_plot: FitnessPlot::new(ctx, [550.0, 300.0, 400.0, 300.0].into(), 4.0, 1.0, 1.0),
+            fitness_plot: FitnessPlot::new([550.0, 300.0, 400.0, 300.0].into(), 4.0, 1.0, 1.0),
             innov_record,
             pool,
             timer: Duration::new(1, 0),
             params,
         }
+    }
+
+    fn draw_separator(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
+        let vertical = graphics::Mesh::new_line(
+            ctx,
+            &[na::Point2::new(550.0, 0.0), na::Point2::new(550.0, 600.0)],
+            3.0,
+            graphics::Color::from_rgba(0, 0, 0, 50),
+        )?;
+        graphics::draw(ctx, &vertical, (na::Point2::new(0.0, 0.0),))?;
+
+        let horizontal = graphics::Mesh::new_line(
+            ctx,
+            &[na::Point2::new(550.0, 300.0), na::Point2::new(950.0, 300.0)],
+            3.0,
+            graphics::Color::from_rgba(0, 0, 0, 50),
+        )?;
+        graphics::draw(ctx, &horizontal, (na::Point2::new(0.0, 0.0),))
     }
 }
 
@@ -65,7 +84,6 @@ impl event::EventHandler for MainState {
 
             self.fitness_plot.add_data(best_fitness);
             self.graph_visual = Some(GraphVisual::new(
-                ctx,
                 best_network.graph().clone(),
                 [550.0, 0.0, 400.0, 300.0].into(),
                 self.params.mutation.weight_max.abs(),
@@ -89,6 +107,7 @@ impl event::EventHandler for MainState {
 
         self.fitness_plot.draw(ctx)?;
 
+        self.draw_separator(ctx)?;
         graphics::present(ctx)
     }
 }

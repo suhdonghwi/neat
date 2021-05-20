@@ -1,15 +1,12 @@
-use std::path::Path;
-
 use ggez::graphics;
 pub struct Text {
     text: graphics::Text,
 }
 
 impl Text {
-    pub fn new(ctx: &mut ggez::Context, text: &str, scale: f32) -> Self {
-        let font = graphics::Font::new(ctx, Path::new("/LiberationMono-Regular.ttf")).unwrap();
+    pub fn new(text: &str, scale: f32) -> Self {
         let mut text = graphics::Text::new(text);
-        text.set_font(font, graphics::Scale::uniform(scale));
+        text.set_font(graphics::Font::default(), graphics::Scale::uniform(scale));
 
         Text { text }
     }

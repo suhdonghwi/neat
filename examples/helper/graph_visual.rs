@@ -111,7 +111,6 @@ pub struct GraphVisual {
 
 impl GraphVisual {
     pub fn new(
-        ctx: &mut ggez::Context,
         graph: NetworkGraph,
         rect: graphics::Rect,
         max_weight: f64,
@@ -146,7 +145,6 @@ impl GraphVisual {
         }
 
         let text = Text::new(
-            ctx,
             &format!(
                 "#{} Best genome (fitness : {:.5})\n{} node(s), {} edge(s)",
                 generation,

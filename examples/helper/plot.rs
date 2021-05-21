@@ -1,4 +1,5 @@
 use ggez::graphics;
+use ggez::mint;
 use ggez::nalgebra as na;
 
 use super::text::Text;
@@ -30,6 +31,8 @@ impl Axis {
 
 pub struct Plot {
     rect: graphics::Rect,
+    actual_rect: graphics::Rect,
+
     title_text: Text,
 
     x_axis: Axis,
@@ -48,8 +51,21 @@ impl Plot {
     ) -> Plot {
         let title_text = Text::new(title_str, font, 35.0);
 
+        let top_padding = 60.0;
+        let right_padding = 30.0;
+        let bottom_padding = 50.0;
+        let left_padding = 60.0;
+
+        let actual_rect = graphics::Rect::new(
+            rect.x + left_padding,
+            rect.y + top_padding,
+            rect.w - left_padding - right_padding,
+            rect.h - top_padding - bottom_padding,
+        );
+
         Plot {
             rect,
+            actual_rect,
             title_text,
             x_axis,
             y_axis,
@@ -85,22 +101,27 @@ impl Plot {
         ctx: &mut ggez::Context,
         text_str: &str,
         x: f32,
-        rect: &graphics::Rect,
     ) -> ggez::GameResult<()> {
         let line = graphics::Mesh::new_line(
             ctx,
-            &[na::Point2::new(x, rect.h), na::Point2::new(x, 0.0)],
+            &[
+                na::Point2::new(x, self.actual_rect.h),
+                na::Point2::new(x, 0.0),
+            ],
             1.5,
             graphics::Color::from_rgba(0, 0, 0, 50),
         )?;
 
-        graphics::draw(ctx, &line, (rect.point(),))?;
+        graphics::draw(ctx, &line, (self.actual_rect.point(),))?;
 
         let text = Text::new(text_str, self.font, 28.0);
         let text_width = text.width(ctx);
         text.draw(
             ctx,
-            na::Point2::new(rect.x + x - text_width / 2.0, rect.y + rect.h + 8.0),
+            na::Point2::new(
+                self.actual_rect.x + x - text_width / 2.0,
+                self.actual_rect.y + self.actual_rect.h + 8.0,
+            ),
             graphics::BLACK,
         )
     }
@@ -110,40 +131,33 @@ impl Plot {
         ctx: &mut ggez::Context,
         text_str: &str,
         y: f32,
-        rect: &graphics::Rect,
     ) -> ggez::GameResult<()> {
         let line = graphics::Mesh::new_line(
             ctx,
-            &[na::Point2::new(0.0, y), na::Point2::new(rect.w, y)],
+            &[
+                na::Point2::new(0.0, y),
+                na::Point2::new(self.actual_rect.w, y),
+            ],
             1.5,
             graphics::Color::from_rgba(0, 0, 0, 50),
         )?;
 
-        graphics::draw(ctx, &line, (rect.point(),))?;
+        graphics::draw(ctx, &line, (self.actual_rect.point(),))?;
 
         let text = Text::new(text_str, self.font, 28.0);
         let text_width = text.width(ctx);
         text.draw(
             ctx,
-            na::Point2::new(rect.x - text_width - 10.0, rect.y + y - 7.0),
+            na::Point2::new(
+                self.actual_rect.x - text_width - 10.0,
+                self.actual_rect.y + y - 7.0,
+            ),
             graphics::BLACK,
         )
     }
 
     pub fn draw_plane(&self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {
-        let top_padding = 60.0;
-        let right_padding = 30.0;
-        let bottom_padding = 50.0;
-        let left_padding = 60.0;
-
-        let actual_rect = graphics::Rect::new(
-            self.rect.x + left_padding,
-            self.rect.y + top_padding,
-            self.rect.w - left_padding - right_padding,
-            self.rect.h - top_padding - bottom_padding,
-        );
-
-        self.draw_axes(ctx, &actual_rect)?;
+        self.draw_axes(ctx, &self.actual_rect)?;
 
         let title_point = na::Point2::new(
             self.rect.x + (self.rect.w - self.title_text.width(ctx)) / 2.0,
@@ -152,19 +166,30 @@ impl Plot {
         self.title_text.draw(ctx, title_point, graphics::BLACK)?;
 
         for n in self.x_axis.ticks() {
-            let x = (n - self.x_axis.min) / (self.x_axis.max - self.x_axis.min) * actual_rect.w;
+            let x =
+                (n - self.x_axis.min) / (self.x_axis.max - self.x_axis.min) * self.actual_rect.w;
             let guide_text = &format!("{:.1}", n);
-            self.draw_vertical_guide(ctx, guide_text, x, &actual_rect)?;
+            self.draw_vertical_guide(ctx, guide_text, x)?;
         }
 
         for n in self.y_axis.ticks() {
-            let y = actual_rect.h
-                - (n - self.y_axis.min) / (self.y_axis.max - self.y_axis.min) * actual_rect.h;
+            let y = self.actual_rect.h
+                - (n - self.y_axis.min) / (self.y_axis.max - self.y_axis.min) * self.actual_rect.h;
             let guide_text = &format!("{:.1}", n);
-            self.draw_horizontal_guide(ctx, guide_text, y, &actual_rect)?;
+            self.draw_horizontal_guide(ctx, guide_text, y)?;
         }
 
         Ok(())
+    }
+
+    pub fn draw_line(
+        &self,
+        ctx: &mut ggez::Context,
+        points: &[mint::Point2<f32>],
+        color: graphics::Color,
+    ) -> ggez::GameResult<()> {
+        let line = graphics::Mesh::new_line(ctx, &points, 3.0, color)?;
+        graphics::draw(ctx, &line, (self.actual_rect.point(),))
     }
 
     /*

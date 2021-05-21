@@ -74,10 +74,10 @@ impl Plot {
         graphics::draw(ctx, &line, (rect.point(),))?;
 
         let text = Text::new(&format!("{}", gen), self.font, 28.0);
-        let width = text.width(ctx) as f32;
+        let width = text.width(ctx);
         text.draw(
             ctx,
-            na::Point2::new(rect.x + x - width / 4.0, rect.y + rect.h + 8.0),
+            na::Point2::new(rect.x + x - width / 2.0, rect.y + rect.h + 8.0),
             graphics::BLACK,
         )
     }
@@ -102,7 +102,7 @@ impl Plot {
         let width = text.width(ctx);
         text.draw(
             ctx,
-            na::Point2::new(rect.x - width as f32 + 7.0, rect.y + y - 7.0),
+            na::Point2::new(rect.x - width - 10.0, rect.y + y - 7.0),
             graphics::BLACK,
         )
     }
@@ -131,11 +131,12 @@ impl Plot {
             .collect();
 
         self.draw_axis(ctx, &actual_rect)?;
-        self.text.draw(
-            ctx,
-            na::Point2::new(self.rect.x + 90.0, self.rect.y + 20.0),
-            graphics::BLACK,
-        )?;
+
+        let text_pos = na::Point2::new(
+            self.rect.x + (self.rect.w - self.text.width(ctx)) / 2.0,
+            self.rect.y + 20.0,
+        );
+        self.text.draw(ctx, text_pos, graphics::BLACK)?;
 
         let current_gen = self.fitness_list.len();
         let gen_delta = (to_show.len() as f64 / 5.0).ceil() as usize;

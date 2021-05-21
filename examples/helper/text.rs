@@ -11,8 +11,8 @@ impl Text {
         Text { text }
     }
 
-    pub fn width(&self, ctx: &mut ggez::Context) -> u32 {
-        self.text.width(ctx)
+    pub fn width(&self, ctx: &mut ggez::Context) -> f32 {
+        self.text.width(ctx) as f32 / 2.0
     }
 
     pub fn draw(

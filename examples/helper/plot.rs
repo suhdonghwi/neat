@@ -130,7 +130,7 @@ impl Plot {
         )
     }
 
-    pub fn draw_basic(&self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {
+    pub fn draw_plane(&self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {
         let top_padding = 60.0;
         let right_padding = 30.0;
         let bottom_padding = 50.0;

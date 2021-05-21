@@ -66,7 +66,7 @@ impl MainLayout {
             graph.draw(ctx)?;
         }
 
-        self.fitness_plot.draw_basic(ctx)?;
+        self.fitness_plot.draw_plane(ctx)?;
 
         self.draw_separator(ctx)
     }

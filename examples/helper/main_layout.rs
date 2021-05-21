@@ -6,8 +6,8 @@ use ggez::nalgebra as na;
 
 use neat::network::network_graph::NetworkGraph;
 
-use super::graph_visual::GraphVisual;
 use super::plot::Plot;
+use super::{graph_visual::GraphVisual, plot::Axis};
 
 pub struct MainLayout {
     graph_visual: Option<GraphVisual>,
@@ -22,7 +22,13 @@ impl MainLayout {
 
         MainLayout {
             graph_visual: None,
-            fitness_plot: Plot::new([550.0, 300.0, 400.0, 300.0].into(), 4.0, 1.0, 1.0, font),
+            fitness_plot: Plot::new(
+                [550.0, 300.0, 400.0, 300.0].into(),
+                Axis::new(0.0, 4.0, 1.0),
+                Axis::new(0.0, 4.0, 0.5),
+                "fitness-generation grpah",
+                font,
+            ),
             font,
             max_weight,
         }
@@ -60,7 +66,7 @@ impl MainLayout {
             graph.draw(ctx)?;
         }
 
-        self.fitness_plot.draw(ctx)?;
+        self.fitness_plot.draw_basic(ctx)?;
 
         self.draw_separator(ctx)
     }
@@ -74,6 +80,5 @@ impl MainLayout {
             fitness,
             self.font,
         ));
-        self.fitness_plot.add_data(fitness);
     }
 }

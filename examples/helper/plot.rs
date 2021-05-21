@@ -3,48 +3,71 @@ use ggez::nalgebra as na;
 
 use super::text::Text;
 
+pub struct Axis {
+    min: f32,
+    max: f32,
+    delta: f32,
+}
+
+impl Axis {
+    pub fn new(min: f32, max: f32, delta: f32) -> Self {
+        Axis { min, max, delta }
+    }
+
+    pub fn ticks(&self) -> impl Iterator<Item = f32> {
+        let mut list = Vec::new();
+
+        let mut n = self.min;
+        while n < self.max {
+            list.push(n);
+            n += self.delta;
+        }
+
+        list.push(self.max);
+        list.into_iter()
+    }
+}
+
 pub struct Plot {
     rect: graphics::Rect,
-    fitness_list: Vec<f64>,
-    text: Text,
+    title_text: Text,
 
-    fitness_max: f32,
-    fitness_min: f32,
-    fitness_delta: f32,
+    x_axis: Axis,
+    y_axis: Axis,
 
     font: graphics::Font,
 }
 
 impl Plot {
-    pub fn new(rect: graphics::Rect, max: f32, min: f32, delta: f32, font: graphics::Font) -> Plot {
-        let text = Text::new("fitness-generation graph", font, 35.0);
+    pub fn new(
+        rect: graphics::Rect,
+        x_axis: Axis,
+        y_axis: Axis,
+        title_str: &str,
+        font: graphics::Font,
+    ) -> Plot {
+        let title_text = Text::new(title_str, font, 35.0);
 
         Plot {
             rect,
-            text,
-            fitness_list: Vec::new(),
-            fitness_max: max,
-            fitness_min: min,
-            fitness_delta: delta,
+            title_text,
+            x_axis,
+            y_axis,
             font,
         }
     }
 
-    pub fn add_data(&mut self, v: f64) {
-        self.fitness_list.push(v);
-    }
-
-    fn draw_axis(&self, ctx: &mut ggez::Context, rect: &graphics::Rect) -> ggez::GameResult<()> {
-        let vertical = graphics::Mesh::new_line(
+    fn draw_axes(&self, ctx: &mut ggez::Context, rect: &graphics::Rect) -> ggez::GameResult<()> {
+        let y_line = graphics::Mesh::new_line(
             ctx,
             &[na::Point2::new(0.0, 0.0), na::Point2::new(0.0, rect.h)],
             1.5,
             graphics::BLACK,
         )?;
 
-        graphics::draw(ctx, &vertical, (rect.point(),))?;
+        graphics::draw(ctx, &y_line, (rect.point(),))?;
 
-        let horizontal = graphics::Mesh::new_line(
+        let x_line = graphics::Mesh::new_line(
             ctx,
             &[
                 na::Point2::new(0.0, rect.h),
@@ -54,13 +77,13 @@ impl Plot {
             graphics::BLACK,
         )?;
 
-        graphics::draw(ctx, &horizontal, (rect.point(),))
+        graphics::draw(ctx, &x_line, (rect.point(),))
     }
 
-    fn draw_vertical(
+    fn draw_vertical_guide(
         &self,
         ctx: &mut ggez::Context,
-        gen: usize,
+        text_str: &str,
         x: f32,
         rect: &graphics::Rect,
     ) -> ggez::GameResult<()> {
@@ -73,20 +96,20 @@ impl Plot {
 
         graphics::draw(ctx, &line, (rect.point(),))?;
 
-        let text = Text::new(&format!("{}", gen), self.font, 28.0);
-        let width = text.width(ctx);
+        let text = Text::new(text_str, self.font, 28.0);
+        let text_width = text.width(ctx);
         text.draw(
             ctx,
-            na::Point2::new(rect.x + x - width / 2.0, rect.y + rect.h + 8.0),
+            na::Point2::new(rect.x + x - text_width / 2.0, rect.y + rect.h + 8.0),
             graphics::BLACK,
         )
     }
 
-    fn draw_horizontal(
+    fn draw_horizontal_guide(
         &self,
         ctx: &mut ggez::Context,
+        text_str: &str,
         y: f32,
-        fitness: f32,
         rect: &graphics::Rect,
     ) -> ggez::GameResult<()> {
         let line = graphics::Mesh::new_line(
@@ -98,15 +121,53 @@ impl Plot {
 
         graphics::draw(ctx, &line, (rect.point(),))?;
 
-        let text = Text::new(&format!("{:.1}", fitness), self.font, 28.0);
-        let width = text.width(ctx);
+        let text = Text::new(text_str, self.font, 28.0);
+        let text_width = text.width(ctx);
         text.draw(
             ctx,
-            na::Point2::new(rect.x - width - 10.0, rect.y + y - 7.0),
+            na::Point2::new(rect.x - text_width - 10.0, rect.y + y - 7.0),
             graphics::BLACK,
         )
     }
 
+    pub fn draw_basic(&self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {
+        let top_padding = 60.0;
+        let right_padding = 30.0;
+        let bottom_padding = 50.0;
+        let left_padding = 60.0;
+
+        let actual_rect = graphics::Rect::new(
+            self.rect.x + left_padding,
+            self.rect.y + top_padding,
+            self.rect.w - left_padding - right_padding,
+            self.rect.h - top_padding - bottom_padding,
+        );
+
+        self.draw_axes(ctx, &actual_rect)?;
+
+        let title_point = na::Point2::new(
+            self.rect.x + (self.rect.w - self.title_text.width(ctx)) / 2.0,
+            self.rect.y + 20.0,
+        );
+        self.title_text.draw(ctx, title_point, graphics::BLACK)?;
+
+        for n in self.x_axis.ticks() {
+            let x = (n - self.x_axis.min) / (self.x_axis.max - self.x_axis.min) * actual_rect.w;
+            let guide_text = &format!("{:.1}", n);
+            self.draw_vertical_guide(ctx, guide_text, x, &actual_rect)?;
+        }
+
+        for n in self.y_axis.ticks() {
+            let y = actual_rect.h
+                - (n - self.y_axis.min) / (self.y_axis.max - self.y_axis.min) * actual_rect.h;
+            let guide_text = &format!("{:.1}", n);
+            self.draw_horizontal_guide(ctx, guide_text, y, &actual_rect)?;
+        }
+
+        Ok(())
+    }
+
+    /*
     pub fn draw(&self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {
         let top_padding = 60.0;
         let right_padding = 30.0;
@@ -130,7 +191,7 @@ impl Plot {
             .cloned()
             .collect();
 
-        self.draw_axis(ctx, &actual_rect)?;
+        self.draw_axes(ctx, &actual_rect)?;
 
         let text_pos = na::Point2::new(
             self.rect.x + (self.rect.w - self.text.width(ctx)) / 2.0,
@@ -148,14 +209,14 @@ impl Plot {
         let mut gen = gen_start;
         while gen < current_gen {
             let x = (gen - gen_start) as f32 / to_show.len() as f32 * actual_rect.w;
-            self.draw_vertical(ctx, gen, x, &actual_rect)?;
+            self.draw_vertical_guide(ctx, gen, x, &actual_rect)?;
             gen += gen_delta;
         }
-        self.draw_vertical(ctx, current_gen, actual_rect.w, &actual_rect)?;
+        self.draw_vertical_guide(ctx, current_gen, actual_rect.w, &actual_rect)?;
 
         let mut fitness: f32 = 0.0;
         while fitness < self.fitness_max - self.fitness_delta / 2.0 {
-            self.draw_horizontal(
+            self.draw_horizontal_guide(
                 ctx,
                 actual_rect.h - actual_rect.h * fitness / self.fitness_max,
                 fitness,
@@ -163,7 +224,7 @@ impl Plot {
             )?;
             fitness += self.fitness_delta;
         }
-        self.draw_horizontal(ctx, 0.0, self.fitness_max, &actual_rect)?;
+        self.draw_horizontal_guide(ctx, 0.0, self.fitness_max, &actual_rect)?;
 
         let delta = if to_show.len() <= 1 {
             0.0
@@ -192,4 +253,5 @@ impl Plot {
 
         Ok(())
     }
+    */
 }

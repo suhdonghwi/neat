@@ -8,7 +8,7 @@ use ggez::graphics;
 use neat::network::Network;
 use neat::{innovation_record::InnovationRecord, network::feedforward::Feedforward, pool::Pool};
 
-use helper::main_layout::MainLayout;
+use helper::{main_layout::MainLayout, plot::Axis};
 
 struct MainState {
     layout: MainLayout,
@@ -25,7 +25,15 @@ impl MainState {
         let mut innov_record = InnovationRecord::new(2, 1);
         let pool = Pool::<Feedforward>::new(params, args.verbosity, &mut innov_record);
 
-        let layout = MainLayout::new(ctx, params.mutation.weight_max);
+        let x_axis = Axis::new(1.0, 10.0, 2.0);
+        let y_axis = Axis::new(0.0, 4.0, 1.0);
+        let layout = MainLayout::new(
+            ctx,
+            params.mutation.weight_max,
+            "fitness-generation graph",
+            x_axis,
+            y_axis,
+        );
 
         MainState {
             innov_record,

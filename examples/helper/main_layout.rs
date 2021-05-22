@@ -20,20 +20,26 @@ pub struct MainLayout {
 }
 
 impl MainLayout {
-    pub fn new(ctx: &mut ggez::Context, max_weight: f64) -> Self {
+    pub fn new(
+        ctx: &mut ggez::Context,
+        weight_max: f64,
+        title: &str,
+        x_axis: Axis,
+        y_axis: Axis,
+    ) -> Self {
         let font = graphics::Font::new(ctx, Path::new("/LiberationMono-Regular.ttf")).unwrap();
 
         MainLayout {
             graph_visual: None,
             fitness_plot: Plot::new(
                 [550.0, 300.0, 400.0, 300.0].into(),
-                Axis::new(1.0, 100.0, 20.0),
-                Axis::new(0.0, 4.0, 1.0),
-                "fitness-generation grpah",
+                x_axis,
+                y_axis,
+                title,
                 font,
             ),
             font,
-            max_weight,
+            max_weight: weight_max,
             fitness_points: Vec::new(),
         }
     }

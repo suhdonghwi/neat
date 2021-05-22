@@ -99,10 +99,19 @@ impl MainLayout {
             y: fitness as f32,
         });
 
-        let max_points = 40;
-        let min = i32::max(self.fitness_points.len() as i32 - max_points, 1);
+        let points_count = self.fitness_points.len();
+        let max_points: usize = 40;
+        let tick_count: usize = 4;
+        let min = if points_count <= max_points {
+            1
+        } else {
+            points_count - max_points
+        };
+        let max = self.fitness_points.len();
+        let delta = ((max - min) as f32 / tick_count as f32).ceil();
+
         self.fitness_plot
             .x_axis_mut()
-            .set_range(min as f32, self.fitness_points.len() as f32, 4);
+            .set_range(min as f32, max as f32, delta);
     }
 }

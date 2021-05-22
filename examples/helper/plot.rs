@@ -32,9 +32,7 @@ impl Axis {
         (v - self.min) / (self.max - self.min)
     }
 
-    pub fn set_range(&mut self, min: f32, max: f32, tick_count: usize) {
-        let delta = ((max - min) / tick_count as f32).ceil();
-
+    pub fn set_range(&mut self, min: f32, max: f32, delta: f32) {
         self.min = min;
         self.max = max;
         self.delta = delta;

@@ -31,6 +31,14 @@ impl Axis {
     pub fn value_proportion(&self, v: f32) -> f32 {
         (v - self.min) / (self.max - self.min)
     }
+
+    pub fn set_range(&mut self, min: f32, max: f32, tick_count: usize) {
+        let delta = ((max - min) / tick_count as f32).ceil();
+
+        self.min = min;
+        self.max = max;
+        self.delta = delta;
+    }
 }
 
 pub struct Plot {
@@ -75,6 +83,10 @@ impl Plot {
             y_axis,
             font,
         }
+    }
+
+    pub fn x_axis_mut(&mut self) -> &mut Axis {
+        &mut self.x_axis
     }
 
     fn draw_axes(&self, ctx: &mut ggez::Context, rect: &graphics::Rect) -> ggez::GameResult<()> {

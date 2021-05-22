@@ -98,5 +98,11 @@ impl MainLayout {
             x: generation as f32,
             y: fitness as f32,
         });
+
+        let max_points = 40;
+        let min = i32::max(self.fitness_points.len() as i32 - max_points, 1);
+        self.fitness_plot
+            .x_axis_mut()
+            .set_range(min as f32, self.fitness_points.len() as f32, 4);
     }
 }

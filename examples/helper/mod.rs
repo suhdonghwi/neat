@@ -4,6 +4,7 @@ use std::fs;
 pub mod cli;
 pub mod graph_visual;
 pub mod main_layout;
+pub mod opencolor;
 pub mod plot;
 pub mod text;
 

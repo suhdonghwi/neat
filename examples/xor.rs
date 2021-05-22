@@ -1,3 +1,4 @@
+#![recursion_limit = "512"]
 mod helper;
 
 use std::time::Duration;
@@ -79,8 +80,6 @@ impl event::EventHandler for MainState {
     }
 
     fn draw(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
-        graphics::clear(ctx, graphics::Color::from_rgb(248, 249, 250));
-
         self.layout.draw(ctx)?;
         graphics::present(ctx)
     }

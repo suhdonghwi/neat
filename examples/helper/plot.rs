@@ -2,7 +2,7 @@ use ggez::graphics;
 use ggez::mint;
 use ggez::nalgebra as na;
 
-use super::text::Text;
+use super::{opencolor, text::Text};
 
 pub struct Axis {
     min: f32,
@@ -123,7 +123,7 @@ impl Plot {
                 na::Point2::new(x, 0.0),
             ],
             1.5,
-            graphics::Color::from_rgba(0, 0, 0, 50),
+            *opencolor::GRAY3,
         )?;
 
         graphics::draw(ctx, &line, (self.actual_rect.point(),))?;
@@ -153,7 +153,7 @@ impl Plot {
                 na::Point2::new(self.actual_rect.w, y),
             ],
             1.5,
-            graphics::Color::from_rgba(0, 0, 0, 50),
+            *opencolor::GRAY3,
         )?;
 
         graphics::draw(ctx, &line, (self.actual_rect.point(),))?;
@@ -176,8 +176,6 @@ impl Plot {
         x_format: F1,
         y_format: F2,
     ) -> ggez::GameResult<()> {
-        self.draw_axes(ctx, &self.actual_rect)?;
-
         let title_point = na::Point2::new(
             self.rect.x + (self.rect.w - self.title_text.width(ctx)) / 2.0,
             self.rect.y + 20.0,
@@ -197,6 +195,8 @@ impl Plot {
             let guide_text = &y_format(n);
             self.draw_horizontal_guide(ctx, guide_text, y)?;
         }
+
+        self.draw_axes(ctx, &self.actual_rect)?;
 
         Ok(())
     }
@@ -231,92 +231,4 @@ impl Plot {
         let line = graphics::Mesh::new_line(ctx, &converted_points, 3.0, color)?;
         graphics::draw(ctx, &line, (self.actual_rect.point(),))
     }
-
-    /*
-    pub fn draw(&self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {
-        let top_padding = 60.0;
-        let right_padding = 30.0;
-        let bottom_padding = 50.0;
-        let left_padding = 60.0;
-
-        let actual_rect = graphics::Rect::new(
-            self.rect.x + left_padding,
-            self.rect.y + top_padding,
-            self.rect.w - left_padding - right_padding,
-            self.rect.h - top_padding - bottom_padding,
-        );
-
-        let max_points = 50;
-        let to_show: Vec<f64> = self
-            .fitness_list
-            .iter()
-            .rev()
-            .take(max_points)
-            .rev()
-            .cloned()
-            .collect();
-
-        self.draw_axes(ctx, &actual_rect)?;
-
-        let text_pos = na::Point2::new(
-            self.rect.x + (self.rect.w - self.text.width(ctx)) / 2.0,
-            self.rect.y + 20.0,
-        );
-        self.text.draw(ctx, text_pos, graphics::BLACK)?;
-
-        let current_gen = self.fitness_list.len();
-        let gen_delta = (to_show.len() as f64 / 5.0).ceil() as usize;
-        let gen_start = if self.fitness_list.len() <= max_points {
-            1
-        } else {
-            self.fitness_list.len() - max_points
-        };
-        let mut gen = gen_start;
-        while gen < current_gen {
-            let x = (gen - gen_start) as f32 / to_show.len() as f32 * actual_rect.w;
-            self.draw_vertical_guide(ctx, gen, x, &actual_rect)?;
-            gen += gen_delta;
-        }
-        self.draw_vertical_guide(ctx, current_gen, actual_rect.w, &actual_rect)?;
-
-        let mut fitness: f32 = 0.0;
-        while fitness < self.fitness_max - self.fitness_delta / 2.0 {
-            self.draw_horizontal_guide(
-                ctx,
-                actual_rect.h - actual_rect.h * fitness / self.fitness_max,
-                fitness,
-                &actual_rect,
-            )?;
-            fitness += self.fitness_delta;
-        }
-        self.draw_horizontal_guide(ctx, 0.0, self.fitness_max, &actual_rect)?;
-
-        let delta = if to_show.len() <= 1 {
-            0.0
-        } else {
-            actual_rect.w / (to_show.len() - 1) as f32
-        };
-
-        if self.fitness_list.len() < 2 {
-            return Ok(());
-        }
-
-        let points: Vec<na::Point2<f32>> = to_show
-            .iter()
-            .enumerate()
-            .map(|(i, &y)| {
-                let y = actual_rect.h
-                    - (actual_rect.h * (y as f32 - self.fitness_min)
-                        / (self.fitness_max - self.fitness_min)) as f32;
-                na::Point2::new(i as f32 * delta, y)
-            })
-            .collect();
-
-        let line =
-            graphics::Mesh::new_line(ctx, &points, 3.0, graphics::Color::from_rgb(92, 124, 250))?;
-        graphics::draw(ctx, &line, (actual_rect.point(),))?;
-
-        Ok(())
-    }
-    */
 }

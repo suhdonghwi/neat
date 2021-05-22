@@ -7,7 +7,7 @@ use ggez::graphics::{self};
 use ggez::nalgebra as na;
 use rand::Rng;
 
-use super::text::Text;
+use super::{opencolor, text::Text};
 
 fn calculate_y(total_count: usize, nth: usize, rect: &graphics::Rect) -> f32 {
     let delta = 40.0;
@@ -36,9 +36,9 @@ impl NodeDrawInfo {
 
                 let total_count = graph.input_number() + 1;
                 let color = if node_data.kind() == NodeKind::Input {
-                    graphics::Color::from_rgb(73, 80, 87)
+                    *opencolor::GRAY7
                 } else {
-                    graphics::Color::from_rgb(173, 181, 189)
+                    *opencolor::GRAY5
                 };
 
                 NodeDrawInfo {
@@ -58,7 +58,7 @@ impl NodeDrawInfo {
                         rect.x as f32 + rect.w as f32 - left_right_space,
                         calculate_y(total_count, nth, rect),
                     ),
-                    color: graphics::Color::from_rgb(73, 80, 87),
+                    color: *opencolor::GRAY7,
                 }
             }
             NodeKind::Hidden => NodeDrawInfo {
@@ -68,7 +68,7 @@ impl NodeDrawInfo {
                     ),
                     rng.gen_range(rect.y + 60.0..rect.y + rect.h - 60.0),
                 ),
-                color: graphics::Color::from_rgb(134, 142, 150),
+                color: *opencolor::GRAY5,
             },
         }
     }
@@ -94,9 +94,9 @@ impl EdgeDrawInfo {
             to,
             width: (7.0 * weight.abs() / max_weight) as f32,
             color: if weight > 0.0 {
-                graphics::Color::from_rgba(81, 207, 102, 150)
+                opencolor::with_alpha(*opencolor::GREEN5, 0.7)
             } else {
-                graphics::Color::from_rgba(255, 107, 107, 150)
+                opencolor::with_alpha(*opencolor::RED5, 0.7)
             },
         }
     }

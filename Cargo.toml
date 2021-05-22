@@ -17,6 +17,7 @@ clap = "2.33.3"
 toml = "0.5.8"
 ggez = "0.5"
 float-cmp = "0.8.0"
+lazy_static = "1.4.0"
 
 [lib]
 name = "neat"

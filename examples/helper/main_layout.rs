@@ -7,8 +7,8 @@ use ggez::nalgebra as na;
 
 use neat::network::network_graph::NetworkGraph;
 
-use super::plot::Plot;
 use super::{graph_visual::GraphVisual, plot::Axis};
+use super::{opencolor, plot::Plot};
 
 pub struct MainLayout {
     graph_visual: Option<GraphVisual>,
@@ -56,7 +56,7 @@ impl MainLayout {
             ctx,
             &[na::Point2::new(550.0, 0.0), na::Point2::new(550.0, 600.0)],
             3.0,
-            graphics::Color::from_rgba(0, 0, 0, 50),
+            opencolor::with_alpha(*opencolor::BLACK, 0.2),
         )?;
         graphics::draw(ctx, &vertical, (na::Point2::new(0.0, 0.0),))?;
 
@@ -64,13 +64,13 @@ impl MainLayout {
             ctx,
             &[na::Point2::new(550.0, 300.0), na::Point2::new(950.0, 300.0)],
             3.0,
-            graphics::Color::from_rgba(0, 0, 0, 50),
+            opencolor::with_alpha(*opencolor::BLACK, 0.2),
         )?;
         graphics::draw(ctx, &horizontal, (na::Point2::new(0.0, 0.0),))
     }
 
     pub fn draw(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
-        graphics::clear(ctx, graphics::Color::from_rgb(248, 249, 250));
+        graphics::clear(ctx, *opencolor::GRAY0);
 
         if let Some(graph) = &self.graph_visual {
             graph.draw(ctx)?;
@@ -79,7 +79,7 @@ impl MainLayout {
         self.fitness_plot
             .draw_plane(ctx, |x| format!("{}", x), |y| format!("{:.1}", y))?;
         self.fitness_plot
-            .draw_line(ctx, &self.fitness_points, graphics::BLACK)?;
+            .draw_line(ctx, &self.fitness_points, *opencolor::INDIGO5)?;
 
         self.draw_separator(ctx)
     }

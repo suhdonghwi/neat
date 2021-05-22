@@ -87,7 +87,7 @@ impl event::EventHandler for MainState {
 }
 
 pub fn main() -> ggez::GameResult {
-    let cb = MainLayout::builder();
+    let cb = MainLayout::builder("XOR");
     let (ctx, event_loop) = &mut cb.build()?;
     let state = &mut MainState::new(ctx);
 

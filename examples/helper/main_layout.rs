@@ -44,10 +44,10 @@ impl MainLayout {
         }
     }
 
-    pub fn builder() -> ggez::ContextBuilder {
+    pub fn builder(window_title: &str) -> ggez::ContextBuilder {
         ggez::ContextBuilder::new("neat", "suhdonghwi")
             .window_mode(ggez::conf::WindowMode::default().dimensions(950.0, 600.0))
-            .window_setup(WindowSetup::default().title("XOR"))
+            .window_setup(WindowSetup::default().title(window_title))
             .add_resource_path(Path::new("./resources"))
     }
 

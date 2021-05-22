@@ -2,6 +2,7 @@ use std::path::Path;
 
 use ggez::conf::WindowSetup;
 use ggez::graphics;
+use ggez::mint;
 use ggez::nalgebra as na;
 
 use neat::network::network_graph::NetworkGraph;
@@ -14,6 +15,8 @@ pub struct MainLayout {
     fitness_plot: Plot,
     font: graphics::Font,
     max_weight: f64,
+
+    fitness_points: Vec<mint::Point2<f32>>,
 }
 
 impl MainLayout {
@@ -24,13 +27,14 @@ impl MainLayout {
             graph_visual: None,
             fitness_plot: Plot::new(
                 [550.0, 300.0, 400.0, 300.0].into(),
+                Axis::new(1.0, 100.0, 20.0),
                 Axis::new(0.0, 4.0, 1.0),
-                Axis::new(0.0, 4.0, 0.5),
                 "fitness-generation grpah",
                 font,
             ),
             font,
             max_weight,
+            fitness_points: Vec::new(),
         }
     }
 
@@ -67,6 +71,8 @@ impl MainLayout {
         }
 
         self.fitness_plot.draw_plane(ctx)?;
+        self.fitness_plot
+            .draw_line(ctx, &self.fitness_points, graphics::BLACK)?;
 
         self.draw_separator(ctx)
     }
@@ -80,5 +86,10 @@ impl MainLayout {
             fitness,
             self.font,
         ));
+
+        self.fitness_points.push(mint::Point2 {
+            x: generation as f32,
+            y: fitness as f32,
+        });
     }
 }

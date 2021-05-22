@@ -27,6 +27,10 @@ impl Axis {
         list.push(self.max);
         list.into_iter()
     }
+
+    pub fn value_proportion(&self, v: f32) -> f32 {
+        (v - self.min) / (self.max - self.min)
+    }
 }
 
 pub struct Plot {
@@ -188,7 +192,28 @@ impl Plot {
         points: &[mint::Point2<f32>],
         color: graphics::Color,
     ) -> ggez::GameResult<()> {
-        let line = graphics::Mesh::new_line(ctx, &points, 3.0, color)?;
+        if points.len() < 2 {
+            return Ok(());
+        }
+
+        let mut converted_points: Vec<mint::Point2<f32>> = Vec::new();
+
+        for point in points {
+            if point.x < self.x_axis.min
+                || point.x > self.x_axis.max
+                || point.y < self.y_axis.min
+                || point.y > self.y_axis.max
+            {
+                continue;
+            }
+
+            converted_points.push(mint::Point2 {
+                x: self.x_axis.value_proportion(point.x) * self.actual_rect.w,
+                y: (1.0 - self.y_axis.value_proportion(point.y)) * self.actual_rect.h,
+            });
+        }
+
+        let line = graphics::Mesh::new_line(ctx, &converted_points, 3.0, color)?;
         graphics::draw(ctx, &line, (self.actual_rect.point(),))
     }
 

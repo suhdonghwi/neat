@@ -70,7 +70,8 @@ impl MainLayout {
             graph.draw(ctx)?;
         }
 
-        self.fitness_plot.draw_plane(ctx)?;
+        self.fitness_plot
+            .draw_plane(ctx, |x| format!("{}", x), |y| format!("{:.1}", y))?;
         self.fitness_plot
             .draw_line(ctx, &self.fitness_points, graphics::BLACK)?;
 

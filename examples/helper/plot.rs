@@ -160,7 +160,12 @@ impl Plot {
         )
     }
 
-    pub fn draw_plane(&self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {
+    pub fn draw_plane<F1: Fn(f32) -> String, F2: Fn(f32) -> String>(
+        &self,
+        ctx: &mut ggez::Context,
+        x_format: F1,
+        y_format: F2,
+    ) -> ggez::GameResult<()> {
         self.draw_axes(ctx, &self.actual_rect)?;
 
         let title_point = na::Point2::new(
@@ -172,14 +177,14 @@ impl Plot {
         for n in self.x_axis.ticks() {
             let x =
                 (n - self.x_axis.min) / (self.x_axis.max - self.x_axis.min) * self.actual_rect.w;
-            let guide_text = &format!("{:.1}", n);
+            let guide_text = &x_format(n);
             self.draw_vertical_guide(ctx, guide_text, x)?;
         }
 
         for n in self.y_axis.ticks() {
             let y = self.actual_rect.h
                 - (n - self.y_axis.min) / (self.y_axis.max - self.y_axis.min) * self.actual_rect.h;
-            let guide_text = &format!("{:.1}", n);
+            let guide_text = &y_format(n);
             self.draw_horizontal_guide(ctx, guide_text, y)?;
         }
 

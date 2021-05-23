@@ -3,7 +3,7 @@ output_number = 1
 population = 300
 
 hidden_activation = 'Tanh'
-output_activation = 'Tanh'
+output_activation = 'Linear'
 
 [mutation] 
 weight_perturbation = 0.8
@@ -11,7 +11,7 @@ weight_assign = 0.1
 add_connection = 0.5
 remove_connection = 0.5
 toggle_connection = 0.0
-add_node = 0.3
+add_node = 0.2
 remove_node = 0.2
 
 weight_min = -10.0

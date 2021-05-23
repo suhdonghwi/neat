@@ -108,7 +108,7 @@ impl Network for Feedforward {
     }
 
     fn evaluate(&mut self, fitness: f64) {
-        self.fitness = Some(fitness);
+        self.fitness = Some(fitness.max(0.0));
     }
 
     fn fitness(&self) -> Option<f64> {

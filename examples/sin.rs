@@ -40,21 +40,21 @@ impl MainState {
             params.mutation.weight_max,
             "fitness-generation graph",
             Axis::new(1.0, 10.0, 2.0),
-            Axis::new(0.9, 1.0, 0.02),
+            Axis::new(3.0, 4.0, 0.2),
             font,
         );
 
         let sin_plot = Plot::new(
             graphics::Rect::new(60.0, 70.0, 400.0, 400.0),
             Axis::new(-1.0, 1.0, 0.5),
-            Axis::new(-0.5, 0.5, 0.25),
+            Axis::new(-1.0, 1.0, 0.5),
             "SIN",
             font,
         );
         let mut sin_points = Vec::new();
         for i in -50..=50 {
             sin_points.push(mint::Point2 {
-                x: (i as f32 / 25.0),
+                x: (i as f32 / 50.0),
                 y: 0.0,
             });
         }
@@ -80,19 +80,20 @@ impl event::EventHandler for MainState {
                 .pool
                 .evaluate(|_, network| {
                     let n = 50;
-                    let mut fitness = 0.0;
+                    let mut error_sum = 0.0;
 
                     for i in -n..=n {
                         let x = i as f64 / n as f64;
 
-                        let output = network.activate(&[x]).unwrap()[0].clamp(-0.5, 0.5);
-                        let expected = (x * std::f64::consts::PI).sin() * 0.5;
+                        let output = network.activate(&[x]).unwrap()[0];
+                        let expected = (x * std::f64::consts::PI).sin();
                         let err = output - expected;
 
-                        fitness += 1.0 - err * err;
+                        error_sum += err * err;
                     }
 
-                    network.evaluate(fitness / (2 * n + 1) as f64);
+                    let error_mean = error_sum / (n * 2 + 1) as f64;
+                    network.evaluate(4.0 - error_mean);
                 })
                 .clone();
             let best_fitness = best_network.fitness().unwrap();

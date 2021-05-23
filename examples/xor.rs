@@ -58,7 +58,7 @@ impl MainState {
                 let x = 1.0 * i as f32 / 20.0;
                 let y = 1.0 * j as f32 / 20.0;
 
-                xor_points.push((mint::Point2 { x, y }, *opencolor::RED5));
+                xor_points.push((mint::Point2 { x, y }, *opencolor::GRAY5));
             }
         }
 
@@ -86,17 +86,27 @@ impl event::EventHandler for MainState {
             ];
 
             let generation = self.pool.generation();
-            let best_network = self.pool.evaluate(|_, network| {
-                let mut err = 0.0;
+            let mut best_network = self
+                .pool
+                .evaluate(|_, network| {
+                    let mut err = 0.0;
 
-                for (inputs, expected) in &data {
-                    let output = network.activate(inputs).unwrap()[0];
-                    err += (output - expected) * (output - expected);
-                }
+                    for (inputs, expected) in &data {
+                        let output = network.activate(inputs).unwrap()[0];
+                        err += (output - expected) * (output - expected);
+                    }
 
-                network.evaluate(4.0 - err);
-            });
+                    network.evaluate(4.0 - err);
+                })
+                .clone();
             let best_fitness = best_network.fitness().unwrap();
+
+            for (point, color) in &mut self.xor_points {
+                let output = best_network
+                    .activate(&[point.x.into(), point.y.into()])
+                    .unwrap()[0];
+                *color = graphics::Color::from_rgba(255, 0, 0, (255.0 * output) as u8);
+            }
 
             self.layout
                 .update(best_network.graph().clone(), best_fitness, generation);
@@ -115,7 +125,7 @@ impl event::EventHandler for MainState {
 
         self.xor_plot.start_plotting();
         for (point, color) in &self.xor_points {
-            self.xor_plot.draw_point(point, 3.0, *color)?;
+            self.xor_plot.draw_point(point, 3.0, *color);
         }
         self.xor_plot.finish_plotting(ctx)?;
 

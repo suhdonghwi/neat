@@ -76,8 +76,13 @@ impl MainLayout {
 
         self.fitness_plot
             .draw_plane(ctx, |x| format!("{}", x), |y| format!("{:.1}", y))?;
-        self.fitness_plot
-            .draw_line(&self.fitness_points, *opencolor::INDIGO5)?;
+
+        if self.fitness_points.len() > 1 {
+            self.fitness_plot.start_plotting();
+            self.fitness_plot
+                .draw_line(&self.fitness_points, *opencolor::INDIGO5)?;
+            self.fitness_plot.finish_plotting(ctx)?;
+        }
 
         self.draw_separator(ctx)
     }

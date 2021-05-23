@@ -247,12 +247,7 @@ impl Plot {
         //graphics::draw(ctx, &line, (self.actual_rect.point(),))
     }
 
-    pub fn draw_point(
-        &mut self,
-        point: &mint::Point2<f32>,
-        radius: f32,
-        color: graphics::Color,
-    ) -> ggez::GameResult<()> {
+    pub fn draw_point(&mut self, point: &mint::Point2<f32>, radius: f32, color: graphics::Color) {
         let converted_point = self.convert_point(&point);
         self.mesh_builder.circle(
             graphics::DrawMode::fill(),
@@ -261,7 +256,5 @@ impl Plot {
             0.1,
             color,
         );
-
-        Ok(())
     }
 }

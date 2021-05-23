@@ -111,7 +111,7 @@ pub struct GraphVisual {
 
 impl GraphVisual {
     pub fn new(
-        graph: NetworkGraph,
+        graph: &NetworkGraph,
         rect: graphics::Rect,
         max_weight: f64,
         generation: usize,

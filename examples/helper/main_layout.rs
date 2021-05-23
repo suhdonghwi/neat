@@ -87,7 +87,7 @@ impl MainLayout {
         self.draw_separator(ctx)
     }
 
-    pub fn update(&mut self, graph: NetworkGraph, fitness: f64, generation: usize) {
+    pub fn update(&mut self, graph: &NetworkGraph, fitness: f64, generation: usize) {
         self.graph_visual = Some(GraphVisual::new(
             graph,
             [550.0, 0.0, 400.0, 300.0].into(),

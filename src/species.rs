@@ -1,6 +1,6 @@
 use rand::{distributions::Uniform, prelude::Distribution, RngCore};
 
-use crate::{network::Network, parameters::Parameters};
+use crate::{activations::ActivationKind, network::Network};
 use std::fmt::Debug;
 
 #[derive(Clone, Debug)]
@@ -42,14 +42,14 @@ impl<'a, T: Network + Debug + Clone> Species<'a, T> {
         self.info
     }
 
-    pub fn try_assign(&mut self, network: &'a T, params: &Parameters) -> bool {
-        let metric = self.info.representative.graph().compatibility_metric(
-            network.graph(),
-            params.speciation.c1,
-            params.speciation.c2,
-        );
+    pub fn try_assign(&mut self, network: &'a T, c1: f64, c2: f64, threshold: f64) -> bool {
+        let metric = self
+            .info
+            .representative
+            .graph()
+            .compatibility_metric(network.graph(), c1, c2);
 
-        if metric <= params.speciation.compatibility_threshold {
+        if metric <= threshold {
             self.list.push(network);
             true
         } else {
@@ -79,7 +79,12 @@ impl<'a, T: Network + Debug + Clone> Species<'a, T> {
         self.list.len()
     }
 
-    pub fn mate(&self, rng: &mut impl RngCore) -> Option<T> {
+    pub fn mate(
+        &self,
+        rng: &mut impl RngCore,
+        hidden_func: ActivationKind,
+        output_func: ActivationKind,
+    ) -> Option<T> {
         let uniform = Uniform::new(0, self.list.len());
 
         let index1 = uniform.sample(rng);
@@ -91,7 +96,7 @@ impl<'a, T: Network + Debug + Clone> Species<'a, T> {
         let parent1 = &self.list[index1];
         let parent2 = &self.list[index2];
 
-        parent1.crossover(parent2)
+        parent1.crossover(parent2, hidden_func, output_func)
     }
 
     pub fn elites(&self, count: usize) -> Vec<T> {

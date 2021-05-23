@@ -3,15 +3,25 @@ use std::cmp::Ordering;
 use petgraph::graph::{EdgeIndex, NodeIndex};
 
 use self::network_graph::NetworkGraph;
-use crate::innovation_record::InnovationRecord;
 use crate::node_kind::NodeKind;
+use crate::{activations::ActivationKind, innovation_record::InnovationRecord};
 
 pub mod feedforward;
 pub mod network_graph;
 
 pub trait Network {
-    fn new(input_number: usize, output_number: usize, innov_record: &mut InnovationRecord) -> Self;
-    fn from_graph(graph: NetworkGraph) -> Self;
+    fn new(
+        input_number: usize,
+        output_number: usize,
+        hidden_func: ActivationKind,
+        output_func: ActivationKind,
+        innov_record: &mut InnovationRecord,
+    ) -> Self;
+    fn from_graph(
+        graph: NetworkGraph,
+        hidden_func: ActivationKind,
+        output_func: ActivationKind,
+    ) -> Self;
 
     fn activate(&mut self, inputs: &[f64]) -> Option<Vec<f64>>;
 
@@ -63,7 +73,12 @@ pub trait Network {
         true
     }
 
-    fn crossover(&self, other: &Self) -> Option<Self>
+    fn crossover(
+        &self,
+        other: &Self,
+        hidden_func: ActivationKind,
+        output_func: ActivationKind,
+    ) -> Option<Self>
     where
         Self: Sized,
     {
@@ -73,7 +88,7 @@ pub trait Network {
             .graph()
             .crossover(&other.graph(), my_fitness >= other_fitness, rng)?;
 
-        Some(Self::from_graph(new_graph))
+        Some(Self::from_graph(new_graph, hidden_func, output_func))
     }
 
     fn evaluate(&mut self, fitness: f64);

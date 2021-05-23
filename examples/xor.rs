@@ -32,7 +32,7 @@ impl MainState {
         let params = helper::read_parameters_file("./params/xor.toml");
 
         let mut innov_record = InnovationRecord::new(2, 1);
-        let pool = Pool::<Feedforward>::new(params, args.verbosity, &mut innov_record);
+        let pool = Pool::<Feedforward>::new(params.clone(), args.verbosity, &mut innov_record);
 
         let font = graphics::Font::new(ctx, Path::new("/LiberationMono-Regular.ttf")).unwrap();
 

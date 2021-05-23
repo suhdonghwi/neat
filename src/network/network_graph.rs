@@ -12,8 +12,8 @@ use rand::{
     RngCore,
 };
 
-use crate::node_data::NodeData;
 use crate::node_kind::NodeKind;
+use crate::{activations::ActivationKind, node_data::NodeData};
 use crate::{edge_data::EdgeData, innovation_record::InnovationRecord};
 
 #[derive(Debug, Clone)]
@@ -113,11 +113,11 @@ impl NetworkGraph {
     }
 
     // Collect activation results of output nodes and return them
-    pub fn activate_output(&self) -> Vec<f64> {
+    pub fn activate_output(&self, func: ActivationKind) -> Vec<f64> {
         let mut result = Vec::new();
         for index in self.input_number..self.input_number + self.output_number {
             let node = &self.graph[NodeIndex::new(index)];
-            result.push(node.activate().unwrap());
+            result.push(node.activate(func).unwrap());
         }
 
         result
@@ -170,9 +170,9 @@ impl NetworkGraph {
     }
 
     // Propagate output of the node to outgoing connections
-    pub fn activate_node(&mut self, index: NodeIndex) {
+    pub fn activate_node(&mut self, index: NodeIndex, func: ActivationKind) {
         let activation;
-        match self.graph[index].activate() {
+        match self.graph[index].activate(func) {
             // Check if every incoming connection has been propagated
             Some(v) => activation = v,
             None => return,

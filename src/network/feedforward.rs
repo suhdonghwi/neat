@@ -1,26 +1,46 @@
 use petgraph::graph::NodeIndex;
 
 use super::{network_graph::NetworkGraph, Network};
-use crate::{innovation_record::InnovationRecord, node_data::NodeData, node_kind::NodeKind};
+use crate::{
+    activations::ActivationKind, innovation_record::InnovationRecord, node_data::NodeData,
+    node_kind::NodeKind,
+};
 
 #[derive(Debug, Clone)]
 pub struct Feedforward {
     graph: NetworkGraph,
     fitness: Option<f64>,
+
+    hidden_func: ActivationKind,
+    output_func: ActivationKind,
 }
 
 impl Network for Feedforward {
-    fn new(input_number: usize, output_number: usize, innov_record: &mut InnovationRecord) -> Self {
+    fn new(
+        input_number: usize,
+        output_number: usize,
+        hidden_func: ActivationKind,
+        output_func: ActivationKind,
+        innov_record: &mut InnovationRecord,
+    ) -> Self {
         Self {
             graph: NetworkGraph::new(input_number, output_number, innov_record),
             fitness: None,
+            hidden_func,
+            output_func,
         }
     }
 
-    fn from_graph(graph: NetworkGraph) -> Self {
+    fn from_graph(
+        graph: NetworkGraph,
+        hidden_func: ActivationKind,
+        output_func: ActivationKind,
+    ) -> Self {
         Self {
             graph,
             fitness: None,
+            hidden_func,
+            output_func,
         }
     }
 
@@ -41,10 +61,10 @@ impl Network for Feedforward {
         // Activate nodes in topological order
         let toposort = self.graph.toposort().unwrap();
         for node_index in toposort {
-            self.graph.activate_node(node_index);
+            self.graph.activate_node(node_index, self.hidden_func);
         }
 
-        let result = Some(self.graph.activate_output());
+        let result = Some(self.graph.activate_output(self.output_func));
         self.graph.clear_sum();
 
         result
@@ -98,6 +118,7 @@ impl Network for Feedforward {
 
 #[cfg(test)]
 mod tests {
+    use super::ActivationKind as Kind;
     use super::*;
     use crate::activations::sigmoid;
 
@@ -106,7 +127,13 @@ mod tests {
         let input_number = 2;
         let output_number = 1;
         let mut innov_record = InnovationRecord::new(input_number, output_number);
-        let mut network = Feedforward::new(input_number, output_number, &mut innov_record);
+        let mut network = Feedforward::new(
+            input_number,
+            output_number,
+            Kind::Sigmoid,
+            Kind::Sigmoid,
+            &mut innov_record,
+        );
         assert_eq!(
             network.activate(&[1.0, 2.0]),
             Some(vec![sigmoid(1.0 + 2.0)])
@@ -123,7 +150,7 @@ mod tests {
         graph.add_node(0.into(), &mut innov_record);
         graph.remove_connetion(1.into());
 
-        let mut network = Feedforward::from_graph(graph);
+        let mut network = Feedforward::from_graph(graph, Kind::Sigmoid, Kind::Sigmoid);
 
         assert_eq!(network.activate(&[0.0]), Some(vec![0.0]));
         assert_eq!(network.activate(&[1.0]), Some(vec![0.0]));
@@ -134,7 +161,13 @@ mod tests {
         let input_number = 2;
         let output_number = 1;
         let mut innov_record = InnovationRecord::new(input_number, output_number);
-        let mut network = Feedforward::new(input_number, output_number, &mut innov_record);
+        let mut network = Feedforward::new(
+            input_number,
+            output_number,
+            Kind::Sigmoid,
+            Kind::Sigmoid,
+            &mut innov_record,
+        );
         assert!(network.mutate_add_node(0.into(), &mut innov_record));
 
         assert_eq!(
@@ -148,7 +181,7 @@ mod tests {
         let input_number = 2;
         let output_number = 1;
         let mut innov_record = InnovationRecord::new(input_number, output_number);
-        let mut network = Feedforward::new(2, 1, &mut innov_record);
+        let mut network = Feedforward::new(2, 1, Kind::Sigmoid, Kind::Sigmoid, &mut innov_record);
 
         assert_eq!(
             network.activate(&[1.0, 2.0]),
@@ -165,7 +198,13 @@ mod tests {
         let input_number = 2;
         let output_number = 1;
         let mut innov_record = InnovationRecord::new(input_number, output_number);
-        let mut network = Feedforward::new(input_number, output_number, &mut innov_record);
+        let mut network = Feedforward::new(
+            input_number,
+            output_number,
+            Kind::Sigmoid,
+            Kind::Sigmoid,
+            &mut innov_record,
+        );
         assert!(network.mutate_add_connection(3.into(), 2.into(), -3.0, &mut innov_record));
 
         assert_eq!(network.activate(&[1.0, 2.0]), Some(vec![sigmoid(0.0)]));
@@ -176,7 +215,7 @@ mod tests {
         let input_number = 2;
         let output_number = 1;
         let mut innov_record = InnovationRecord::new(input_number, output_number);
-        let mut network = Feedforward::new(2, 1, &mut innov_record);
+        let mut network = Feedforward::new(2, 1, Kind::Sigmoid, Kind::Sigmoid, &mut innov_record);
         assert!(network.mutate_add_node(0.into(), &mut innov_record));
         assert!(network.mutate_add_connection(1.into(), 4.into(), 2.0, &mut innov_record));
 
@@ -191,7 +230,7 @@ mod tests {
         let input_number = 2;
         let output_number = 1;
         let mut innov_record = InnovationRecord::new(input_number, output_number);
-        let mut network = Feedforward::new(2, 1, &mut innov_record);
+        let mut network = Feedforward::new(2, 1, Kind::Sigmoid, Kind::Sigmoid, &mut innov_record);
         assert_eq!(
             network.mutate_add_connection(0.into(), 2.into(), 1.0, &mut innov_record),
             false
@@ -203,7 +242,13 @@ mod tests {
         let input_number = 2;
         let output_number = 1;
         let mut innov_record = InnovationRecord::new(input_number, output_number);
-        let mut network = Feedforward::new(input_number, output_number, &mut innov_record);
+        let mut network = Feedforward::new(
+            input_number,
+            output_number,
+            Kind::Sigmoid,
+            Kind::Sigmoid,
+            &mut innov_record,
+        );
         assert!(network.mutate_add_node(0.into(), &mut innov_record));
         assert!(network.mutate_add_node(1.into(), &mut innov_record));
         assert!(network.mutate_add_connection(4.into(), 5.into(), 1.0, &mut innov_record));
@@ -218,7 +263,13 @@ mod tests {
         let input_number = 2;
         let output_number = 1;
         let mut innov_record = InnovationRecord::new(input_number, output_number);
-        let mut network = Feedforward::new(input_number, output_number, &mut innov_record);
+        let mut network = Feedforward::new(
+            input_number,
+            output_number,
+            Kind::Sigmoid,
+            Kind::Sigmoid,
+            &mut innov_record,
+        );
         assert!(network.mutate_add_node(0.into(), &mut innov_record));
         assert_eq!(
             network.mutate_add_connection(2.into(), 4.into(), 1.0, &mut innov_record),

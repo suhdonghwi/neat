@@ -1,4 +1,4 @@
-use crate::activations;
+use crate::activations::{activate, ActivationKind};
 use crate::node_kind::NodeKind;
 
 #[derive(Debug, PartialEq, Clone)]
@@ -29,13 +29,13 @@ impl NodeData {
         self.activated = false;
     }
 
-    pub fn activate(&self) -> Option<f64> {
+    pub fn activate(&self, func: ActivationKind) -> Option<f64> {
         if self.kind == NodeKind::Input || self.kind == NodeKind::Bias {
             Some(self.input_sum)
         } else if self.activated {
-            Some(activations::sigmoid(self.input_sum))
+            Some(activate(func, self.input_sum))
         } else if self.kind == NodeKind::Output {
-            Some(0.0)
+            Some(self.input_sum)
         } else {
             None
         }

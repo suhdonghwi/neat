@@ -2,6 +2,9 @@ input_number = 2
 output_number = 1
 population = 150
 
+hidden_activation = 'Sigmoid'
+output_activation = 'Sigmoid'
+
 [mutation] 
 weight_perturbation = 0.8
 weight_assign = 0.1

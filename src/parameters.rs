@@ -1,10 +1,15 @@
 use serde::Deserialize;
 
-#[derive(Deserialize, Clone, Copy)]
+use crate::activations::ActivationKind;
+
+#[derive(Deserialize, Clone)]
 pub struct Parameters {
     pub input_number: usize,
     pub output_number: usize,
     pub population: usize,
+
+    pub hidden_activation: ActivationKind,
+    pub output_activation: ActivationKind,
 
     pub mutation: MutationParameters,
     pub speciation: SpeciationParameters,

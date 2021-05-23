@@ -29,7 +29,13 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
         let mut list: Vec<T> = Vec::new();
 
         for _ in 0..params.population {
-            let mut network = T::new(params.input_number, params.output_number, innov_record);
+            let mut network = T::new(
+                params.input_number,
+                params.output_number,
+                params.hidden_activation,
+                params.output_activation,
+                innov_record,
+            );
             network
                 .graph_mut()
                 .randomize_weights(params.mutation.weight_min, params.mutation.weight_max);
@@ -116,7 +122,12 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
             let mut found = false;
 
             for species in &mut new_species_set {
-                if species.try_assign(network, &self.params) {
+                if species.try_assign(
+                    network,
+                    self.params.speciation.c1,
+                    self.params.speciation.c2,
+                    self.params.speciation.compatibility_threshold,
+                ) {
                     found = true;
                     break;
                 }
@@ -254,7 +265,13 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
         let rng = &mut rand::thread_rng();
         for (i, count) in count_list.into_iter().enumerate() {
             for _ in 0..count {
-                let mut offspring = species_set[i].mate(rng).unwrap();
+                let mut offspring = species_set[i]
+                    .mate(
+                        rng,
+                        self.params.hidden_activation,
+                        self.params.output_activation,
+                    )
+                    .unwrap();
                 self.mutate(&mut offspring, innov_record, rng);
 
                 offspring_list.push(offspring);

@@ -75,7 +75,7 @@ impl MainLayout {
         }
 
         self.fitness_plot
-            .draw_plane(ctx, |x| format!("{}", x), |y| format!("{:.1}", y))?;
+            .draw_plane(ctx, |x| format!("{}", x), |y| format!("{:.2}", y))?;
 
         if self.fitness_points.len() > 1 {
             self.fitness_plot.start_plotting();

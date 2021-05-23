@@ -40,21 +40,21 @@ impl MainState {
             params.mutation.weight_max,
             "fitness-generation graph",
             Axis::new(1.0, 10.0, 2.0),
-            Axis::new(0.0, 1.0, 0.5),
+            Axis::new(0.0, 0.25, 0.1),
             font,
         );
 
         let sin_plot = Plot::new(
             graphics::Rect::new(60.0, 70.0, 400.0, 400.0),
-            Axis::new(0.0, 2.0 * std::f32::consts::PI, std::f32::consts::PI / 2.0),
             Axis::new(-1.0, 1.0, 0.5),
+            Axis::new(-0.5, 0.5, 0.25),
             "SIN",
             font,
         );
         let mut sin_points = Vec::new();
-        for i in 0..=50 {
+        for i in -50..=50 {
             sin_points.push(mint::Point2 {
-                x: 2.0 * std::f32::consts::PI * (i as f32 / 50.0),
+                x: (i as f32 / 25.0),
                 y: 0.0,
             });
         }
@@ -79,20 +79,20 @@ impl event::EventHandler for MainState {
             let mut best_network = self
                 .pool
                 .evaluate(|_, network| {
-                    let n: usize = 50;
-                    let mut total_err = 0.0;
+                    let n = 50;
+                    let mut fitness = 0.0;
 
-                    for i in 0..=n {
-                        let x = 2.0 * std::f64::consts::PI * (i as f64 / n as f64);
+                    for i in -n..=n {
+                        let x = i as f64 / n as f64;
 
                         let output = network.activate(&[x]).unwrap()[0];
-                        let expected = x.sin();
+                        let expected = (x * std::f64::consts::PI).sin() * 0.5;
                         let err = output - expected;
 
-                        total_err += err * err;
+                        fitness += 0.25 - err * err;
                     }
 
-                    network.evaluate(1.0 - total_err / (n + 1) as f64);
+                    network.evaluate(fitness / (2 * n + 1) as f64);
                 })
                 .clone();
             let best_fitness = best_network.fitness().unwrap();

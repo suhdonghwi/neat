@@ -5,6 +5,7 @@ pub enum ActivationKind {
     Sigmoid,
     Tanh,
     Linear,
+    Relu,
 }
 
 pub fn activate(kind: ActivationKind, v: f64) -> f64 {
@@ -12,6 +13,7 @@ pub fn activate(kind: ActivationKind, v: f64) -> f64 {
         ActivationKind::Sigmoid => sigmoid(v),
         ActivationKind::Tanh => tanh(v),
         ActivationKind::Linear => linear(v),
+        ActivationKind::Relu => relu(v),
     }
 }
 
@@ -25,4 +27,8 @@ pub fn tanh(s: f64) -> f64 {
 
 pub fn linear(v: f64) -> f64 {
     v
+}
+
+pub fn relu(v: f64) -> f64 {
+    v.max(0.0)
 }

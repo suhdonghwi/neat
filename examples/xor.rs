@@ -45,7 +45,7 @@ impl MainState {
         );
 
         let xor_plot = Plot::new(
-            graphics::Rect::new(0.0, 0.0, 400.0, 400.0),
+            graphics::Rect::new(60.0, 70.0, 400.0, 400.0),
             Axis::new(0.0, 1.0, 0.2),
             Axis::new(0.0, 1.0, 0.2),
             "XOR",
@@ -105,7 +105,7 @@ impl event::EventHandler for MainState {
                 let output = best_network
                     .activate(&[point.x.into(), point.y.into()])
                     .unwrap()[0];
-                *color = graphics::Color::from_rgba(255, 0, 0, (255.0 * output) as u8);
+                *color = opencolor::with_alpha(*opencolor::RED5, output as f32);
             }
 
             self.layout
@@ -125,7 +125,7 @@ impl event::EventHandler for MainState {
 
         self.xor_plot.start_plotting();
         for (point, color) in &self.xor_points {
-            self.xor_plot.draw_point(point, 3.0, *color);
+            self.xor_plot.draw_point(point, 4.0, *color);
         }
         self.xor_plot.finish_plotting(ctx)?;
 

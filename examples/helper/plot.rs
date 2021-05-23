@@ -49,6 +49,7 @@ pub struct Plot {
     y_axis: Axis,
 
     font: graphics::Font,
+    mesh_builder: graphics::MeshBuilder,
 }
 
 impl Plot {
@@ -80,6 +81,7 @@ impl Plot {
             x_axis,
             y_axis,
             font,
+            mesh_builder: graphics::MeshBuilder::new(),
         }
     }
 
@@ -201,9 +203,24 @@ impl Plot {
         Ok(())
     }
 
+    pub fn start_plotting(&mut self) {
+        self.mesh_builder = graphics::MeshBuilder::new();
+    }
+
+    pub fn finish_plotting(&self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {
+        let mesh = self.mesh_builder.build(ctx)?;
+        graphics::draw(ctx, &mesh, (self.actual_rect.point(),))
+    }
+
+    fn convert_point(&self, point: &mint::Point2<f32>) -> mint::Point2<f32> {
+        mint::Point2 {
+            x: self.x_axis.value_proportion(point.x) * self.actual_rect.w,
+            y: (1.0 - self.y_axis.value_proportion(point.y)) * self.actual_rect.h,
+        }
+    }
+
     pub fn draw_line(
-        &self,
-        ctx: &mut ggez::Context,
+        &mut self,
         points: &[mint::Point2<f32>],
         color: graphics::Color,
     ) -> ggez::GameResult<()> {
@@ -222,13 +239,29 @@ impl Plot {
                 continue;
             }
 
-            converted_points.push(mint::Point2 {
-                x: self.x_axis.value_proportion(point.x) * self.actual_rect.w,
-                y: (1.0 - self.y_axis.value_proportion(point.y)) * self.actual_rect.h,
-            });
+            converted_points.push(self.convert_point(point));
         }
 
-        let line = graphics::Mesh::new_line(ctx, &converted_points, 3.0, color)?;
-        graphics::draw(ctx, &line, (self.actual_rect.point(),))
+        self.mesh_builder.line(&converted_points, 3.0, color)?;
+        Ok(())
+        //graphics::draw(ctx, &line, (self.actual_rect.point(),))
+    }
+
+    pub fn draw_point(
+        &mut self,
+        point: &mint::Point2<f32>,
+        radius: f32,
+        color: graphics::Color,
+    ) -> ggez::GameResult<()> {
+        let converted_point = self.convert_point(&point);
+        self.mesh_builder.circle(
+            graphics::DrawMode::fill(),
+            converted_point,
+            radius,
+            0.1,
+            color,
+        );
+
+        Ok(())
     }
 }

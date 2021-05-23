@@ -21,14 +21,12 @@ pub struct MainLayout {
 
 impl MainLayout {
     pub fn new(
-        ctx: &mut ggez::Context,
         weight_max: f64,
         title: &str,
         x_axis: Axis,
         y_axis: Axis,
+        font: graphics::Font,
     ) -> Self {
-        let font = graphics::Font::new(ctx, Path::new("/LiberationMono-Regular.ttf")).unwrap();
-
         MainLayout {
             graph_visual: None,
             fitness_plot: Plot::new(
@@ -79,7 +77,7 @@ impl MainLayout {
         self.fitness_plot
             .draw_plane(ctx, |x| format!("{}", x), |y| format!("{:.1}", y))?;
         self.fitness_plot
-            .draw_line(ctx, &self.fitness_points, *opencolor::INDIGO5)?;
+            .draw_line(&self.fitness_points, *opencolor::INDIGO5)?;
 
         self.draw_separator(ctx)
     }

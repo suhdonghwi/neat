@@ -22,16 +22,16 @@ struct MainState {
     pool: Pool<Feedforward>,
     timer: Duration,
 
-    xor_plot: Plot,
-    xor_points: Vec<(mint::Point2<f32>, graphics::Color)>,
+    sin_plot: Plot,
+    sin_points: Vec<mint::Point2<f32>>,
 }
 
 impl MainState {
     fn new(ctx: &mut ggez::Context) -> Self {
         let args = helper::cli::get_arguments();
-        let params = helper::read_parameters_file("./params/xor.toml");
+        let params = helper::read_parameters_file("./params/sin.toml");
 
-        let mut innov_record = InnovationRecord::new(2, 1);
+        let mut innov_record = InnovationRecord::new(1, 1);
         let pool = Pool::<Feedforward>::new(params, args.verbosity, &mut innov_record);
 
         let font = graphics::Font::new(ctx, Path::new("/LiberationMono-Regular.ttf")).unwrap();
@@ -40,26 +40,23 @@ impl MainState {
             params.mutation.weight_max,
             "fitness-generation graph",
             Axis::new(1.0, 10.0, 2.0),
-            Axis::new(0.0, 4.0, 1.0),
+            Axis::new(0.0, 1.0, 0.5),
             font,
         );
 
-        let xor_plot = Plot::new(
+        let sin_plot = Plot::new(
             graphics::Rect::new(60.0, 70.0, 400.0, 400.0),
-            Axis::new(0.0, 1.0, 0.2),
-            Axis::new(0.0, 1.0, 0.2),
-            "XOR",
+            Axis::new(0.0, 2.0 * std::f32::consts::PI, std::f32::consts::PI / 2.0),
+            Axis::new(-1.0, 1.0, 0.5),
+            "SIN",
             font,
         );
-        let mut xor_points = Vec::new();
-
-        for i in 0..=20 {
-            for j in 0..=20 {
-                let x = 1.0 * i as f32 / 20.0;
-                let y = 1.0 * j as f32 / 20.0;
-
-                xor_points.push((mint::Point2 { x, y }, *opencolor::GRAY5));
-            }
+        let mut sin_points = Vec::new();
+        for i in 0..=50 {
+            sin_points.push(mint::Point2 {
+                x: 2.0 * std::f32::consts::PI * (i as f32 / 50.0),
+                y: 0.0,
+            });
         }
 
         MainState {
@@ -67,8 +64,8 @@ impl MainState {
             pool,
             timer: Duration::new(1, 0),
             layout,
-            xor_plot,
-            xor_points,
+            sin_plot,
+            sin_points,
         }
     }
 }
@@ -77,35 +74,31 @@ impl event::EventHandler for MainState {
     fn update(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
         self.timer += ggez::timer::delta(ctx);
 
-        if self.timer >= Duration::from_secs_f64(0.2) {
-            let data = vec![
-                (vec![0.0, 0.0], 0.0),
-                (vec![0.0, 1.0], 1.0),
-                (vec![1.0, 0.0], 1.0),
-                (vec![1.0, 1.0], 0.0),
-            ];
-
+        if self.timer >= Duration::from_secs_f64(0.1) {
             let generation = self.pool.generation();
             let mut best_network = self
                 .pool
                 .evaluate(|_, network| {
-                    let mut err = 0.0;
+                    let n: usize = 50;
+                    let mut total_err = 0.0;
 
-                    for (inputs, expected) in &data {
-                        let output = network.activate(inputs).unwrap()[0];
-                        err += (output - expected) * (output - expected);
+                    for i in 0..=n {
+                        let x = 2.0 * std::f64::consts::PI * (i as f64 / n as f64);
+
+                        let output = network.activate(&[x]).unwrap()[0];
+                        let expected = x.sin();
+                        let err = output - expected;
+
+                        total_err += err * err;
                     }
 
-                    network.evaluate(4.0 - err);
+                    network.evaluate(1.0 - total_err / (n + 1) as f64);
                 })
                 .clone();
             let best_fitness = best_network.fitness().unwrap();
 
-            for (point, color) in &mut self.xor_points {
-                let output = best_network
-                    .activate(&[point.x.into(), point.y.into()])
-                    .unwrap()[0];
-                *color = opencolor::with_alpha(*opencolor::RED5, output as f32);
+            for point in &mut self.sin_points {
+                point.y = best_network.activate(&[point.x.into()]).unwrap()[0] as f32;
             }
 
             self.layout
@@ -120,21 +113,20 @@ impl event::EventHandler for MainState {
     fn draw(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
         self.layout.draw(ctx)?;
 
-        self.xor_plot
+        self.sin_plot
             .draw_plane(ctx, |x| format!("{:.1}", x), |y| format!("{:.1}", y))?;
 
-        self.xor_plot.start_plotting();
-        for (point, color) in &self.xor_points {
-            self.xor_plot.draw_point(point, 4.0, *color);
-        }
-        self.xor_plot.finish_plotting(ctx)?;
+        self.sin_plot.start_plotting();
+        self.sin_plot
+            .draw_line(&self.sin_points, *opencolor::RED5)?;
+        self.sin_plot.finish_plotting(ctx)?;
 
         graphics::present(ctx)
     }
 }
 
 pub fn main() -> ggez::GameResult {
-    let cb = MainLayout::builder("XOR");
+    let cb = MainLayout::builder("SIN");
     let (ctx, event_loop) = &mut cb.build()?;
     let state = &mut MainState::new(ctx);
 

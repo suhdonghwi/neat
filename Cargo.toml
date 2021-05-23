@@ -25,3 +25,6 @@ path = "src/lib.rs"
 
 [[example]]
 name = "xor"
+
+[[example]]
+name = "sin"

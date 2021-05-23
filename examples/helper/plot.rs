@@ -208,8 +208,11 @@ impl Plot {
     }
 
     pub fn finish_plotting(&self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {
-        let mesh = self.mesh_builder.build(ctx)?;
-        graphics::draw(ctx, &mesh, (self.actual_rect.point(),))
+        if let Ok(mesh) = self.mesh_builder.build(ctx) {
+            graphics::draw(ctx, &mesh, (self.actual_rect.point(),))?;
+        }
+
+        Ok(())
     }
 
     fn convert_point(&self, point: &mint::Point2<f32>) -> mint::Point2<f32> {
@@ -242,7 +245,9 @@ impl Plot {
             converted_points.push(self.convert_point(point));
         }
 
-        self.mesh_builder.line(&converted_points, 3.0, color)?;
+        if converted_points.len() > 1 {
+            self.mesh_builder.line(&converted_points, 3.0, color)?;
+        }
         Ok(())
         //graphics::draw(ctx, &line, (self.actual_rect.point(),))
     }

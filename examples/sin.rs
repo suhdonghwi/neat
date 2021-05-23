@@ -40,7 +40,7 @@ impl MainState {
             params.mutation.weight_max,
             "fitness-generation graph",
             Axis::new(1.0, 10.0, 2.0),
-            Axis::new(0.0, 0.25, 0.1),
+            Axis::new(0.9, 1.0, 0.02),
             font,
         );
 
@@ -85,11 +85,11 @@ impl event::EventHandler for MainState {
                     for i in -n..=n {
                         let x = i as f64 / n as f64;
 
-                        let output = network.activate(&[x]).unwrap()[0];
+                        let output = network.activate(&[x]).unwrap()[0].clamp(-0.5, 0.5);
                         let expected = (x * std::f64::consts::PI).sin() * 0.5;
                         let err = output - expected;
 
-                        fitness += 0.25 - err * err;
+                        fitness += 1.0 - err * err;
                     }
 
                     network.evaluate(fitness / (2 * n + 1) as f64);

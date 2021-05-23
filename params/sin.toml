@@ -11,11 +11,11 @@ weight_assign = 0.1
 add_connection = 0.4
 remove_connection = 0.4
 toggle_connection = 0.0
-add_node = 0.3
+add_node = 0.4
 remove_node = 0.2
 
-weight_min = -15.0
-weight_max = 15.0
+weight_min = -10.0
+weight_max = 10.0
 
 perturb_min = -1.0
 perturb_max = 1.0
@@ -23,7 +23,7 @@ perturb_max = 1.0
 [speciation]
 c1 = 1.0
 c2 = 0.5
-compatibility_threshold = 20.0
+compatibility_threshold = 10.0
 elitism = 2
 
 survival_rate = 0.2

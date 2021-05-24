@@ -15,6 +15,10 @@ impl Text {
         self.text.width(ctx) as f32 / 2.0
     }
 
+    pub fn height(&self, ctx: &mut ggez::Context) -> f32 {
+        self.text.height(ctx) as f32 / 2.0
+    }
+
     pub fn draw(
         &self,
         ctx: &mut ggez::Context,

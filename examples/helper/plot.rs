@@ -15,7 +15,7 @@ impl Axis {
         Axis { min, max, delta }
     }
 
-    pub fn ticks(&self) -> impl Iterator<Item = f32> {
+    pub fn ticks(&self) -> Vec<f32> {
         let mut list = Vec::new();
 
         let mut n = self.min;
@@ -25,7 +25,7 @@ impl Axis {
         }
 
         list.push(self.max);
-        list.into_iter()
+        list
     }
 
     pub fn value_proportion(&self, v: f32) -> f32 {
@@ -112,30 +112,34 @@ impl Plot {
         graphics::draw(ctx, &x_line, (rect.point(),))
     }
 
+    fn draw_guide_line(
+        &self,
+        ctx: &mut ggez::Context,
+        from: na::Point2<f32>,
+        to: na::Point2<f32>,
+    ) -> ggez::GameResult<()> {
+        let line = graphics::Mesh::new_line(ctx, &[from, to], 1.5, *opencolor::GRAY3)?;
+        graphics::draw(ctx, &line, (self.actual_rect.point(),))
+    }
+
     fn draw_vertical_guide(
         &self,
         ctx: &mut ggez::Context,
-        text_str: &str,
+        text: &Text,
         x: f32,
+        text_delta: f32,
     ) -> ggez::GameResult<()> {
-        let line = graphics::Mesh::new_line(
+        self.draw_guide_line(
             ctx,
-            &[
-                na::Point2::new(x, self.actual_rect.h),
-                na::Point2::new(x, 0.0),
-            ],
-            1.5,
-            *opencolor::GRAY3,
+            na::Point2::new(x, self.actual_rect.h),
+            na::Point2::new(x, 0.0),
         )?;
 
-        graphics::draw(ctx, &line, (self.actual_rect.point(),))?;
-
-        let text = Text::new(text_str, self.font, 28.0);
         let text_width = text.width(ctx);
         text.draw(
             ctx,
             na::Point2::new(
-                self.actual_rect.x + x - text_width / 2.0,
+                self.actual_rect.x + x - text_width / 2.0 + text_delta,
                 self.actual_rect.y + self.actual_rect.h + 8.0,
             ),
             graphics::BLACK,
@@ -145,28 +149,22 @@ impl Plot {
     fn draw_horizontal_guide(
         &self,
         ctx: &mut ggez::Context,
-        text_str: &str,
+        text: &Text,
         y: f32,
+        text_delta: f32,
     ) -> ggez::GameResult<()> {
-        let line = graphics::Mesh::new_line(
+        self.draw_guide_line(
             ctx,
-            &[
-                na::Point2::new(0.0, y),
-                na::Point2::new(self.actual_rect.w, y),
-            ],
-            1.5,
-            *opencolor::GRAY3,
+            na::Point2::new(0.0, y),
+            na::Point2::new(self.actual_rect.w, y),
         )?;
 
-        graphics::draw(ctx, &line, (self.actual_rect.point(),))?;
-
-        let text = Text::new(text_str, self.font, 28.0);
         let text_width = text.width(ctx);
         text.draw(
             ctx,
             na::Point2::new(
                 self.actual_rect.x - text_width - 10.0,
-                self.actual_rect.y + y - 7.0,
+                self.actual_rect.y + y - 7.0 + text_delta,
             ),
             graphics::BLACK,
         )
@@ -184,18 +182,35 @@ impl Plot {
         );
         self.title_text.draw(ctx, title_point, graphics::BLACK)?;
 
-        for n in self.x_axis.ticks() {
+        // TODO: Generalize this to avoid repeating the similar codes?
+        let x_ticks = self.x_axis.ticks();
+        let x_len = x_ticks.len();
+        for (i, n) in x_ticks.into_iter().enumerate() {
             let x =
                 (n - self.x_axis.min) / (self.x_axis.max - self.x_axis.min) * self.actual_rect.w;
-            let guide_text = &x_format(n);
-            self.draw_vertical_guide(ctx, guide_text, x)?;
+            let guide_text = Text::new(&x_format(n), self.font, 28.0);
+
+            let delta = match i {
+                0 => guide_text.width(ctx) / 2.0,
+                _ if i == x_len - 1 => -guide_text.width(ctx) / 2.0,
+                _ => 0.0,
+            };
+            self.draw_vertical_guide(ctx, &guide_text, x, delta)?;
         }
 
-        for n in self.y_axis.ticks() {
+        let y_ticks = self.y_axis.ticks();
+        let y_len = y_ticks.len();
+        for (i, n) in y_ticks.into_iter().enumerate() {
             let y = self.actual_rect.h
                 - (n - self.y_axis.min) / (self.y_axis.max - self.y_axis.min) * self.actual_rect.h;
-            let guide_text = &y_format(n);
-            self.draw_horizontal_guide(ctx, guide_text, y)?;
+            let guide_text = Text::new(&y_format(n), self.font, 28.0);
+
+            let delta = match i {
+                0 => -guide_text.height(ctx) / 2.0,
+                _ if i == y_len - 1 => guide_text.height(ctx) / 2.0,
+                _ => 0.0,
+            };
+            self.draw_horizontal_guide(ctx, &guide_text, y, delta)?;
         }
 
         self.draw_axes(ctx, &self.actual_rect)?;

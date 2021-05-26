@@ -143,6 +143,10 @@ impl NetworkGraph {
         self.graph.node_count()
     }
 
+    pub fn hidden_node_count(&self) -> usize {
+        self.graph.node_count() - self.input_number - self.output_number - 1
+    }
+
     pub fn edge_count(&self) -> usize {
         self.graph.edge_count()
     }

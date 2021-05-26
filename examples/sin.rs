@@ -103,7 +103,7 @@ impl event::EventHandler for MainState {
             }
 
             self.layout
-                .update(best_network.graph(), best_fitness, generation);
+                .update(best_network.graph_mut(), best_fitness, generation);
             self.pool.evolve(&mut self.innov_record);
             self.timer = Duration::new(0, 0);
         }

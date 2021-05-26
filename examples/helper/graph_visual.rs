@@ -5,7 +5,6 @@ use neat::{node_data::NodeData, node_kind::NodeKind};
 
 use ggez::graphics::{self};
 use ggez::nalgebra as na;
-use rand::Rng;
 
 use super::{opencolor, text::Text};
 
@@ -22,9 +21,13 @@ struct NodeDrawInfo {
 }
 
 impl NodeDrawInfo {
-    fn new(node_data: &NodeData, graph: &NetworkGraph, rect: &graphics::Rect) -> NodeDrawInfo {
+    fn new(
+        node_data: &NodeData,
+        graph: &NetworkGraph,
+        rect: &graphics::Rect,
+        hidden_nth: usize,
+    ) -> NodeDrawInfo {
         let left_right_space = 60.0;
-        let mut rng = rand::thread_rng();
 
         match node_data.kind() {
             NodeKind::Input | NodeKind::Bias => {
@@ -61,15 +64,21 @@ impl NodeDrawInfo {
                     color: *opencolor::GRAY7,
                 }
             }
-            NodeKind::Hidden => NodeDrawInfo {
-                pos: na::Point2::new(
-                    rng.gen_range(
-                        rect.x + left_right_space + 30.0..rect.x + rect.w - left_right_space - 30.0,
+            NodeKind::Hidden => {
+                let hidden_count = graph.hidden_node_count();
+                let hidden_per_line: usize = 5;
+                let line_count = (hidden_count as f64 / hidden_per_line as f64).ceil() as usize;
+                let nth_line = (hidden_nth / hidden_per_line) + 1;
+                let delta = (rect.w - left_right_space * 2.0) / (line_count + 1) as f32;
+
+                NodeDrawInfo {
+                    pos: na::Point2::new(
+                        rect.x + left_right_space + delta * nth_line as f32,
+                        calculate_y(hidden_per_line, hidden_nth % hidden_per_line, rect),
                     ),
-                    rng.gen_range(rect.y + 60.0..rect.y + rect.h - 60.0),
-                ),
-                color: *opencolor::GRAY5,
-            },
+                    color: *opencolor::GRAY5,
+                }
+            }
         }
     }
 }
@@ -111,7 +120,7 @@ pub struct GraphVisual {
 
 impl GraphVisual {
     pub fn new(
-        graph: &NetworkGraph,
+        graph: &mut NetworkGraph,
         rect: graphics::Rect,
         max_weight: f64,
         generation: usize,
@@ -121,9 +130,16 @@ impl GraphVisual {
         let mut node_info_map = HashMap::new();
         let mut edge_draw_info_list = Vec::new();
 
-        for node in graph.inner_data().raw_nodes() {
-            let info = NodeDrawInfo::new(&node.weight, &graph, &rect);
-            node_info_map.insert(node.weight.id(), info);
+        let mut hidden_nth: usize = 0;
+        for node_index in graph.toposort().unwrap() {
+            let node_data = graph.node(node_index);
+            let info = NodeDrawInfo::new(&node_data, &graph, &rect, hidden_nth);
+
+            if node_data.kind() == NodeKind::Hidden {
+                hidden_nth += 1;
+            }
+
+            node_info_map.insert(node_data.id(), info);
         }
 
         for edge in graph.inner_data().raw_edges() {

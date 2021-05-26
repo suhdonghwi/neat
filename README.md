@@ -10,5 +10,5 @@ Implementation of [NEAT(NeuroEvolution of Augmenting Topologies)](http://nn.cs.u
 - [x] XOR example
 - [x] Function approximation example (sine function)
 - [ ] [Open AI gym](https://gym.openai.com) environment examples
-- [ ] Real game examples (Flappy Bird, Snake, etc.)
+- [ ] Real world game examples (Flappy Bird, Snake, etc.)
 - [ ] Complexity-based speciation

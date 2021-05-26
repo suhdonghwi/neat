@@ -95,6 +95,8 @@ pub trait Network {
     fn fitness(&self) -> Option<f64>;
 
     fn compare(&self, other: &Self) -> Option<Ordering> {
+        self.fitness().partial_cmp(&other.fitness())
+        /*
         let result = self.fitness().partial_cmp(&other.fitness());
         if result == Some(Ordering::Equal) {
             let my_complexity = self.graph().edge_count();
@@ -102,6 +104,6 @@ pub trait Network {
             other_complexity.partial_cmp(&my_complexity)
         } else {
             result
-        }
+        }*/
     }
 }

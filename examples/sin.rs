@@ -38,7 +38,6 @@ impl MainState {
 
         let layout = MainLayout::new(
             params.mutation.weight_max,
-            "fitness-generation graph",
             Axis::new(1.0, 10.0, 2.0),
             Axis::new(3.0, 4.0, 0.2),
             font,

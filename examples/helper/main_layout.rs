@@ -19,20 +19,14 @@ pub struct MainLayout {
 }
 
 impl MainLayout {
-    pub fn new(
-        weight_max: f64,
-        title: &str,
-        x_axis: Axis,
-        y_axis: Axis,
-        font: graphics::Font,
-    ) -> Self {
+    pub fn new(weight_max: f64, x_axis: Axis, y_axis: Axis, font: graphics::Font) -> Self {
         MainLayout {
             graph_visual: None,
             fitness_plot: Plot::new(
                 [550.0, 300.0, 400.0, 300.0].into(),
                 x_axis,
                 y_axis,
-                title,
+                "fitness-generation graph",
                 font,
             ),
             font,

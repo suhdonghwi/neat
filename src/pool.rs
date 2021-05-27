@@ -210,6 +210,10 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
         self.log(1, &speciation_log);
     }
 
+    pub fn activate_nth(&mut self, index: usize, inputs: &[f64]) -> Option<Vec<f64>> {
+        self.list[index].activate(inputs)
+    }
+
     pub fn evaluate<F: Fn(usize, &mut T)>(&mut self, evaluate: F) -> &T {
         for (i, network) in self.list.iter_mut().enumerate() {
             evaluate(i, network);

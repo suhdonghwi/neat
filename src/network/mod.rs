@@ -104,6 +104,7 @@ pub trait Network {
             other_complexity.partial_cmp(&my_complexity)
         } else {
             result
-        }*/
+        }
+        */
     }
 }

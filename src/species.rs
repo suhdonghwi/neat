@@ -88,13 +88,10 @@ impl<'a, T: Network + Debug + Clone> Species<'a, T> {
         let uniform = Uniform::new(0, self.list.len());
 
         let index1 = uniform.sample(rng);
-        let mut index2 = uniform.sample(rng);
-        while index1 == index2 {
-            index2 = uniform.sample(rng);
-        }
+        let index2 = uniform.sample(rng);
 
-        let parent1 = &self.list[index1];
-        let parent2 = &self.list[index2];
+        let parent1 = self.list[index1];
+        let parent2 = self.list[index2];
 
         parent1.crossover(parent2, hidden_func, output_func)
     }

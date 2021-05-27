@@ -32,7 +32,7 @@ impl Bird {
         self.y_velocity += self.y_accel;
     }
 
-    fn draw(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {
+    fn draw(&self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {
         let rect = graphics::Mesh::new_circle(
             ctx,
             graphics::DrawMode::fill(),
@@ -50,7 +50,7 @@ struct MainState {
     layout: MainLayout,
     innov_record: InnovationRecord,
     pool: Pool<Feedforward>,
-    bird: Bird,
+    birds: Vec<Bird>,
 }
 
 impl MainState {
@@ -70,26 +70,36 @@ impl MainState {
             font,
         );
 
-        let bird = Bird::new(na::Point2::new(50.0, 10.0), 0.0, 0.3);
+        let mut birds = Vec::new();
+        for i in 0..params.population {
+            let bird = Bird::new(na::Point2::new(100.0, 200.0), 0.0, i as f32 * 0.01);
+            birds.push(bird);
+        }
 
         MainState {
             innov_record,
             pool,
             layout,
-            bird,
+            birds,
         }
     }
 }
 
 impl event::EventHandler for MainState {
     fn update(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
-        self.bird.update();
+        for bird in &mut self.birds {
+            bird.update();
+        }
+
         Ok(())
     }
 
     fn draw(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
         self.layout.draw(ctx)?;
-        self.bird.draw(ctx)?;
+
+        for bird in &self.birds {
+            bird.draw(ctx)?;
+        }
 
         graphics::present(ctx)
     }

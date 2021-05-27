@@ -1,11 +1,11 @@
 #![recursion_limit = "512"]
 mod helper;
 
-use std::{path::Path, time::Duration};
+use std::path::Path;
 
 use ggez::event;
 use ggez::graphics;
-use ggez::mint;
+use ggez::nalgebra as na;
 
 use neat::network::Network;
 use neat::{innovation_record::InnovationRecord, network::feedforward::Feedforward, pool::Pool};
@@ -13,23 +13,36 @@ use neat::{innovation_record::InnovationRecord, network::feedforward::Feedforwar
 use helper::{main_layout::MainLayout, opencolor, plot::Axis};
 
 struct Bird {
-    pos: mint::Point2<f32>,
+    pos: na::Point2<f32>,
     y_velocity: f32,
     y_accel: f32,
 }
 
 impl Bird {
+    fn new(pos: na::Point2<f32>, velocity: f32, accel: f32) -> Self {
+        Bird {
+            pos,
+            y_velocity: velocity,
+            y_accel: accel,
+        }
+    }
+
+    fn update(&mut self) {
+        self.pos.y += self.y_velocity;
+        self.y_velocity += self.y_accel;
+    }
+
     fn draw(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {
         let rect = graphics::Mesh::new_circle(
             ctx,
             graphics::DrawMode::fill(),
             self.pos,
-            3.0,
+            30.0,
             0.3,
-            *opencolor::YELLOW3,
+            *opencolor::GRAY5,
         )?;
 
-        graphics::draw(ctx, &rect, (mint::Point2 { x: 0.0, y: 0.0 },))
+        graphics::draw(ctx, &rect, (na::Point2::new(0.0, 0.0),))
     }
 }
 
@@ -37,7 +50,7 @@ struct MainState {
     layout: MainLayout,
     innov_record: InnovationRecord,
     pool: Pool<Feedforward>,
-    timer: Duration,
+    bird: Bird,
 }
 
 impl MainState {
@@ -58,54 +71,26 @@ impl MainState {
             font,
         );
 
+        let bird = Bird::new(na::Point2::new(50.0, 10.0), 0.0, 0.3);
+
         MainState {
             innov_record,
             pool,
-            timer: Duration::new(1, 0),
             layout,
+            bird,
         }
     }
 }
 
 impl event::EventHandler for MainState {
     fn update(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
-        self.timer += ggez::timer::delta(ctx);
-
-        if self.timer >= Duration::from_secs_f64(0.2) {
-            let data = vec![
-                (vec![0.0, 0.0], 0.0),
-                (vec![0.0, 1.0], 1.0),
-                (vec![1.0, 0.0], 1.0),
-                (vec![1.0, 1.0], 0.0),
-            ];
-
-            let generation = self.pool.generation();
-            let mut best_network = self
-                .pool
-                .evaluate(|_, network| {
-                    let mut err = 0.0;
-
-                    for (inputs, expected) in &data {
-                        let output = network.activate(inputs).unwrap()[0];
-                        err += (output - expected) * (output - expected);
-                    }
-
-                    network.evaluate(4.0 - err);
-                })
-                .clone();
-            let best_fitness = best_network.fitness().unwrap();
-
-            self.layout
-                .update(best_network.graph_mut(), best_fitness, generation);
-            self.pool.evolve(&mut self.innov_record);
-            self.timer = Duration::new(0, 0);
-        }
-
+        self.bird.update();
         Ok(())
     }
 
     fn draw(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
         self.layout.draw(ctx)?;
+        self.bird.draw(ctx)?;
 
         graphics::present(ctx)
     }

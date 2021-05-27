@@ -2,7 +2,6 @@ use std::path::Path;
 
 use ggez::conf::WindowSetup;
 use ggez::graphics;
-use ggez::mint;
 use ggez::nalgebra as na;
 
 use neat::network::network_graph::NetworkGraph;
@@ -16,7 +15,7 @@ pub struct MainLayout {
     font: graphics::Font,
     max_weight: f64,
 
-    fitness_points: Vec<mint::Point2<f32>>,
+    fitness_points: Vec<na::Point2<f32>>,
 }
 
 impl MainLayout {
@@ -97,10 +96,8 @@ impl MainLayout {
             self.font,
         ));
 
-        self.fitness_points.push(mint::Point2 {
-            x: generation as f32,
-            y: fitness as f32,
-        });
+        self.fitness_points
+            .push(na::Point2::new(generation as f32, fitness as f32));
 
         let points_count = self.fitness_points.len();
         let max_points: usize = 40;

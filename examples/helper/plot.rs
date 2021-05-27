@@ -1,5 +1,4 @@
 use ggez::graphics;
-use ggez::mint;
 use ggez::nalgebra as na;
 
 use super::{opencolor, text::Text};
@@ -230,23 +229,23 @@ impl Plot {
         Ok(())
     }
 
-    fn convert_point(&self, point: &mint::Point2<f32>) -> mint::Point2<f32> {
-        mint::Point2 {
-            x: self.x_axis.value_proportion(point.x) * self.actual_rect.w,
-            y: (1.0 - self.y_axis.value_proportion(point.y)) * self.actual_rect.h,
-        }
+    fn convert_point(&self, point: &na::Point2<f32>) -> na::Point2<f32> {
+        na::Point2::new(
+            self.x_axis.value_proportion(point.x) * self.actual_rect.w,
+            (1.0 - self.y_axis.value_proportion(point.y)) * self.actual_rect.h,
+        )
     }
 
     pub fn draw_line(
         &mut self,
-        points: &[mint::Point2<f32>],
+        points: &[na::Point2<f32>],
         color: graphics::Color,
     ) -> ggez::GameResult<()> {
         if points.len() < 2 {
             return Ok(());
         }
 
-        let mut converted_points: Vec<mint::Point2<f32>> = Vec::new();
+        let mut converted_points: Vec<na::Point2<f32>> = Vec::new();
 
         for point in points {
             if point.x < self.x_axis.min
@@ -267,7 +266,7 @@ impl Plot {
         //graphics::draw(ctx, &line, (self.actual_rect.point(),))
     }
 
-    pub fn draw_point(&mut self, point: &mint::Point2<f32>, radius: f32, color: graphics::Color) {
+    pub fn draw_point(&mut self, point: &na::Point2<f32>, radius: f32, color: graphics::Color) {
         let converted_point = self.convert_point(&point);
         self.mesh_builder.circle(
             graphics::DrawMode::fill(),

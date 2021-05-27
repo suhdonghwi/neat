@@ -5,7 +5,7 @@ use std::{path::Path, time::Duration};
 
 use ggez::event;
 use ggez::graphics;
-use ggez::mint;
+use ggez::nalgebra as na;
 
 use neat::network::Network;
 use neat::{innovation_record::InnovationRecord, network::feedforward::Feedforward, pool::Pool};
@@ -23,7 +23,7 @@ struct MainState {
     timer: Duration,
 
     xor_plot: Plot,
-    xor_points: Vec<(mint::Point2<f32>, graphics::Color)>,
+    xor_points: Vec<(na::Point2<f32>, graphics::Color)>,
 }
 
 impl MainState {
@@ -58,7 +58,7 @@ impl MainState {
                 let x = 1.0 * i as f32 / 20.0;
                 let y = 1.0 * j as f32 / 20.0;
 
-                xor_points.push((mint::Point2 { x, y }, *opencolor::GRAY5));
+                xor_points.push((na::Point2::new(x, y), *opencolor::GRAY5));
             }
         }
 
@@ -134,7 +134,7 @@ impl event::EventHandler for MainState {
 }
 
 pub fn main() -> ggez::GameResult {
-    let cb = MainLayout::builder("XOR");
+    let cb = MainLayout::builder("XOR gate");
     let (ctx, event_loop) = &mut cb.build()?;
     let state = &mut MainState::new(ctx);
 

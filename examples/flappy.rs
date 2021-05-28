@@ -6,6 +6,7 @@ use std::time::Duration;
 
 use ggez::event;
 use ggez::graphics;
+use ggez::graphics::spritebatch;
 use ggez::nalgebra as na;
 
 use ggez::timer;
@@ -17,18 +18,21 @@ use helper::{main_layout::MainLayout, plot::Axis};
 
 struct MainState {
     layout: MainLayout,
+
     innov_record: InnovationRecord,
     pool: Pool<Feedforward>,
-    birds: Vec<Bird>,
     population: usize,
     generation_start: Duration,
+
+    birds: Vec<Bird>,
+    spritebatch: spritebatch::SpriteBatch,
 }
 
 impl MainState {
     fn reset_birds(&mut self) {
         let mut birds = Vec::new();
         for _ in 0..self.population {
-            let bird = Bird::new(na::Point2::new(100.0, 200.0), 0.0, 0.3);
+            let bird = Bird::new(na::Point2::new(100.0, 300.0), 0.0, 0.3);
             birds.push(bird);
         }
 
@@ -51,13 +55,18 @@ impl MainState {
             font,
         );
 
+        let bird_image = graphics::Image::new(ctx, "/flappy/bird.png").unwrap();
+        let batch = spritebatch::SpriteBatch::new(bird_image);
+
         let mut state = MainState {
             innov_record,
             pool,
             layout,
-            birds: Vec::new(),
             population: params.population,
             generation_start: Duration::new(0, 0),
+
+            birds: Vec::new(),
+            spritebatch: batch,
         };
 
         state.reset_birds();
@@ -121,9 +130,13 @@ impl event::EventHandler for MainState {
                 continue;
             }
 
+            self.spritebatch.add(bird.draw_param());
             bird.draw(ctx)?;
         }
 
+        graphics::draw(ctx, &self.spritebatch, (na::Point2::new(0.0, 0.0),))?;
+
+        self.spritebatch.clear();
         graphics::present(ctx)
     }
 }

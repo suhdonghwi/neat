@@ -12,7 +12,7 @@ pub struct Bird {
 
 impl Bird {
     pub fn new(pos: na::Point2<f32>, velocity: f32, accel: f32) -> Self {
-        let rect = graphics::Rect::new(pos.x, pos.y, 50.0, 30.0);
+        let rect = graphics::Rect::new(pos.x, pos.y, 34.0 * 1.5, 24.0 * 1.5);
 
         Bird {
             rect,
@@ -38,8 +38,16 @@ impl Bird {
         graphics::draw(ctx, &rect, (na::Point2::new(0.0, 0.0),))
     }
 
+    pub fn draw_param(&self) -> graphics::DrawParam {
+        graphics::DrawParam::new()
+            .dest(self.rect.point())
+            .scale(na::Vector2::new(1.5, 1.5))
+    }
+
     pub fn jump(&mut self) {
-        self.y_velocity -= 10.0;
+        if self.y_velocity >= -5.0 {
+            self.y_velocity -= 10.0;
+        }
     }
 
     pub fn is_dead(&self) -> bool {

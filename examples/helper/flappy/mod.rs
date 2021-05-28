@@ -57,4 +57,8 @@ impl Bird {
     pub fn kill(&mut self, fitness: f64) {
         self.fitness = Some(fitness);
     }
+
+    pub fn fitness(&self) -> Option<f64> {
+        self.fitness
+    }
 }

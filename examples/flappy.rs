@@ -20,10 +20,21 @@ struct MainState {
     innov_record: InnovationRecord,
     pool: Pool<Feedforward>,
     birds: Vec<Bird>,
+    population: usize,
     generation_start: Duration,
 }
 
 impl MainState {
+    fn reset_birds(&mut self) {
+        let mut birds = Vec::new();
+        for _ in 0..self.population {
+            let bird = Bird::new(na::Point2::new(100.0, 200.0), 0.0, 0.3);
+            birds.push(bird);
+        }
+
+        self.birds = birds;
+    }
+
     fn new(ctx: &mut ggez::Context) -> Self {
         let args = helper::cli::get_arguments();
         let params = helper::read_parameters_file("./params/flappy.toml");
@@ -40,19 +51,17 @@ impl MainState {
             font,
         );
 
-        let mut birds = Vec::new();
-        for _ in 0..params.population {
-            let bird = Bird::new(na::Point2::new(100.0, 200.0), 0.0, 0.3);
-            birds.push(bird);
-        }
-
-        MainState {
+        let mut state = MainState {
             innov_record,
             pool,
             layout,
-            birds,
+            birds: Vec::new(),
+            population: params.population,
             generation_start: Duration::new(0, 0),
-        }
+        };
+
+        state.reset_birds();
+        state
     }
 }
 
@@ -76,6 +85,29 @@ impl event::EventHandler for MainState {
             }
 
             bird.update();
+        }
+
+        if self.birds.iter().all(|bird| bird.is_dead()) {
+            let generation = self.pool.generation();
+            let fitness_list: Vec<f64> = self
+                .birds
+                .iter()
+                .map(|bird| bird.fitness().unwrap())
+                .collect();
+
+            let mut best_network = self
+                .pool
+                .evaluate(|i, network| network.evaluate(fitness_list[i]))
+                .clone();
+            let best_fitness = best_network.fitness().unwrap();
+
+            self.layout
+                .update(best_network.graph_mut(), best_fitness, generation);
+
+            self.pool.evolve(&mut self.innov_record);
+            self.reset_birds();
+
+            self.generation_start = timer::time_since_start(ctx);
         }
 
         Ok(())

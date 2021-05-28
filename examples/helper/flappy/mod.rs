@@ -39,7 +39,7 @@ impl Bird {
     }
 
     pub fn jump(&mut self) {
-        self.y_velocity -= 5.0;
+        self.y_velocity -= 10.0;
     }
 
     pub fn is_dead(&self) -> bool {

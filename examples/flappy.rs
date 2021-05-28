@@ -77,7 +77,7 @@ impl event::EventHandler for MainState {
 
             let output = self
                 .pool
-                .activate_nth(i, &[bird.y_velocity().into(), 0.0, 0.0])
+                .activate_nth(i, &[bird.y_velocity().into()])
                 .unwrap();
 
             if output[0] > 0.5 {

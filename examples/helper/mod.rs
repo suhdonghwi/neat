@@ -2,6 +2,7 @@ use neat::parameters::Parameters;
 use std::fs;
 
 pub mod cli;
+pub mod flappy;
 pub mod graph_visual;
 pub mod main_layout;
 pub mod opencolor;

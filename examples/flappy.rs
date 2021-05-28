@@ -2,55 +2,25 @@
 mod helper;
 
 use std::path::Path;
+use std::time::Duration;
 
 use ggez::event;
 use ggez::graphics;
 use ggez::nalgebra as na;
 
+use ggez::timer;
 use neat::network::Network;
 use neat::{innovation_record::InnovationRecord, network::feedforward::Feedforward, pool::Pool};
 
-use helper::{main_layout::MainLayout, opencolor, plot::Axis};
-
-struct Bird {
-    pos: na::Point2<f32>,
-    y_velocity: f32,
-    y_accel: f32,
-}
-
-impl Bird {
-    fn new(pos: na::Point2<f32>, velocity: f32, accel: f32) -> Self {
-        Bird {
-            pos,
-            y_velocity: velocity,
-            y_accel: accel,
-        }
-    }
-
-    fn update(&mut self) {
-        self.pos.y += self.y_velocity;
-        self.y_velocity += self.y_accel;
-    }
-
-    fn draw(&self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {
-        let rect = graphics::Mesh::new_circle(
-            ctx,
-            graphics::DrawMode::fill(),
-            self.pos,
-            30.0,
-            0.3,
-            *opencolor::GRAY5,
-        )?;
-
-        graphics::draw(ctx, &rect, (na::Point2::new(0.0, 0.0),))
-    }
-}
+use helper::flappy::Bird;
+use helper::{main_layout::MainLayout, plot::Axis};
 
 struct MainState {
     layout: MainLayout,
     innov_record: InnovationRecord,
     pool: Pool<Feedforward>,
     birds: Vec<Bird>,
+    generation_start: Duration,
 }
 
 impl MainState {
@@ -58,7 +28,7 @@ impl MainState {
         let args = helper::cli::get_arguments();
         let params = helper::read_parameters_file("./params/flappy.toml");
 
-        let mut innov_record = InnovationRecord::new(3, 2);
+        let mut innov_record = InnovationRecord::new(params.input_number, params.output_number);
         let pool = Pool::<Feedforward>::new(params.clone(), args.verbosity, &mut innov_record);
 
         let font = graphics::Font::new(ctx, Path::new("/LiberationMono-Regular.ttf")).unwrap();
@@ -71,8 +41,8 @@ impl MainState {
         );
 
         let mut birds = Vec::new();
-        for i in 0..params.population {
-            let bird = Bird::new(na::Point2::new(100.0, 200.0), 0.0, i as f32 * 0.01);
+        for _ in 0..params.population {
+            let bird = Bird::new(na::Point2::new(100.0, 200.0), 0.0, 0.3);
             birds.push(bird);
         }
 
@@ -81,13 +51,30 @@ impl MainState {
             pool,
             layout,
             birds,
+            generation_start: Duration::new(0, 0),
         }
     }
 }
 
 impl event::EventHandler for MainState {
     fn update(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
-        for bird in &mut self.birds {
+        for (i, bird) in self.birds.iter_mut().enumerate() {
+            if bird.is_dead() {
+                continue;
+            } else if bird.rect().y < 0.0 || bird.rect().y + bird.rect().h >= 600.0 {
+                let fitness = (timer::time_since_start(ctx) - self.generation_start).as_secs_f64();
+                bird.kill(fitness);
+            }
+
+            let output = self
+                .pool
+                .activate_nth(i, &[bird.y_velocity().into(), 0.0, 0.0])
+                .unwrap();
+
+            if output[0] > 0.5 {
+                bird.jump();
+            }
+
             bird.update();
         }
 
@@ -98,6 +85,10 @@ impl event::EventHandler for MainState {
         self.layout.draw(ctx)?;
 
         for bird in &self.birds {
+            if bird.is_dead() {
+                continue;
+            }
+
             bird.draw(ctx)?;
         }
 

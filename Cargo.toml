@@ -22,12 +22,3 @@ lazy_static = "1.4.0"
 [lib]
 name = "neat"
 path = "src/lib.rs"
-
-[[example]]
-name = "xor"
-
-[[example]]
-name = "sin"
-
-[[example]]
-name = "flappy"

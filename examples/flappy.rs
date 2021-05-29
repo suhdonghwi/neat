@@ -15,6 +15,7 @@ use neat::{innovation_record::InnovationRecord, network::feedforward::Feedforwar
 
 use helper::flappy::{Bird, PipePair};
 use helper::{main_layout::MainLayout, plot::Axis};
+use rand::Rng;
 
 struct MainState {
     layout: MainLayout,
@@ -29,7 +30,7 @@ struct MainState {
 
     pipes: Vec<PipePair>,
     pipe_image: graphics::Image,
-    current_pipe: usize,
+    current_pipe_index: usize,
     pipe_timer: Duration,
 }
 
@@ -45,13 +46,17 @@ impl MainState {
     }
 
     fn new_pipe(&self) -> PipePair {
-        PipePair::new(self.pipe_image.clone(), na::Point2::new(600.0, 200.0))
+        let mut rng = rand::thread_rng();
+        PipePair::new(
+            self.pipe_image.clone(),
+            na::Point2::new(600.0, rng.gen_range(50.0..400.0)),
+        )
     }
 
     fn reset_pipes(&mut self) {
         self.pipes = vec![self.new_pipe()];
         self.pipe_timer = Duration::new(0, 0);
-        self.current_pipe = 0;
+        self.current_pipe_index = 0;
     }
 
     fn new(ctx: &mut ggez::Context) -> Self {
@@ -85,7 +90,7 @@ impl MainState {
 
             pipes: Vec::new(),
             pipe_image: graphics::Image::new(ctx, "/flappy/pipe.png").unwrap(),
-            current_pipe: 0,
+            current_pipe_index: 0,
             pipe_timer: Duration::new(0, 0),
         };
 
@@ -98,7 +103,7 @@ impl MainState {
 impl event::EventHandler for MainState {
     fn update(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
         self.pipe_timer += timer::delta(ctx);
-        if self.pipe_timer >= Duration::from_secs_f64(1.5) {
+        if self.pipe_timer >= Duration::from_secs_f64(1.9) {
             self.pipes.push(self.new_pipe());
             self.pipe_timer = Duration::new(0, 0);
         }
@@ -107,16 +112,17 @@ impl event::EventHandler for MainState {
             pipe_pair.update();
         }
 
-        if self.pipes[self.current_pipe].past(self.birds[0].rect().x) {
-            self.current_pipe += 1;
+        if self.pipes[self.current_pipe_index].past(self.birds[0].rect().x) {
+            self.current_pipe_index += 1;
         }
 
+        let current_pipe = &self.pipes[self.current_pipe_index];
         for (i, bird) in self.birds.iter_mut().enumerate() {
             if bird.is_dead() {
                 continue;
             } else if bird.rect().y < 0.0
                 || bird.rect().y + bird.rect().h >= 600.0
-                || self.pipes[self.current_pipe].overlaps(&bird.rect())
+                || current_pipe.overlaps(&bird.rect())
             {
                 let fitness = (timer::time_since_start(ctx) - self.generation_start).as_secs_f64();
                 bird.kill(fitness);
@@ -124,7 +130,15 @@ impl event::EventHandler for MainState {
 
             let output = self
                 .pool
-                .activate_nth(i, &[bird.y_velocity().into()])
+                .activate_nth(
+                    i,
+                    &[
+                        bird.y_velocity().into(),
+                        (current_pipe.upper_rect().y + current_pipe.upper_rect().h - bird.rect().y)
+                            .into(),
+                        (current_pipe.upper_rect().x - bird.rect().x - bird.rect().w).into(),
+                    ],
+                )
                 .unwrap();
 
             if output[0] > 0.5 {

@@ -104,6 +104,10 @@ impl PipePair {
         self.upper_rect.x + self.upper_rect.w < x
     }
 
+    pub fn upper_rect(&self) -> graphics::Rect {
+        self.upper_rect
+    }
+
     pub fn draw(&self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {
         /*
         let param = graphics::DrawParam::new()

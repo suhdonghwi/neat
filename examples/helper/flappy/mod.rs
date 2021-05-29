@@ -46,7 +46,7 @@ impl Bird {
     }
 
     pub fn jump(&mut self) {
-        self.y_velocity = -7.0;
+        self.y_velocity = -10.0;
     }
 
     pub fn is_dead(&self) -> bool {
@@ -96,8 +96,8 @@ impl PipePair {
             return;
         }
 
-        self.upper_rect.x -= 4.0 * timer::delta(ctx).as_secs_f32() * 60.0;
-        self.lower_rect.x -= 4.0 * timer::delta(ctx).as_secs_f32() * 60.0;
+        self.upper_rect.x -= 5.0 * timer::delta(ctx).as_secs_f32() * 60.0;
+        self.lower_rect.x -= 5.0 * timer::delta(ctx).as_secs_f32() * 60.0;
 
         if self.upper_rect.right() < 0.0 {
             self.out = true;

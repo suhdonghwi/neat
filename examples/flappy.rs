@@ -38,7 +38,7 @@ impl MainState {
     fn reset_birds(&mut self) {
         let mut birds = Vec::new();
         for _ in 0..self.population {
-            let bird = Bird::new(na::Point2::new(70.0, 300.0), 0.0, 0.3);
+            let bird = Bird::new(na::Point2::new(70.0, 300.0), 0.0, 0.7);
             birds.push(bird);
         }
 
@@ -103,7 +103,7 @@ impl MainState {
 impl event::EventHandler for MainState {
     fn update(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
         self.pipe_timer += timer::delta(ctx);
-        if self.pipe_timer >= Duration::from_secs_f64(1.4) {
+        if self.pipe_timer >= Duration::from_secs_f64(0.8) {
             self.pipes.push(self.new_pipe());
             self.pipe_timer = Duration::new(0, 0);
         }
@@ -133,9 +133,9 @@ impl event::EventHandler for MainState {
                 .activate_nth(
                     i,
                     &[
-                        (current_pipe.upper_rect().left() - bird.rect().right()).into(),
-                        (current_pipe.upper_rect().bottom() - bird.rect().top()).into(),
-                        (bird.rect().bottom() - current_pipe.lower_rect().top()).into(),
+                        bird.rect().y.into(),
+                        current_pipe.upper_rect().bottom().into(),
+                        current_pipe.lower_rect().top().into(),
                     ],
                 )
                 .unwrap();

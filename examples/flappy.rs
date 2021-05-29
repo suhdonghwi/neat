@@ -136,7 +136,7 @@ impl event::EventHandler for MainState {
                         bird.y_velocity().into(),
                         (current_pipe.upper_rect().y + current_pipe.upper_rect().h - bird.rect().y)
                             .into(),
-                        (current_pipe.upper_rect().x - bird.rect().x - bird.rect().w).into(),
+                        (bird.rect().y + bird.rect().h - current_pipe.lower_rect().y).into(),
                     ],
                 )
                 .unwrap();

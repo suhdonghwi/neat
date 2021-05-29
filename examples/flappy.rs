@@ -72,7 +72,7 @@ impl MainState {
             birds: Vec::new(),
             spritebatch: batch,
 
-            pipes: vec![PipePair::new(pipe_image, na::Point2::new(100.0, 200.0))],
+            pipes: vec![PipePair::new(pipe_image, na::Point2::new(500.0, 200.0))],
         };
 
         state.reset_birds();
@@ -82,10 +82,17 @@ impl MainState {
 
 impl event::EventHandler for MainState {
     fn update(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
+        for pipe_pair in &mut self.pipes {
+            pipe_pair.update();
+        }
+
         for (i, bird) in self.birds.iter_mut().enumerate() {
             if bird.is_dead() {
                 continue;
-            } else if bird.rect().y < 0.0 || bird.rect().y + bird.rect().h >= 600.0 {
+            } else if bird.rect().y < 0.0
+                || bird.rect().y + bird.rect().h >= 600.0
+                || self.pipes[0].overlaps(&bird.rect())
+            {
                 let fitness = (timer::time_since_start(ctx) - self.generation_start).as_secs_f64();
                 bird.kill(fitness);
             }
@@ -121,6 +128,7 @@ impl event::EventHandler for MainState {
 
             self.pool.evolve(&mut self.innov_record);
             self.reset_birds();
+            self.pipes[0].reset();
 
             self.generation_start = timer::time_since_start(ctx);
         }

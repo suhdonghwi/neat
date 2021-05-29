@@ -1,6 +1,6 @@
 input_number = 1
 output_number = 1
-population = 150
+population = 100
 
 hidden_activation = 'Sigmoid'
 output_activation = 'Sigmoid'
@@ -24,6 +24,6 @@ perturb_max = 1.0
 c1 = 1.0
 c2 = 0.5
 compatibility_threshold = 20.0
-elitism = 2
+elitism = 5
 
-survival_rate = 0.4
+survival_rate = 0.2

@@ -82,8 +82,22 @@ impl PipePair {
         PipePair {
             pipe_image: image,
             upper_rect: graphics::Rect::new(pos.x, pos.y - 400.0, 65.0, 400.0),
-            lower_rect: graphics::Rect::new(pos.x, pos.y + 100.0, 65.0, 400.0),
+            lower_rect: graphics::Rect::new(pos.x, pos.y + 150.0, 65.0, 400.0),
         }
+    }
+
+    pub fn overlaps(&self, other: &graphics::Rect) -> bool {
+        self.upper_rect.overlaps(other) || self.lower_rect.overlaps(other)
+    }
+
+    pub fn update(&mut self) {
+        self.upper_rect.x -= 2.0;
+        self.lower_rect.x -= 2.0;
+    }
+
+    pub fn reset(&mut self) {
+        self.upper_rect.x = 500.0;
+        self.lower_rect.x = 500.0;
     }
 
     pub fn draw(&self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {

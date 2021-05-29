@@ -13,7 +13,7 @@ use ggez::timer;
 use neat::network::Network;
 use neat::{innovation_record::InnovationRecord, network::feedforward::Feedforward, pool::Pool};
 
-use helper::flappy::Bird;
+use helper::flappy::{Bird, PipePair};
 use helper::{main_layout::MainLayout, plot::Axis};
 
 struct MainState {
@@ -26,13 +26,15 @@ struct MainState {
 
     birds: Vec<Bird>,
     spritebatch: spritebatch::SpriteBatch,
+
+    pipes: Vec<PipePair>,
 }
 
 impl MainState {
     fn reset_birds(&mut self) {
         let mut birds = Vec::new();
         for _ in 0..self.population {
-            let bird = Bird::new(na::Point2::new(100.0, 300.0), 0.0, 0.3);
+            let bird = Bird::new(na::Point2::new(70.0, 300.0), 0.0, 0.3);
             birds.push(bird);
         }
 
@@ -58,6 +60,8 @@ impl MainState {
         let bird_image = graphics::Image::new(ctx, "/flappy/bird.png").unwrap();
         let batch = spritebatch::SpriteBatch::new(bird_image);
 
+        let pipe_image = graphics::Image::new(ctx, "/flappy/pipe.png").unwrap();
+
         let mut state = MainState {
             innov_record,
             pool,
@@ -67,6 +71,8 @@ impl MainState {
 
             birds: Vec::new(),
             spritebatch: batch,
+
+            pipes: vec![PipePair::new(pipe_image, na::Point2::new(100.0, 200.0))],
         };
 
         state.reset_birds();
@@ -135,6 +141,10 @@ impl event::EventHandler for MainState {
         }
 
         graphics::draw(ctx, &self.spritebatch, (na::Point2::new(0.0, 0.0),))?;
+
+        for pipe_pair in &self.pipes {
+            pipe_pair.draw(ctx)?;
+        }
 
         self.spritebatch.clear();
         graphics::present(ctx)

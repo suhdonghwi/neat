@@ -45,8 +45,8 @@ impl Bird {
     }
 
     pub fn jump(&mut self) {
-        if self.y_velocity >= -5.0 {
-            self.y_velocity -= 10.0;
+        if self.y_velocity >= 0.0 {
+            self.y_velocity = -7.0;
         }
     }
 
@@ -68,5 +68,45 @@ impl Bird {
 
     pub fn fitness(&self) -> Option<f64> {
         self.fitness
+    }
+}
+
+pub struct PipePair {
+    pipe_image: graphics::Image,
+    upper_rect: graphics::Rect,
+    lower_rect: graphics::Rect,
+}
+
+impl PipePair {
+    pub fn new(image: graphics::Image, pos: na::Point2<f32>) -> Self {
+        PipePair {
+            pipe_image: image,
+            upper_rect: graphics::Rect::new(pos.x, pos.y - 400.0, 65.0, 400.0),
+            lower_rect: graphics::Rect::new(pos.x, pos.y + 100.0, 65.0, 400.0),
+        }
+    }
+
+    pub fn draw(&self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {
+        /*
+        let param = graphics::DrawParam::new()
+            .dest(na::Point2::new(0.0, 0.0))
+            .scale(na::Vector2::new(1.25, 1.25));
+        graphics::draw(ctx, &self.pipe_image, param)
+        */
+
+        let upper = graphics::Mesh::new_rectangle(
+            ctx,
+            graphics::DrawMode::fill(),
+            self.upper_rect,
+            *opencolor::GRAY5,
+        )?;
+        let lower = graphics::Mesh::new_rectangle(
+            ctx,
+            graphics::DrawMode::fill(),
+            self.lower_rect,
+            *opencolor::GRAY5,
+        )?;
+        graphics::draw(ctx, &upper, (na::Point2::new(0.0, 0.0),))?;
+        graphics::draw(ctx, &lower, (na::Point2::new(0.0, 0.0),))
     }
 }

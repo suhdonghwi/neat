@@ -1,6 +1,6 @@
 input_number = 1
 output_number = 1
-population = 100
+population = 150
 
 hidden_activation = 'Sigmoid'
 output_activation = 'Sigmoid'

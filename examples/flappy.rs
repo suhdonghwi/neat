@@ -120,8 +120,8 @@ impl event::EventHandler for MainState {
         for (i, bird) in self.birds.iter_mut().enumerate() {
             if bird.is_dead() {
                 continue;
-            } else if bird.rect().y < 0.0
-                || bird.rect().y + bird.rect().h >= 600.0
+            } else if bird.rect().top() < 0.0
+                || bird.rect().bottom() >= 600.0
                 || current_pipe.overlaps(&bird.rect())
             {
                 let fitness = (timer::time_since_start(ctx) - self.generation_start).as_secs_f64();
@@ -134,9 +134,8 @@ impl event::EventHandler for MainState {
                     i,
                     &[
                         bird.y_velocity().into(),
-                        (current_pipe.upper_rect().y + current_pipe.upper_rect().h - bird.rect().y)
-                            .into(),
-                        (bird.rect().y + bird.rect().h - current_pipe.lower_rect().y).into(),
+                        (current_pipe.upper_rect().bottom() - bird.rect().top()).into(),
+                        (bird.rect().bottom() - current_pipe.lower_rect().top()).into(),
                     ],
                 )
                 .unwrap();

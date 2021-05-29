@@ -100,6 +100,10 @@ impl PipePair {
         self.lower_rect.x = 500.0;
     }
 
+    pub fn past(&self, x: f32) -> bool {
+        self.upper_rect.x + self.upper_rect.w < x
+    }
+
     pub fn draw(&self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {
         /*
         let param = graphics::DrawParam::new()

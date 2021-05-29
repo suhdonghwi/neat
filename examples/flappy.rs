@@ -28,6 +28,9 @@ struct MainState {
     spritebatch: spritebatch::SpriteBatch,
 
     pipes: Vec<PipePair>,
+    pipe_image: graphics::Image,
+    current_pipe: usize,
+    pipe_timer: Duration,
 }
 
 impl MainState {
@@ -39,6 +42,16 @@ impl MainState {
         }
 
         self.birds = birds;
+    }
+
+    fn new_pipe(&self) -> PipePair {
+        PipePair::new(self.pipe_image.clone(), na::Point2::new(600.0, 200.0))
+    }
+
+    fn reset_pipes(&mut self) {
+        self.pipes = vec![self.new_pipe()];
+        self.pipe_timer = Duration::new(0, 0);
+        self.current_pipe = 0;
     }
 
     fn new(ctx: &mut ggez::Context) -> Self {
@@ -60,8 +73,6 @@ impl MainState {
         let bird_image = graphics::Image::new(ctx, "/flappy/bird.png").unwrap();
         let batch = spritebatch::SpriteBatch::new(bird_image);
 
-        let pipe_image = graphics::Image::new(ctx, "/flappy/pipe.png").unwrap();
-
         let mut state = MainState {
             innov_record,
             pool,
@@ -72,18 +83,32 @@ impl MainState {
             birds: Vec::new(),
             spritebatch: batch,
 
-            pipes: vec![PipePair::new(pipe_image, na::Point2::new(500.0, 200.0))],
+            pipes: Vec::new(),
+            pipe_image: graphics::Image::new(ctx, "/flappy/pipe.png").unwrap(),
+            current_pipe: 0,
+            pipe_timer: Duration::new(0, 0),
         };
 
         state.reset_birds();
+        state.reset_pipes();
         state
     }
 }
 
 impl event::EventHandler for MainState {
     fn update(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
+        self.pipe_timer += timer::delta(ctx);
+        if self.pipe_timer >= Duration::from_secs_f64(1.5) {
+            self.pipes.push(self.new_pipe());
+            self.pipe_timer = Duration::new(0, 0);
+        }
+
         for pipe_pair in &mut self.pipes {
             pipe_pair.update();
+        }
+
+        if self.pipes[self.current_pipe].past(self.birds[0].rect().x) {
+            self.current_pipe += 1;
         }
 
         for (i, bird) in self.birds.iter_mut().enumerate() {
@@ -91,7 +116,7 @@ impl event::EventHandler for MainState {
                 continue;
             } else if bird.rect().y < 0.0
                 || bird.rect().y + bird.rect().h >= 600.0
-                || self.pipes[0].overlaps(&bird.rect())
+                || self.pipes[self.current_pipe].overlaps(&bird.rect())
             {
                 let fitness = (timer::time_since_start(ctx) - self.generation_start).as_secs_f64();
                 bird.kill(fitness);
@@ -128,7 +153,7 @@ impl event::EventHandler for MainState {
 
             self.pool.evolve(&mut self.innov_record);
             self.reset_birds();
-            self.pipes[0].reset();
+            self.reset_pipes();
 
             self.generation_start = timer::time_since_start(ctx);
         }

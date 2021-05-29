@@ -103,13 +103,13 @@ impl MainState {
 impl event::EventHandler for MainState {
     fn update(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
         self.pipe_timer += timer::delta(ctx);
-        if self.pipe_timer >= Duration::from_secs_f64(1.9) {
+        if self.pipe_timer >= Duration::from_secs_f64(1.4) {
             self.pipes.push(self.new_pipe());
             self.pipe_timer = Duration::new(0, 0);
         }
 
         for pipe_pair in &mut self.pipes {
-            pipe_pair.update();
+            pipe_pair.update(ctx);
         }
 
         if self.pipes[self.current_pipe_index].past(self.birds[0].rect().x) {
@@ -133,7 +133,7 @@ impl event::EventHandler for MainState {
                 .activate_nth(
                     i,
                     &[
-                        bird.y_velocity().into(),
+                        (current_pipe.upper_rect().left() - bird.rect().right()).into(),
                         (current_pipe.upper_rect().bottom() - bird.rect().top()).into(),
                         (bird.rect().bottom() - current_pipe.lower_rect().top()).into(),
                     ],

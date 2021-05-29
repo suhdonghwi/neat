@@ -1,5 +1,6 @@
 use ggez::graphics;
 use ggez::nalgebra as na;
+use ggez::timer;
 
 use super::opencolor;
 
@@ -45,9 +46,7 @@ impl Bird {
     }
 
     pub fn jump(&mut self) {
-        if self.y_velocity >= 0.0 {
-            self.y_velocity = -7.0;
-        }
+        self.y_velocity = -7.0;
     }
 
     pub fn is_dead(&self) -> bool {
@@ -75,6 +74,7 @@ pub struct PipePair {
     pipe_image: graphics::Image,
     upper_rect: graphics::Rect,
     lower_rect: graphics::Rect,
+    out: bool,
 }
 
 impl PipePair {
@@ -83,6 +83,7 @@ impl PipePair {
             pipe_image: image,
             upper_rect: graphics::Rect::new(pos.x, pos.y - 400.0, 65.0, 400.0),
             lower_rect: graphics::Rect::new(pos.x, pos.y + 150.0, 65.0, 400.0),
+            out: false,
         }
     }
 
@@ -90,9 +91,17 @@ impl PipePair {
         self.upper_rect.overlaps(other) || self.lower_rect.overlaps(other)
     }
 
-    pub fn update(&mut self) {
-        self.upper_rect.x -= 2.0;
-        self.lower_rect.x -= 2.0;
+    pub fn update(&mut self, ctx: &mut ggez::Context) {
+        if self.out {
+            return;
+        }
+
+        self.upper_rect.x -= 4.0 * timer::delta(ctx).as_secs_f32() * 60.0;
+        self.lower_rect.x -= 4.0 * timer::delta(ctx).as_secs_f32() * 60.0;
+
+        if self.upper_rect.right() < 0.0 {
+            self.out = true;
+        }
     }
 
     pub fn reset(&mut self) {
@@ -101,7 +110,7 @@ impl PipePair {
     }
 
     pub fn past(&self, x: f32) -> bool {
-        self.upper_rect.x + self.upper_rect.w < x
+        self.upper_rect.right() < x
     }
 
     pub fn upper_rect(&self) -> graphics::Rect {
@@ -113,6 +122,10 @@ impl PipePair {
     }
 
     pub fn draw(&self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {
+        if self.out {
+            return Ok(());
+        }
+
         /*
         let param = graphics::DrawParam::new()
             .dest(na::Point2::new(0.0, 0.0))

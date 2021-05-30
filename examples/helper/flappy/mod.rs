@@ -2,8 +2,6 @@ use ggez::graphics;
 use ggez::nalgebra as na;
 use ggez::timer;
 
-use super::opencolor;
-
 pub struct Bird {
     rect: graphics::Rect,
     y_velocity: f32,

@@ -72,7 +72,7 @@ impl MainState {
         let layout = MainLayout::new(
             params.mutation.weight_max,
             Axis::new(1.0, 10.0, 2.0),
-            Axis::new(0.0, 4.0, 1.0),
+            Axis::new(0.0, 60.0, 20.0),
             font,
         );
 
@@ -104,7 +104,7 @@ impl MainState {
 impl event::EventHandler for MainState {
     fn update(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
         self.pipe_timer += timer::delta(ctx);
-        if self.pipe_timer >= Duration::from_secs_f64(1.3) {
+        if self.pipe_timer >= Duration::from_secs_f64(1.1) {
             self.pipes.push(self.new_pipe());
             self.pipe_timer = Duration::new(0, 0);
         }

@@ -117,6 +117,7 @@ impl event::EventHandler for MainState {
     }
 
     fn draw(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
+        graphics::clear(ctx, *opencolor::GRAY0);
         self.layout.draw(ctx)?;
 
         self.xor_plot

@@ -28,17 +28,6 @@ impl Bird {
         self.y_velocity += self.y_accel;
     }
 
-    pub fn draw(&self, ctx: &mut ggez::Context) -> ggez::GameResult<()> {
-        let rect = graphics::Mesh::new_rectangle(
-            ctx,
-            graphics::DrawMode::fill(),
-            self.rect,
-            *opencolor::GRAY5,
-        )?;
-
-        graphics::draw(ctx, &rect, (na::Point2::new(0.0, 0.0),))
-    }
-
     pub fn draw_param(&self) -> graphics::DrawParam {
         graphics::DrawParam::new()
             .dest(self.rect.point())
@@ -81,8 +70,8 @@ impl PipePair {
     pub fn new(image: graphics::Image, pos: na::Point2<f32>) -> Self {
         PipePair {
             pipe_image: image,
-            upper_rect: graphics::Rect::new(pos.x, pos.y - 400.0, 65.0, 400.0),
-            lower_rect: graphics::Rect::new(pos.x, pos.y + 150.0, 65.0, 400.0),
+            upper_rect: graphics::Rect::new(pos.x, pos.y - 480.0, 78.0, 480.0),
+            lower_rect: graphics::Rect::new(pos.x, pos.y + 150.0, 78.0, 480.0),
             out: false,
         }
     }
@@ -126,13 +115,22 @@ impl PipePair {
             return Ok(());
         }
 
-        /*
         let param = graphics::DrawParam::new()
-            .dest(na::Point2::new(0.0, 0.0))
-            .scale(na::Vector2::new(1.25, 1.25));
-        graphics::draw(ctx, &self.pipe_image, param)
-        */
+            .dest(na::Point2::new(
+                self.upper_rect.x + self.upper_rect.w / 2.0,
+                self.upper_rect.y + self.upper_rect.h / 2.0,
+            ))
+            .rotation(std::f32::consts::PI)
+            .scale(na::Vector2::new(-1.5, 1.5))
+            .offset(na::Point2::new(0.5, 0.5));
+        graphics::draw(ctx, &self.pipe_image, param)?;
 
+        let param = graphics::DrawParam::new()
+            .dest(self.lower_rect.point())
+            .scale(na::Vector2::new(1.5, 1.5));
+        graphics::draw(ctx, &self.pipe_image, param)
+
+        /*
         let upper = graphics::Mesh::new_rectangle(
             ctx,
             graphics::DrawMode::fill(),
@@ -147,5 +145,6 @@ impl PipePair {
         )?;
         graphics::draw(ctx, &upper, (na::Point2::new(0.0, 0.0),))?;
         graphics::draw(ctx, &lower, (na::Point2::new(0.0, 0.0),))
+        */
     }
 }

@@ -61,6 +61,14 @@ impl MainLayout {
     }
 
     pub fn draw(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
+        let rect = graphics::Mesh::new_rectangle(
+            ctx,
+            graphics::DrawMode::fill(),
+            graphics::Rect::new(550.0, 0.0, 400.0, 600.0),
+            *opencolor::GRAY0,
+        )?;
+        graphics::draw(ctx, &rect, (na::Point2::new(0.0, 0.0),))?;
+
         if let Some(graph) = &self.graph_visual {
             graph.draw(ctx)?;
         }

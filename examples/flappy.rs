@@ -104,7 +104,7 @@ impl MainState {
 impl event::EventHandler for MainState {
     fn update(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
         self.pipe_timer += timer::delta(ctx);
-        if self.pipe_timer >= Duration::from_secs_f64(1.1) {
+        if self.pipe_timer >= Duration::from_secs_f64(1.3) {
             self.pipes.push(self.new_pipe());
             self.pipe_timer = Duration::new(0, 0);
         }
@@ -135,8 +135,8 @@ impl event::EventHandler for MainState {
                     i,
                     &[
                         bird.rect().y.into(),
-                        current_pipe.upper_rect().bottom().into(),
-                        current_pipe.lower_rect().top().into(),
+                        (current_pipe.upper_rect().bottom() - bird.rect().top()).into(),
+                        (bird.rect().bottom() - current_pipe.lower_rect().top()).into(),
                     ],
                 )
                 .unwrap();
@@ -177,6 +177,11 @@ impl event::EventHandler for MainState {
 
     fn draw(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
         graphics::clear(ctx, *opencolor::GRAY0);
+
+        for pipe_pair in &self.pipes {
+            pipe_pair.draw(ctx)?;
+        }
+
         self.layout.draw(ctx)?;
 
         for bird in &self.birds {
@@ -185,14 +190,9 @@ impl event::EventHandler for MainState {
             }
 
             self.spritebatch.add(bird.draw_param());
-            bird.draw(ctx)?;
         }
 
         graphics::draw(ctx, &self.spritebatch, (na::Point2::new(0.0, 0.0),))?;
-
-        for pipe_pair in &self.pipes {
-            pipe_pair.draw(ctx)?;
-        }
 
         self.spritebatch.clear();
         graphics::present(ctx)

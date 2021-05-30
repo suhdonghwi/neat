@@ -6,7 +6,7 @@ hidden_activation = 'Sigmoid'
 output_activation = 'Sigmoid'
 
 [mutation] 
-weight_perturbation = 0.5
+weight_perturbation = 0.7
 weight_assign = 0.1
 add_connection = 0.5
 remove_connection = 0.5

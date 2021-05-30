@@ -14,6 +14,7 @@ use neat::network::Network;
 use neat::{innovation_record::InnovationRecord, network::feedforward::Feedforward, pool::Pool};
 
 use helper::flappy::{Bird, PipePair};
+use helper::opencolor;
 use helper::{main_layout::MainLayout, plot::Axis};
 use rand::Rng;
 
@@ -103,7 +104,7 @@ impl MainState {
 impl event::EventHandler for MainState {
     fn update(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
         self.pipe_timer += timer::delta(ctx);
-        if self.pipe_timer >= Duration::from_secs_f64(0.8) {
+        if self.pipe_timer >= Duration::from_secs_f64(1.1) {
             self.pipes.push(self.new_pipe());
             self.pipe_timer = Duration::new(0, 0);
         }
@@ -175,6 +176,7 @@ impl event::EventHandler for MainState {
     }
 
     fn draw(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
+        graphics::clear(ctx, *opencolor::GRAY0);
         self.layout.draw(ctx)?;
 
         for bird in &self.birds {

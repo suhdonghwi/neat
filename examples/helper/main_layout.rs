@@ -61,8 +61,6 @@ impl MainLayout {
     }
 
     pub fn draw(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
-        graphics::clear(ctx, *opencolor::GRAY0);
-
         if let Some(graph) = &self.graph_visual {
             graph.draw(ctx)?;
         }

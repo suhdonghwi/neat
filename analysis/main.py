@@ -1,4 +1,5 @@
 import re
+import matplotlib.pyplot as plt
 
 
 class Specie:
@@ -41,9 +42,15 @@ class Generation:
         print(self.species)
 
 
-file = open("./analysis/output.txt", "r")
+def parse_generations(path):
+    file = open(path, "r")
+    return [
+        Generation(g)
+        for g in re.compile("[-]+\n").split(file.read())
+        if g.strip() != ""
+    ]
 
-generations = [
-    Generation(g) for g in re.compile("[-]+\n").split(file.read()) if g.strip() != ""
-]
-print(generations)
+
+generations = parse_generations("./analysis/output.txt")
+plt.plot([g.fitness_max for g in generations])
+plt.show()

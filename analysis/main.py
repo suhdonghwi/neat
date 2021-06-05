@@ -41,16 +41,27 @@ class Generation:
         self.species = [Specie(l) for l in species_data.split("\n")]
 
 
-def parse_generations(path):
-    file = open(path, "r")
-    content = file.read()
+def parse_generations(content):
     splited = re.compile("[-]+\n").split(content)
 
     return [Generation(g) for g in splited if g.strip() != ""]
 
 
-for i in range(1, 11):
-    generations = parse_generations("./analysis/output%d.txt" % i)
-    plt.plot([g.fitness_max for g in generations])
+def split_cases(path):
+    result = []
+
+    file = open(path, "r")
+    content = file.read()
+    splited = content.split("<Case Start>")
+    for data in splited:
+        gens = parse_generations(data)
+        result.append(gens)
+
+    return result
+
+
+cases = split_cases("./analysis/output.txt")
+for gens in cases:
+    plt.plot([g.fitness_max for g in gens])
 
 plt.show()

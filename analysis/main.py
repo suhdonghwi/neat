@@ -21,7 +21,7 @@ class Generation:
         data = data.strip()
 
         pat = re.compile(
-            r"""\[Generation (\d+)\]\n# Evaluation result\n  - fitness max: (\d+\.\d+) \((\d+) nodes, (\d+) edges\)\n  - fitness mean: (\d+\.\d+) .+\n\n# Speciation result:\n.+\n.+\n([\s\S]+)"""
+            r"""\[Generation (\d+)\]\n# Evaluation result\n  - fitness max: (\d+\.?\d*) \((\d+) nodes, (\d+) edges\)\n  - fitness mean: (\d+\.?\d*) .+\n\n# Speciation result:\n.+\n.+\n([\s\S]+)"""
         )
         (
             generation_num,
@@ -39,18 +39,18 @@ class Generation:
         self.fitness_mean = float(fitness_mean)
 
         self.species = [Specie(l) for l in species_data.split("\n")]
-        print(self.species)
 
 
 def parse_generations(path):
     file = open(path, "r")
-    return [
-        Generation(g)
-        for g in re.compile("[-]+\n").split(file.read())
-        if g.strip() != ""
-    ]
+    content = file.read()
+    splited = re.compile("[-]+\n").split(content)
+
+    return [Generation(g) for g in splited if g.strip() != ""]
 
 
-generations = parse_generations("./analysis/output.txt")
-plt.plot([g.fitness_max for g in generations])
+for i in range(1, 11):
+    generations = parse_generations("./analysis/output%d.txt" % i)
+    plt.plot([g.fitness_max for g in generations])
+
 plt.show()

@@ -1,0 +1,1400 @@
+[Generation 1]
+# Evaluation result
+  - fitness max: 2.7774729983797792 (4 nodes, 2 edges)
+  - fitness mean: 2.3367907311980813 (σ = 0.418291352336644)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |   0   |   23   |     16      |   0.1195  
+    2    |   0   |   3    |     126     |   0.9158  
+
+
+---------------------------------
+
+[Generation 2]
+# Evaluation result
+  - fitness max: 2.9592920078679787 (5 nodes, 3 edges)
+  - fitness mean: 2.597925558443286 (σ = 0.17673327026792918)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |   1   |   14   |     70      |   0.1992  
+    2    |   1   |   14   |     70      |   0.1964  
+
+
+---------------------------------
+
+[Generation 3]
+# Evaluation result
+  - fitness max: 2.9999156100691513 (5 nodes, 3 edges)
+  - fitness mean: 2.5633876087068597 (σ = 0.26743241628318737)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |   2   |   20   |     41      |   0.1446  
+    2    |   2   |   8    |     99      |   0.3476  
+
+
+---------------------------------
+
+[Generation 4]
+# Evaluation result
+  - fitness max: 2.9999156100691513 (5 nodes, 3 edges)
+  - fitness mean: 2.585239405832052 (σ = 0.33096301613316087)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |   3   |   18   |     52      |   0.1659  
+    2    |   3   |   11   |     88      |   0.2725  
+
+
+---------------------------------
+
+[Generation 5]
+# Evaluation result
+  - fitness max: 2.999997444010587 (6 nodes, 6 edges)
+  - fitness mean: 2.5503707476737736 (σ = 0.44671250480292607)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |   4   |   17   |     57      |   0.1763  
+    2    |   4   |   12   |     83      |   0.2499  
+
+
+---------------------------------
+
+[Generation 6]
+# Evaluation result
+  - fitness max: 2.9999997760570336 (6 nodes, 6 edges)
+  - fitness mean: 2.631609467757975 (σ = 0.4435970830167972)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |   5   |   17   |     57      |   0.1765  
+    2    |   5   |   12   |     83      |   0.2500  
+
+
+---------------------------------
+
+[Generation 7]
+# Evaluation result
+  - fitness max: 2.9999997760570336 (6 nodes, 6 edges)
+  - fitness mean: 2.622925366928535 (σ = 0.4336853041619988)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |   6   |   17   |     57      |   0.1765  
+    2    |   6   |   12   |     83      |   0.2500  
+
+
+---------------------------------
+
+[Generation 8]
+# Evaluation result
+  - fitness max: 2.9999998520310385 (5 nodes, 4 edges)
+  - fitness mean: 2.673749122125044 (σ = 0.4293695214941089)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |   7   |   17   |     57      |   0.1765  
+    2    |   7   |   12   |     83      |   0.2500  
+
+
+---------------------------------
+
+[Generation 9]
+# Evaluation result
+  - fitness max: 2.9999999886713065 (6 nodes, 5 edges)
+  - fitness mean: 2.6992564762755817 (σ = 0.4133878006246666)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |   8   |   17   |     57      |   0.1765  
+    2    |   8   |   12   |     83      |   0.2500  
+
+
+---------------------------------
+
+[Generation 10]
+# Evaluation result
+  - fitness max: 2.9999999886713065 (6 nodes, 5 edges)
+  - fitness mean: 2.6846011328738095 (σ = 0.4321763672794008)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |   9   |   16   |     62      |   0.1875  
+    2    |   9   |   13   |     78      |   0.2308  
+
+
+---------------------------------
+
+[Generation 11]
+# Evaluation result
+  - fitness max: 2.999999995436818 (6 nodes, 5 edges)
+  - fitness mean: 2.6420090746271128 (σ = 0.4351941504478197)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  10   |   18   |     53      |   0.1667  
+    2    |  10   |   11   |     87      |   0.2727  
+
+
+---------------------------------
+
+[Generation 12]
+# Evaluation result
+  - fitness max: 2.9999999980277767 (7 nodes, 5 edges)
+  - fitness mean: 2.7438970625771293 (σ = 0.3993188620287404)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  11   |   16   |     62      |   0.1875  
+    2    |  11   |   13   |     78      |   0.2308  
+
+
+---------------------------------
+
+[Generation 13]
+# Evaluation result
+  - fitness max: 2.9999999996408024 (6 nodes, 5 edges)
+  - fitness mean: 2.649375560585602 (σ = 0.4443515093061225)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  12   |   19   |     48      |   0.1579  
+    2    |  12   |   10   |     92      |   0.3000  
+
+
+---------------------------------
+
+[Generation 14]
+# Evaluation result
+  - fitness max: 3.0007473418671697 (5 nodes, 5 edges)
+  - fitness mean: 2.6668561350667606 (σ = 0.43381694181351316)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  13   |   17   |     57      |   0.1765  
+    2    |  13   |   12   |     83      |   0.2500  
+
+
+---------------------------------
+
+[Generation 15]
+# Evaluation result
+  - fitness max: 3.0140063190274318 (5 nodes, 4 edges)
+  - fitness mean: 2.6909490988525535 (σ = 0.42947160706412574)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  14   |   17   |     57      |   0.1765  
+    2    |  14   |   12   |     83      |   0.2500  
+
+
+---------------------------------
+
+[Generation 16]
+# Evaluation result
+  - fitness max: 3.0140063190274318 (5 nodes, 4 edges)
+  - fitness mean: 2.663068967157325 (σ = 0.441207463479072)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  15   |   18   |     53      |   0.1668  
+    2    |  15   |   11   |     87      |   0.2727  
+
+
+---------------------------------
+
+[Generation 17]
+# Evaluation result
+  - fitness max: 3.0273009011970826 (5 nodes, 4 edges)
+  - fitness mean: 2.6636255459462403 (σ = 0.4422827168129312)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  16   |   17   |     55      |   0.1769  
+    2    |  16   |   11   |     85      |   0.2727  
+
+
+---------------------------------
+
+[Generation 18]
+# Evaluation result
+  - fitness max: 3.0428599893870336 (5 nodes, 4 edges)
+  - fitness mean: 2.677300564665522 (σ = 0.43035324621495996)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  17   |   18   |     53      |   0.1675  
+    2    |  17   |   11   |     87      |   0.2727  
+
+
+---------------------------------
+
+[Generation 19]
+# Evaluation result
+  - fitness max: 3.069815149772884 (5 nodes, 4 edges)
+  - fitness mean: 2.607601012919705 (σ = 0.46308222703453433)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  18   |   17   |     58      |   0.1781  
+    2    |  18   |   12   |     82      |   0.2500  
+
+
+---------------------------------
+
+[Generation 20]
+# Evaluation result
+  - fitness max: 3.069815149772884 (5 nodes, 4 edges)
+  - fitness mean: 2.6594941952206925 (σ = 0.4440284071287295)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  19   |   18   |     56      |   0.1687  
+    2    |  19   |   12   |     84      |   0.2500  
+
+
+---------------------------------
+
+[Generation 21]
+# Evaluation result
+  - fitness max: 3.092652687596976 (5 nodes, 4 edges)
+  - fitness mean: 2.678685071058213 (σ = 0.44340208228099237)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  20   |   17   |     58      |   0.1797  
+    2    |  20   |   12   |     82      |   0.2500  
+
+
+---------------------------------
+
+[Generation 22]
+# Evaluation result
+  - fitness max: 3.149426800837491 (5 nodes, 4 edges)
+  - fitness mean: 2.7038138157792235 (σ = 0.43641093607764564)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  21   |   17   |     58      |   0.1813  
+    2    |  21   |   12   |     82      |   0.2500  
+
+
+---------------------------------
+
+[Generation 23]
+# Evaluation result
+  - fitness max: 3.149426800837491 (5 nodes, 4 edges)
+  - fitness mean: 2.7278913346505496 (σ = 0.43498355956331425)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  22   |   17   |     59      |   0.1822  
+    2    |  22   |   12   |     81      |   0.2500  
+
+
+---------------------------------
+
+[Generation 24]
+# Evaluation result
+  - fitness max: 3.1556893598257933 (5 nodes, 4 edges)
+  - fitness mean: 2.6605163203944393 (σ = 0.4616317709638477)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  23   |   18   |     54      |   0.1728  
+    2    |  23   |   11   |     86      |   0.2727  
+
+
+---------------------------------
+
+[Generation 25]
+# Evaluation result
+  - fitness max: 3.183924531567136 (5 nodes, 4 edges)
+  - fitness mean: 2.6658560666112643 (σ = 0.4468652956767488)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  24   |   18   |     54      |   0.1741  
+    2    |  24   |   11   |     86      |   0.2727  
+
+
+---------------------------------
+
+[Generation 26]
+# Evaluation result
+  - fitness max: 3.1974390401145705 (5 nodes, 4 edges)
+  - fitness mean: 2.6727289901924944 (σ = 0.46562562808803554)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  25   |   17   |     59      |   0.1860  
+    2    |  25   |   12   |     81      |   0.2500  
+
+
+---------------------------------
+
+[Generation 27]
+# Evaluation result
+  - fitness max: 3.249201199247998 (5 nodes, 4 edges)
+  - fitness mean: 2.6378734173112846 (σ = 0.4905955677885171)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  26   |   19   |     50      |   0.1672  
+    2    |  26   |   10   |     90      |   0.3000  
+
+
+---------------------------------
+
+[Generation 28]
+# Evaluation result
+  - fitness max: 3.249201199247998 (5 nodes, 4 edges)
+  - fitness mean: 2.700367634677354 (σ = 0.4590246366623746)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  27   |   15   |     69      |   0.2127  
+    2    |  27   |   14   |     71      |   0.2143  
+
+
+---------------------------------
+
+[Generation 29]
+# Evaluation result
+  - fitness max: 3.249345972473381 (5 nodes, 4 edges)
+  - fitness mean: 2.727875851128773 (σ = 0.45365343381396805)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  28   |   17   |     60      |   0.1890  
+    2    |  28   |   12   |     80      |   0.2500  
+
+
+---------------------------------
+
+[Generation 30]
+# Evaluation result
+  - fitness max: 3.249576334605535 (5 nodes, 4 edges)
+  - fitness mean: 2.6629111085884483 (σ = 0.4895232242216538)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  29   |   17   |     60      |   0.1904  
+    2    |  29   |   12   |     80      |   0.2500  
+
+
+---------------------------------
+
+[Generation 31]
+# Evaluation result
+  - fitness max: 3.2496165113311477 (5 nodes, 4 edges)
+  - fitness mean: 2.6805666228207077 (σ = 0.48467900916299717)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  30   |   16   |     65      |   0.2031  
+    2    |  30   |   13   |     75      |   0.2308  
+
+
+---------------------------------
+
+[Generation 32]
+# Evaluation result
+  - fitness max: 3.2498439021763526 (5 nodes, 4 edges)
+  - fitness mean: 2.627386916284994 (σ = 0.47979691300727056)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  31   |   18   |     55      |   0.1805  
+    2    |  31   |   11   |     85      |   0.2727  
+
+
+---------------------------------
+
+[Generation 33]
+# Evaluation result
+  - fitness max: 3.2498457187628325 (5 nodes, 4 edges)
+  - fitness mean: 2.594167661881409 (σ = 0.4785329157816049)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  32   |   17   |     60      |   0.1912  
+    2    |  32   |   12   |     80      |   0.2500  
+
+
+---------------------------------
+
+[Generation 34]
+# Evaluation result
+  - fitness max: 3.2498530641564307 (5 nodes, 4 edges)
+  - fitness mean: 2.622485341372518 (σ = 0.48957066356010437)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  33   |   18   |     55      |   0.1805  
+    2    |  33   |   11   |     85      |   0.2727  
+
+
+---------------------------------
+
+[Generation 35]
+# Evaluation result
+  - fitness max: 3.4981890073975976 (5 nodes, 5 edges)
+  - fitness mean: 2.664601282401582 (σ = 0.5008071125189654)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  34   |   16   |     65      |   0.2041  
+    2    |  34   |   13   |     75      |   0.2308  
+
+
+---------------------------------
+
+[Generation 36]
+# Evaluation result
+  - fitness max: 3.4981890073975976 (5 nodes, 5 edges)
+  - fitness mean: 2.644701091483612 (σ = 0.5079613124044476)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  35   |   18   |     56      |   0.1842  
+    2    |  35   |   11   |     84      |   0.2727  
+
+
+---------------------------------
+
+[Generation 37]
+# Evaluation result
+  - fitness max: 3.498466019577485 (5 nodes, 5 edges)
+  - fitness mean: 2.6947803243128803 (σ = 0.5158275354168435)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  36   |   17   |     63      |   0.2054  
+    2    |  36   |   12   |     77      |   0.2500  
+
+
+---------------------------------
+
+[Generation 38]
+# Evaluation result
+  - fitness max: 3.498466019577485 (5 nodes, 5 edges)
+  - fitness mean: 2.6642879976914977 (σ = 0.5053539626712803)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  37   |   19   |     53      |   0.1841  
+    2    |  37   |   10   |     87      |   0.3000  
+
+
+---------------------------------
+
+[Generation 39]
+# Evaluation result
+  - fitness max: 3.4989713694981983 (5 nodes, 5 edges)
+  - fitness mean: 2.7098771290259975 (σ = 0.5211305957717481)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  38   |   16   |     68      |   0.2186  
+    2    |  38   |   13   |     72      |   0.2308  
+
+
+---------------------------------
+
+[Generation 40]
+# Evaluation result
+  - fitness max: 3.4989713694981983 (5 nodes, 5 edges)
+  - fitness mean: 2.7834636582211068 (σ = 0.5204574674877905)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  39   |   19   |     53      |   0.1841  
+    2    |  39   |   10   |     87      |   0.3000  
+
+
+---------------------------------
+
+[Generation 41]
+# Evaluation result
+  - fitness max: 3.4992607436930765 (5 nodes, 5 edges)
+  - fitness mean: 2.7068036232590855 (σ = 0.5706124227919843)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  40   |   17   |     63      |   0.2058  
+    2    |  40   |   12   |     77      |   0.2500  
+
+
+---------------------------------
+
+[Generation 42]
+# Evaluation result
+  - fitness max: 3.4992607436930765 (5 nodes, 5 edges)
+  - fitness mean: 2.7340171764166215 (σ = 0.5590328707587303)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  41   |   19   |     53      |   0.1842  
+    2    |  41   |   10   |     87      |   0.3000  
+
+
+---------------------------------
+
+[Generation 43]
+# Evaluation result
+  - fitness max: 3.4992607436930765 (5 nodes, 5 edges)
+  - fitness mean: 2.7095181574741916 (σ = 0.5477548137081083)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  42   |   18   |     58      |   0.1944  
+    2    |  42   |   11   |     82      |   0.2727  
+
+
+---------------------------------
+
+[Generation 44]
+# Evaluation result
+  - fitness max: 3.499440458006041 (5 nodes, 5 edges)
+  - fitness mean: 2.7062016969712714 (σ = 0.5488591395294649)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  43   |   19   |     53      |   0.1842  
+    2    |  43   |   10   |     87      |   0.3000  
+
+
+---------------------------------
+
+[Generation 45]
+# Evaluation result
+  - fitness max: 3.499546726400783 (5 nodes, 5 edges)
+  - fitness mean: 2.708007444439128 (σ = 0.5733272600335751)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  44   |   17   |     63      |   0.2058  
+    2    |  44   |   12   |     77      |   0.2500  
+
+
+---------------------------------
+
+[Generation 46]
+# Evaluation result
+  - fitness max: 3.499670486328174 (5 nodes, 5 edges)
+  - fitness mean: 2.7452111562363126 (σ = 0.522671740725244)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  45   |   19   |     53      |   0.1842  
+    2    |  45   |   10   |     87      |   0.3000  
+
+
+---------------------------------
+
+[Generation 47]
+# Evaluation result
+  - fitness max: 3.499672674408106 (5 nodes, 5 edges)
+  - fitness mean: 2.662651600463024 (σ = 0.532149413979657)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  46   |   17   |     63      |   0.2058  
+    2    |  46   |   12   |     77      |   0.2500  
+
+
+---------------------------------
+
+[Generation 48]
+# Evaluation result
+  - fitness max: 3.7268597425601877 (5 nodes, 6 edges)
+  - fitness mean: 2.7890169142498116 (σ = 0.48036237932291265)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  47   |   16   |     68      |   0.2196  
+    2    |  47   |   13   |     72      |   0.2308  
+
+
+---------------------------------
+
+[Generation 49]
+# Evaluation result
+  - fitness max: 3.7271166898889714 (5 nodes, 6 edges)
+  - fitness mean: 2.7738487092159665 (σ = 0.5378384759952223)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  48   |   18   |     58      |   0.1972  
+    2    |  48   |   11   |     82      |   0.2727  
+
+
+---------------------------------
+
+[Generation 50]
+# Evaluation result
+  - fitness max: 3.732839785556956 (5 nodes, 6 edges)
+  - fitness mean: 2.7592678811118416 (σ = 0.5721457365468241)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  49   |   17   |     64      |   0.2142  
+    2    |  49   |   12   |     76      |   0.2500  
+
+
+---------------------------------
+
+[Generation 51]
+# Evaluation result
+  - fitness max: 3.734835375370987 (5 nodes, 6 edges)
+  - fitness mean: 2.850505654508884 (σ = 0.6014175047942638)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  50   |   18   |     60      |   0.2072  
+    2    |  50   |   11   |     80      |   0.2727  
+
+
+---------------------------------
+
+[Generation 52]
+# Evaluation result
+  - fitness max: 3.7387421292943275 (5 nodes, 6 edges)
+  - fitness mean: 2.8113455479857996 (σ = 0.5670909585228914)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  51   |   17   |     65      |   0.2195  
+    2    |  51   |   12   |     75      |   0.2500  
+
+
+---------------------------------
+
+[Generation 53]
+# Evaluation result
+  - fitness max: 3.7388517545545206 (5 nodes, 6 edges)
+  - fitness mean: 2.8715679915406707 (σ = 0.5651929792048216)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  52   |   18   |     60      |   0.2075  
+    2    |  52   |   11   |     80      |   0.2727  
+
+
+---------------------------------
+
+[Generation 54]
+# Evaluation result
+  - fitness max: 3.741596822749895 (5 nodes, 6 edges)
+  - fitness mean: 2.7955410525814903 (σ = 0.5933369498342133)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  53   |   19   |     55      |   0.1967  
+    2    |  53   |   10   |     85      |   0.3000  
+
+
+---------------------------------
+
+[Generation 55]
+# Evaluation result
+  - fitness max: 3.741596822749895 (5 nodes, 6 edges)
+  - fitness mean: 2.8625367039156946 (σ = 0.555586021024548)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  54   |   16   |     70      |   0.2336  
+    2    |  54   |   13   |     70      |   0.2308  
+
+
+---------------------------------
+
+[Generation 56]
+# Evaluation result
+  - fitness max: 3.7418277708262844 (5 nodes, 6 edges)
+  - fitness mean: 2.8973687676776683 (σ = 0.5980093449117817)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  55   |   19   |     51      |   0.1968  
+    2    |  55   |   9    |     89      |   0.3333  
+
+
+---------------------------------
+
+[Generation 57]
+# Evaluation result
+  - fitness max: 3.7435030362884953 (5 nodes, 6 edges)
+  - fitness mean: 2.8195692560343826 (σ = 0.5486582188700639)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  56   |   16   |     70      |   0.2338  
+    2    |  56   |   13   |     70      |   0.2308  
+
+
+---------------------------------
+
+[Generation 58]
+# Evaluation result
+  - fitness max: 3.7435030362884953 (5 nodes, 6 edges)
+  - fitness mean: 2.815970634897947 (σ = 0.5565923111001715)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  57   |   17   |     62      |   0.2201  
+    2    |  57   |   11   |     78      |   0.2727  
+
+
+---------------------------------
+
+[Generation 59]
+# Evaluation result
+  - fitness max: 3.7438377350503274 (5 nodes, 6 edges)
+  - fitness mean: 2.794955305714905 (σ = 0.6175164148210488)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  58   |   20   |     50      |   0.1871  
+    2    |  58   |   9    |     90      |   0.3333  
+
+
+---------------------------------
+
+[Generation 60]
+# Evaluation result
+  - fitness max: 3.745557412617877 (5 nodes, 6 edges)
+  - fitness mean: 2.6917889113208417 (σ = 0.5882237017209188)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  59   |   17   |     65      |   0.2201  
+    2    |  59   |   12   |     75      |   0.2500  
+
+
+---------------------------------
+
+[Generation 61]
+# Evaluation result
+  - fitness max: 3.745557412617877 (5 nodes, 6 edges)
+  - fitness mean: 2.805409185233812 (σ = 0.6270231921858462)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  60   |   18   |     60      |   0.2080  
+    2    |  60   |   11   |     80      |   0.2727  
+
+
+---------------------------------
+
+[Generation 62]
+# Evaluation result
+  - fitness max: 3.745557412617877 (5 nodes, 6 edges)
+  - fitness mean: 2.8807833619745264 (σ = 0.6100129889425235)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  61   |   17   |     65      |   0.2202  
+    2    |  61   |   12   |     75      |   0.2500  
+
+
+---------------------------------
+
+[Generation 63]
+# Evaluation result
+  - fitness max: 3.834501826986143 (5 nodes, 7 edges)
+  - fitness mean: 2.842450697143067 (σ = 0.5817221814825032)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  62   |   18   |     60      |   0.2083  
+    2    |  62   |   11   |     80      |   0.2727  
+
+
+---------------------------------
+
+[Generation 64]
+# Evaluation result
+  - fitness max: 3.882197884215594 (5 nodes, 7 edges)
+  - fitness mean: 2.786270270679155 (σ = 0.6335052099927514)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  63   |   19   |     55      |   0.1977  
+    2    |  63   |   10   |     85      |   0.3000  
+
+
+---------------------------------
+
+[Generation 65]
+# Evaluation result
+  - fitness max: 3.8887984961687487 (5 nodes, 7 edges)
+  - fitness mean: 2.7827753060725247 (σ = 0.6200023587733287)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  64   |   17   |     65      |   0.2228  
+    2    |  64   |   12   |     75      |   0.2500  
+
+
+---------------------------------
+
+[Generation 66]
+# Evaluation result
+  - fitness max: 3.9007923784834064 (5 nodes, 7 edges)
+  - fitness mean: 2.845316549510638 (σ = 0.6670386335234023)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  65   |   19   |     56      |   0.2040  
+    2    |  65   |   10   |     84      |   0.3000  
+
+
+---------------------------------
+
+[Generation 67]
+# Evaluation result
+  - fitness max: 3.9038923276481063 (5 nodes, 7 edges)
+  - fitness mean: 2.8460957900270407 (σ = 0.616228617716497)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  66   |   16   |     71      |   0.2432  
+    2    |  66   |   13   |     69      |   0.2308  
+
+
+---------------------------------
+
+[Generation 68]
+# Evaluation result
+  - fitness max: 3.9071392042441393 (5 nodes, 7 edges)
+  - fitness mean: 2.9354924144300973 (σ = 0.6507676799196299)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  67   |   19   |     56      |   0.2051  
+    2    |  67   |   10   |     84      |   0.3000  
+
+
+---------------------------------
+
+[Generation 69]
+# Evaluation result
+  - fitness max: 3.9345418541972004 (5 nodes, 7 edges)
+  - fitness mean: 2.8614747106894756 (σ = 0.6439581719087664)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  68   |   16   |     71      |   0.2441  
+    2    |  68   |   13   |     69      |   0.2308  
+
+
+---------------------------------
+
+[Generation 70]
+# Evaluation result
+  - fitness max: 3.9362355575015857 (5 nodes, 7 edges)
+  - fitness mean: 2.958050033702005 (σ = 0.6237045951169272)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  69   |   19   |     56      |   0.2059  
+    2    |  69   |   10   |     84      |   0.3000  
+
+
+---------------------------------
+
+[Generation 71]
+# Evaluation result
+  - fitness max: 3.937553346272766 (5 nodes, 7 edges)
+  - fitness mean: 2.873837269939571 (σ = 0.65675579744659)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  70   |   17   |     67      |   0.2306  
+    2    |  70   |   12   |     73      |   0.2500  
+
+
+---------------------------------
+
+[Generation 72]
+# Evaluation result
+  - fitness max: 3.954298245835223 (5 nodes, 7 edges)
+  - fitness mean: 2.9628122964442825 (σ = 0.6549608122533725)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  71   |   18   |     58      |   0.2184  
+    2    |  71   |   10   |     82      |   0.3000  
+
+
+---------------------------------
+
+[Generation 73]
+# Evaluation result
+  - fitness max: 3.954298245835223 (5 nodes, 7 edges)
+  - fitness mean: 2.8634110702795152 (σ = 0.6663098447595999)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  72   |   18   |     62      |   0.2189  
+    2    |  72   |   11   |     78      |   0.2727  
+
+
+---------------------------------
+
+[Generation 74]
+# Evaluation result
+  - fitness max: 3.955958955061395 (5 nodes, 7 edges)
+  - fitness mean: 2.8761949646586062 (σ = 0.7008749339651901)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  73   |   18   |     62      |   0.2194  
+    2    |  73   |   11   |     78      |   0.2727  
+
+
+---------------------------------
+
+[Generation 75]
+# Evaluation result
+  - fitness max: 3.9594229247510357 (5 nodes, 7 edges)
+  - fitness mean: 2.8840260453134516 (σ = 0.692338800202676)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  74   |   19   |     57      |   0.2082  
+    2    |  74   |   10   |     83      |   0.3000  
+
+
+---------------------------------
+
+[Generation 76]
+# Evaluation result
+  - fitness max: 3.9605005127159876 (5 nodes, 7 edges)
+  - fitness mean: 2.878883175421112 (σ = 0.7089811354314924)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  75   |   18   |     65      |   0.2199  
+    2    |  75   |   12   |     75      |   0.2500  
+
+
+---------------------------------
+
+[Generation 77]
+# Evaluation result
+  - fitness max: 3.974001466725964 (5 nodes, 7 edges)
+  - fitness mean: 2.888853200179678 (σ = 0.727137445041188)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  76   |   19   |     57      |   0.2084  
+    2    |  76   |   10   |     83      |   0.3000  
+
+
+---------------------------------
+
+[Generation 78]
+# Evaluation result
+  - fitness max: 3.974278792233114 (5 nodes, 7 edges)
+  - fitness mean: 2.829501003640578 (σ = 0.6802508467996294)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  77   |   17   |     64      |   0.2331  
+    2    |  77   |   11   |     76      |   0.2727  
+
+
+---------------------------------
+
+[Generation 79]
+# Evaluation result
+  - fitness max: 3.976080851523929 (5 nodes, 7 edges)
+  - fitness mean: 2.8497994224084353 (σ = 0.678956332731741)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  78   |   18   |     62      |   0.2203  
+    2    |  78   |   11   |     78      |   0.2727  
+
+
+---------------------------------
+
+[Generation 80]
+# Evaluation result
+  - fitness max: 3.9864266577269993 (5 nodes, 7 edges)
+  - fitness mean: 2.8274031572783893 (σ = 0.6672398211350872)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  79   |   19   |     57      |   0.2091  
+    2    |  79   |   10   |     83      |   0.3000  
+
+
+---------------------------------
+
+[Generation 81]
+# Evaluation result
+  - fitness max: 3.9864266577269993 (5 nodes, 7 edges)
+  - fitness mean: 2.7867882230144514 (σ = 0.6646399592345369)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  80   |   18   |     62      |   0.2208  
+    2    |  80   |   11   |     78      |   0.2727  
+
+
+---------------------------------
+
+[Generation 82]
+# Evaluation result
+  - fitness max: 3.9882466757410646 (5 nodes, 7 edges)
+  - fitness mean: 2.847944771468749 (σ = 0.6762753469277812)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  81   |   19   |     60      |   0.2094  
+    2    |  81   |   11   |     80      |   0.2727  
+
+
+---------------------------------
+
+[Generation 83]
+# Evaluation result
+  - fitness max: 3.9882466757410646 (5 nodes, 7 edges)
+  - fitness mean: 2.9307230011093655 (σ = 0.6683729523704862)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  82   |   17   |     67      |   0.2344  
+    2    |  82   |   12   |     73      |   0.2500  
+
+
+---------------------------------
+
+[Generation 84]
+# Evaluation result
+  - fitness max: 3.9882466757410646 (5 nodes, 7 edges)
+  - fitness mean: 2.9943767903468195 (σ = 0.6278070814780863)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  83   |   18   |     62      |   0.2214  
+    2    |  83   |   11   |     78      |   0.2727  
+
+
+---------------------------------
+
+[Generation 85]
+# Evaluation result
+  - fitness max: 3.988814086133319 (5 nodes, 7 edges)
+  - fitness mean: 2.944372184526216 (σ = 0.7151011139576521)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  84   |   17   |     67      |   0.2346  
+    2    |  84   |   12   |     73      |   0.2500  
+
+
+---------------------------------
+
+[Generation 86]
+# Evaluation result
+  - fitness max: 3.990316246113633 (5 nodes, 7 edges)
+  - fitness mean: 2.9113235831169275 (σ = 0.696660349796758)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  85   |   20   |     52      |   0.1994  
+    2    |  85   |   9    |     88      |   0.3333  
+
+
+---------------------------------
+
+[Generation 87]
+# Evaluation result
+  - fitness max: 3.990316246113633 (5 nodes, 7 edges)
+  - fitness mean: 2.882099410426246 (σ = 0.7060084848583092)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  86   |   17   |     67      |   0.2346  
+    2    |  86   |   12   |     73      |   0.2500  
+
+
+---------------------------------
+
+[Generation 88]
+# Evaluation result
+  - fitness max: 3.990316246113633 (5 nodes, 7 edges)
+  - fitness mean: 2.971966771465795 (σ = 0.6863187588306614)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  87   |   18   |     62      |   0.2216  
+    2    |  87   |   11   |     78      |   0.2727  
+
+
+---------------------------------
+
+[Generation 89]
+# Evaluation result
+  - fitness max: 3.993150931238293 (5 nodes, 7 edges)
+  - fitness mean: 2.883370521570963 (σ = 0.6788853648539193)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  88   |   18   |     62      |   0.2217  
+    2    |  88   |   11   |     78      |   0.2727  
+
+
+---------------------------------
+
+[Generation 90]
+# Evaluation result
+  - fitness max: 3.993150931238293 (5 nodes, 7 edges)
+  - fitness mean: 2.851629425969456 (σ = 0.6757824305606536)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  89   |   18   |     62      |   0.2217  
+    2    |  89   |   11   |     78      |   0.2772  
+
+
+---------------------------------
+
+[Generation 91]
+# Evaluation result
+  - fitness max: 3.993150931238293 (5 nodes, 7 edges)
+  - fitness mean: 2.9248512511905562 (σ = 0.6721691381075994)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  90   |   16   |     70      |   0.2494  
+    2    |  90   |   13   |     70      |   0.2433  
+
+
+---------------------------------
+
+[Generation 92]
+# Evaluation result
+  - fitness max: 3.993150931238293 (5 nodes, 7 edges)
+  - fitness mean: 3.0889789750142276 (σ = 0.6804251374436193)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  91   |   17   |     59      |   0.2348  
+    2    |  91   |   11   |     81      |   0.3210  
+
+
+---------------------------------
+
+[Generation 93]
+# Evaluation result
+  - fitness max: 3.9939805669387423 (5 nodes, 7 edges)
+  - fitness mean: 3.2880547911566165 (σ = 0.5090101542771871)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  92   |   14   |     76      |   0.2852  
+    2    |  92   |   15   |     64      |   0.2401  
+
+
+---------------------------------
+
+[Generation 94]
+# Evaluation result
+  - fitness max: 3.994865695904234 (5 nodes, 7 edges)
+  - fitness mean: 3.2193185148020262 (σ = 0.5761308584349112)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  93   |   17   |     60      |   0.2349  
+    2    |  93   |   12   |     80      |   0.3074  
+
+
+---------------------------------
+
+[Generation 95]
+# Evaluation result
+  - fitness max: 3.994865695904234 (5 nodes, 7 edges)
+  - fitness mean: 3.292285808855517 (σ = 0.5355930794545057)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  94   |   16   |     65      |   0.2496  
+    2    |  94   |   13   |     75      |   0.2865  
+
+
+---------------------------------
+
+[Generation 96]
+# Evaluation result
+  - fitness max: 3.9948736557457734 (5 nodes, 7 edges)
+  - fitness mean: 3.2690430770258057 (σ = 0.6005920544114551)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  95   |   16   |     67      |   0.2496  
+    2    |  95   |   14   |     73      |   0.2674  
+
+
+---------------------------------
+
+[Generation 97]
+# Evaluation result
+  - fitness max: 3.9948736557457734 (5 nodes, 7 edges)
+  - fitness mean: 3.29311500372317 (σ = 0.567826019387513)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  96   |   17   |     59      |   0.2350  
+    2    |  96   |   12   |     81      |   0.3143  
+
+
+---------------------------------
+
+[Generation 98]
+# Evaluation result
+  - fitness max: 3.9954936822943665 (5 nodes, 7 edges)
+  - fitness mean: 3.27641194033064 (σ = 0.5915849848649591)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  97   |   15   |     68      |   0.2663  
+    2    |  97   |   14   |     72      |   0.2766  
+
+
+---------------------------------
+
+[Generation 99]
+# Evaluation result
+  - fitness max: 3.995931161576633 (5 nodes, 7 edges)
+  - fitness mean: 3.3062482417181576 (σ = 0.5696861398038512)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  98   |   17   |     58      |   0.2350  
+    2    |  98   |   12   |     82      |   0.3295  
+
+
+---------------------------------
+
+[Generation 100]
+# Evaluation result
+  - fitness max: 3.996244370416865 (5 nodes, 7 edges)
+  - fitness mean: 3.322039687619055 (σ = 0.6818792691771851)
+
+# Speciation result:
+    id   |  age  |  size  |  offspring  | adj fit avg.
+  ====================================================
+    0    |  99   |   18   |     53      |   0.2220  
+    2    |  99   |   11   |     87      |   0.3632  
+
+
+---------------------------------
+

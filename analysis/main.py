@@ -1,5 +1,6 @@
 import re
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 class Specie:
@@ -61,7 +62,26 @@ def split_cases(path):
 
 
 cases = split_cases("./analysis/output.txt")
+sizes = []
 for gens in cases:
-    plt.plot([g.fitness_max for g in gens])
+    for gen in gens:
+        if gen.fitness_max >= 3.9:
+            sizes.append(gen.best_edges_count)
+            break
 
+"""
+for gens in cases:
+    plt.plot([x.fitness_max for x in gens])
+"""
+
+
+d, counts = np.unique(sizes, return_counts=True)
+plt.bar(x=d, height=counts)
+plt.xticks(range(7, 23))
+
+"""
+plt.xlabel("Generation")
+plt.ylabel("Fitness")
+plt.title("XOR evolution result")
+"""
 plt.show()

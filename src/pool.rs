@@ -135,7 +135,9 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
 
             if !found {
                 let id = innov_record.new_species();
-                new_species_set.push(Species::new(SpeciesInfo::new(id, network.clone(), 0)));
+                let mut new_species = Species::new(SpeciesInfo::new(id, network.clone(), 0));
+                new_species.force_assign(network);
+                new_species_set.push(new_species);
             }
         }
 

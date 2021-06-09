@@ -5,7 +5,7 @@ use neat::network::Network;
 use neat::{innovation_record::InnovationRecord, network::feedforward::Feedforward, pool::Pool};
 
 pub fn main() {
-    for _ in 0..100 {
+    for _ in 0..500 {
         println!("<Case Start>");
 
         let args = helper::cli::get_arguments();

@@ -1,6 +1,7 @@
 import re
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 
 
 class Specie:
@@ -61,27 +62,68 @@ def split_cases(path):
     return result
 
 
-cases = split_cases("./analysis/output.txt")
-sizes = []
-for gens in cases:
-    for gen in gens:
-        if gen.fitness_max >= 3.9:
-            sizes.append(gen.best_edges_count)
-            break
+def plot_fitness_max(cases):
+    for gens in cases:
+        plt.plot([x.fitness_max for x in gens])
 
-"""
-for gens in cases:
-    plt.plot([x.fitness_max for x in gens])
-"""
+    plt.xlabel("Generation")
+    plt.ylabel("Fitness")
 
 
-d, counts = np.unique(sizes, return_counts=True)
-plt.bar(x=d, height=counts)
-plt.xticks(range(7, 23))
+def plot_succ_gens(cases):
+    succ_gens = []
+    for gens in cases:
+        for (i, gen) in enumerate(gens):
+            if gen.fitness_max >= 3.95:
+                succ_gens.append(i)
+                break
 
-"""
+    print("Success : " + str(len(succ_gens)))
+    sns.kdeplot(succ_gens)
+
+
+def plot_size(cases):
+    sizes = []
+    for gens in cases:
+        for (i, gen) in enumerate(gens):
+            if gen.fitness_max >= 3.95:
+                sizes.append(gen.best_edges_count)
+                break
+
+    print("Success : " + str(len(sizes)))
+    sns.kdeplot(sizes)
+
+
+case5 = split_cases("./analysis/output-3.txt")
+case8 = split_cases("./analysis/output-8.txt")
+case15 = split_cases("./analysis/output-15.txt")
+case30 = split_cases("./analysis/output-30.txt")
+
+plot_fitness_max(case5)
+plt.show()
+
+plot_fitness_max(case30)
+plt.show()
+
+
+plot_succ_gens(case5)
+# plot_succ_gens(case8)
+# plot_succ_gens(case15)
+plot_succ_gens(case30)
+
+plt.legend(labels=["5", "8", "15", "30"])
 plt.xlabel("Generation")
-plt.ylabel("Fitness")
-plt.title("XOR evolution result")
-"""
+plt.title("Success generation")
+
+plt.show()
+
+plot_size(case5)
+# plot_size(case8)
+# plot_size(case15)
+plot_size(case30)
+
+plt.legend(labels=["5", "8", "15", "30"])
+plt.xlabel("Size")
+plt.title("Success network complexity")
+
 plt.show()

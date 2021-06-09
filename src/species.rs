@@ -57,9 +57,20 @@ impl<'a, T: Network + Debug + Clone> Species<'a, T> {
         }
     }
 
+    pub fn force_assign(&mut self, network: &'a T) {
+        self.list.push(network);
+    }
+
     pub fn kill_worst(&mut self, survival_rate: f64) {
         self.list
             .truncate(((self.list.len() as f64) * survival_rate).floor() as usize);
+    }
+
+    pub fn replace_representative(&mut self, rng: &mut impl RngCore) {
+        let uniform = Uniform::new(0, self.list.len());
+
+        let index = uniform.sample(rng);
+        self.info.representative = self.list[index].clone();
     }
 
     pub fn adjusted_fitness_average(&self) -> Option<f64> {

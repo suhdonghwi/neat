@@ -1,6 +1,6 @@
 input_number = 1
 output_number = 1
-population = 300
+population = 150
 
 hidden_activation = 'Tanh'
 output_activation = 'Linear'
@@ -23,7 +23,7 @@ perturb_max = 1.0
 [speciation]
 c1 = 1.0
 c2 = 0.5
-compatibility_threshold = 5.0
+compatibility_threshold = 100.0
 elitism = 5
 
-survival_rate = 0.1
+survival_rate = 0.4

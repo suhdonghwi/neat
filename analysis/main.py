@@ -74,56 +74,50 @@ def plot_succ_gens(cases):
     succ_gens = []
     for gens in cases:
         for (i, gen) in enumerate(gens):
-            if gen.fitness_max >= 3.95:
+            if gen.fitness_max >= 3.9:
                 succ_gens.append(i)
                 break
 
     print("Success : " + str(len(succ_gens)))
-    sns.kdeplot(succ_gens)
+    sns.histplot(succ_gens, kde=True)
 
 
 def plot_size(cases):
     sizes = []
     for gens in cases:
         for (i, gen) in enumerate(gens):
-            if gen.fitness_max >= 3.95:
+            if gen.fitness_max >= 3.9:
                 sizes.append(gen.best_edges_count)
                 break
 
     print("Success : " + str(len(sizes)))
-    sns.kdeplot(sizes)
+    sns.countplot(x=sizes)
 
 
-case5 = split_cases("./analysis/output-3.txt")
-case8 = split_cases("./analysis/output-8.txt")
-case15 = split_cases("./analysis/output-15.txt")
-case30 = split_cases("./analysis/output-30.txt")
+case1 = split_cases("./analysis/output-0.4.txt")
+case2 = split_cases("./analysis/output-0.2.txt")
+case3 = split_cases("./analysis/output-0.1.txt")
+case4 = split_cases("./analysis/output-0.07.txt")
 
-plot_fitness_max(case5)
-plt.show()
+cases = [case1, case2, case3, case4]
 
-plot_fitness_max(case30)
-plt.show()
+for case in cases:
+    plot_fitness_max(case)
+    plt.show()
+
+labels = ["0.4", "0.2", "0.1", "0.07"]
+
+for case, label in zip(cases, labels):
+    plot_succ_gens(case)
+
+    plt.title("survival rate = " + label)
+    plt.xlabel("Generation")
+    plt.show()
 
 
-plot_succ_gens(case5)
-# plot_succ_gens(case8)
-# plot_succ_gens(case15)
-plot_succ_gens(case30)
+for case, label in zip(cases, labels):
+    plot_size(case)
 
-plt.legend(labels=["5", "8", "15", "30"])
-plt.xlabel("Generation")
-plt.title("Success generation")
-
-plt.show()
-
-plot_size(case5)
-# plot_size(case8)
-# plot_size(case15)
-plot_size(case30)
-
-plt.legend(labels=["5", "8", "15", "30"])
-plt.xlabel("Size")
-plt.title("Success network complexity")
-
-plt.show()
+    plt.title("survival rate = " + label)
+    plt.xlabel("Size")
+    plt.show()

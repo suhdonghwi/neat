@@ -23,7 +23,7 @@ perturb_max = 1.0
 [speciation]
 c1 = 1.0
 c2 = 0.5
-compatibility_threshold = 5.0
+compatibility_threshold = 8.0
 elitism = 1
 
-survival_rate = 0.2
+survival_rate = 0.07

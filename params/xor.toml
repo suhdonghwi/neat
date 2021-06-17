@@ -9,10 +9,10 @@ output_activation = 'Sigmoid'
 weight_perturbation = 0.8
 weight_assign = 0.1
 add_connection = 0.5
-remove_connection = 0.5
+remove_connection = 0.2
 toggle_connection = 0.0
-add_node = 0.2
-remove_node = 0.2
+add_node = 0.3
+remove_node = 0.1
 
 weight_min = -15.0
 weight_max = 15.0
@@ -24,6 +24,6 @@ perturb_max = 1.0
 c1 = 1.0
 c2 = 0.5
 compatibility_threshold = 8.0
-elitism = 1
+elitism = 5
 
-survival_rate = 0.07
+survival_rate = 0.1

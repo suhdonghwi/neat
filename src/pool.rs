@@ -169,6 +169,8 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
     fn log_evaluation(&self, fitness_list: &[f64]) {
         let (fitness_mean, fitness_std_deviation) = self.list_stats(&fitness_list);
 
+        self.log(1, &format!("[Generation {}]", self.generation));
+
         let message = &format!(
             indoc! {"
         # Evaluation result
@@ -223,15 +225,14 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
         }
 
         self.list.sort_by(|a, b| b.compare(a).unwrap());
-        &self.list[0]
-    }
-
-    pub fn evolve(&mut self, innov_record: &mut InnovationRecord) {
-        self.log(1, &format!("[Generation {}]", self.generation));
 
         let fitness_list: Vec<f64> = self.list.iter().map(|g| g.fitness().unwrap()).collect();
         self.log_evaluation(&fitness_list);
 
+        &self.list[0]
+    }
+
+    pub fn evolve(&mut self, innov_record: &mut InnovationRecord) {
         let mut species_set = self.speciate(innov_record);
         for species in &mut species_set {
             species.kill_worst(self.params.speciation.survival_rate);

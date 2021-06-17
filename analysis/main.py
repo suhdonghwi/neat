@@ -90,22 +90,20 @@ def plot_size(cases):
                 sizes.append(gen.best_edges_count)
                 break
 
-    print("Success : " + str(len(sizes)))
+    print("Mean : " + str(np.array(sizes).mean()))
     sns.countplot(x=sizes)
 
 
-case1 = split_cases("./analysis/output-0.4.txt")
-case2 = split_cases("./analysis/output-0.2.txt")
-case3 = split_cases("./analysis/output-0.1.txt")
-case4 = split_cases("./analysis/output-0.07.txt")
+case1 = split_cases("./analysis/output.txt")
+case2 = split_cases("./analysis/output-no.txt")
 
-cases = [case1, case2, case3, case4]
+cases = [case1, case2]
+labels = ["With destructive mutation", "Without destructive mutation"]
 
 for case in cases:
     plot_fitness_max(case)
     plt.show()
 
-labels = ["0.4", "0.2", "0.1", "0.07"]
 
 for case, label in zip(cases, labels):
     plot_succ_gens(case)

@@ -1,29 +1,29 @@
 input_number = 1
 output_number = 1
-population = 150
+population = 300
 
 hidden_activation = 'Tanh'
 output_activation = 'Linear'
 
 [mutation] 
-weight_perturbation = 0.8
+weight_perturbation = 0.7
 weight_assign = 0.1
-add_connection = 0.5
-remove_connection = 0.5
-toggle_connection = 0.0
+add_connection = 0.2
+remove_connection = 0.0
+toggle_connection = 0.1
 add_node = 0.2
-remove_node = 0.2
+remove_node = 0.0
 
-weight_min = -15.0
-weight_max = 15.0
+weight_min = -3.0
+weight_max = 3.0
 
-perturb_min = -1.0
-perturb_max = 1.0
+perturb_min = -0.1
+perturb_max = 0.1
 
 [speciation]
 c1 = 1.0
 c2 = 0.5
-compatibility_threshold = 100.0
+compatibility_threshold = 1.5
 elitism = 5
 
-survival_rate = 0.4
+survival_rate = 0.3

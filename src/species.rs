@@ -90,6 +90,13 @@ impl<'a, T: Network + Debug + Clone> Species<'a, T> {
         self.list.len()
     }
 
+    pub fn random_genome(&self, rng: &mut impl RngCore) -> T {
+        let uniform = Uniform::new(0, self.list.len());
+        let index = uniform.sample(rng);
+
+        self.list[index].clone()
+    }
+
     pub fn mate(
         &self,
         rng: &mut impl RngCore,

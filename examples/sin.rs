@@ -70,7 +70,7 @@ impl event::EventHandler for MainState {
     fn update(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
         self.timer += ggez::timer::delta(ctx);
 
-        if self.timer >= Duration::from_secs_f64(0.05) {
+        if self.timer >= Duration::from_secs_f64(0.02) {
             let generation = self.pool.generation();
             let mut best_network = self
                 .pool
@@ -82,7 +82,7 @@ impl event::EventHandler for MainState {
                         let x = 1.0 * i as f64 / n as f64;
 
                         let output = network.activate(&[x]).unwrap()[0];
-                        let expected = (2.0 * x * std::f64::consts::PI).sin() * 0.5;
+                        let expected = (1.0 * x * std::f64::consts::PI).sin() * 0.75;
                         let err = output - expected;
 
                         error_sum += err * err;

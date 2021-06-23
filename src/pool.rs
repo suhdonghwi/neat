@@ -12,7 +12,7 @@ use crate::{
 };
 use std::fmt::Debug;
 
-fn random(rng: &mut impl RngCore) -> f64 {
+fn random01(rng: &mut impl RngCore) -> f64 {
     Open01.sample(rng)
 }
 
@@ -64,7 +64,7 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
             self.params.mutation.weight_max,
         );
 
-        if random(rng) < self.params.mutation.weight_perturbation {
+        if random01(rng) < self.params.mutation.weight_perturbation {
             if let Some(to_mutate) = network.graph().random_edge(rng) {
                 network.mutate_perturb_weight(
                     to_mutate,
@@ -75,37 +75,37 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
             }
         }
 
-        if random(rng) < self.params.mutation.weight_assign {
+        if random01(rng) < self.params.mutation.weight_assign {
             if let Some(to_mutate) = network.graph().random_edge(rng) {
                 network.mutate_assign_weight(to_mutate, assign_uniform.sample(rng));
             }
         }
 
-        if random(rng) < self.params.mutation.add_node {
+        if random01(rng) < self.params.mutation.add_node {
             if let Some(to_add) = network.graph().random_edge(rng) {
                 network.mutate_add_node(to_add, innov_record);
             }
         }
 
-        if random(rng) < self.params.mutation.remove_node {
+        if random01(rng) < self.params.mutation.remove_node {
             let to_remove = network.graph().random_node(rng);
             network.mutate_remove_node(to_remove);
         }
 
-        if random(rng) < self.params.mutation.add_connection {
+        if random01(rng) < self.params.mutation.add_connection {
             let source = network.graph().random_node(rng);
             let target = network.graph().random_node(rng);
 
             network.mutate_add_connection(source, target, assign_uniform.sample(rng), innov_record);
         }
 
-        if random(rng) < self.params.mutation.remove_connection {
+        if random01(rng) < self.params.mutation.remove_connection {
             if let Some(to_remove) = network.graph().random_edge(rng) {
                 network.mutate_remove_connection(to_remove);
             }
         }
 
-        if random(rng) < self.params.mutation.toggle_connection {
+        if random01(rng) < self.params.mutation.toggle_connection {
             if let Some(to_toggle) = network.graph().random_edge(rng) {
                 network.mutate_toggle_connection(to_toggle);
             }
@@ -275,15 +275,19 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
         let rng = &mut rand::thread_rng();
         for (i, count) in count_list.into_iter().enumerate() {
             for _ in 0..count {
-                // let mut offspring = species_set[i].random_genome(rng);
-                let mut offspring = species_set[i]
-                    .mate(
-                        rng,
-                        self.params.hidden_activation,
-                        self.params.output_activation,
-                    )
-                    .unwrap();
-                self.mutate(&mut offspring, innov_record, rng);
+                let mut offspring;
+                if random01(rng) < self.params.reproduction.crossover_rate {
+                    offspring = species_set[i]
+                        .mate(
+                            rng,
+                            self.params.hidden_activation,
+                            self.params.output_activation,
+                        )
+                        .unwrap();
+                } else {
+                    offspring = species_set[i].random_genome(rng);
+                    self.mutate(&mut offspring, innov_record, rng);
+                }
 
                 offspring_list.push(offspring);
             }

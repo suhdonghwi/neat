@@ -27,3 +27,6 @@ compatibility_threshold = 1000
 elitism = 3
 
 survival_rate = 0.1
+
+[reproduction]
+crossover_rate = 0.5

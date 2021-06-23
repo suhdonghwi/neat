@@ -1,4 +1,4 @@
-use rand::{distributions::Uniform, prelude::Distribution, RngCore};
+use rand::{distributions::Uniform, prelude::Distribution, Rng, RngCore};
 
 use crate::{activations::ActivationKind, network::Network};
 use std::fmt::Debug;
@@ -67,9 +67,7 @@ impl<'a, T: Network + Debug + Clone> Species<'a, T> {
     }
 
     pub fn replace_representative(&mut self, rng: &mut impl RngCore) {
-        let uniform = Uniform::new(0, self.list.len());
-
-        let index = uniform.sample(rng);
+        let index = rng.gen_range(0..self.list.len());
         self.info.representative = self.list[index].clone();
     }
 
@@ -91,9 +89,7 @@ impl<'a, T: Network + Debug + Clone> Species<'a, T> {
     }
 
     pub fn random_genome(&self, rng: &mut impl RngCore) -> T {
-        let uniform = Uniform::new(0, self.list.len());
-        let index = uniform.sample(rng);
-
+        let index = rng.gen_range(0..self.list.len());
         self.list[index].clone()
     }
 
@@ -106,7 +102,10 @@ impl<'a, T: Network + Debug + Clone> Species<'a, T> {
         let uniform = Uniform::new(0, self.list.len());
 
         let index1 = uniform.sample(rng);
-        let index2 = uniform.sample(rng);
+        let mut index2 = index1;
+        while index1 == index2 {
+            index2 = uniform.sample(rng);
+        }
 
         let parent1 = self.list[index1];
         let parent2 = self.list[index2];

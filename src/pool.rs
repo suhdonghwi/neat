@@ -28,6 +28,7 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
     pub fn new(params: Parameters, verbosity: usize, innov_record: &mut InnovationRecord) -> Self {
         let mut list: Vec<T> = Vec::new();
 
+        let mut rng = &mut rand::thread_rng();
         for _ in 0..params.population {
             let mut network = T::new(
                 params.input_number,
@@ -36,9 +37,11 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
                 params.output_activation,
                 innov_record,
             );
-            network
-                .graph_mut()
-                .randomize_weights(params.mutation.weight_min, params.mutation.weight_max);
+            network.graph_mut().randomize_weights(
+                params.mutation.weight_min,
+                params.mutation.weight_max,
+                &mut rng,
+            );
             list.push(network);
         }
 
@@ -272,14 +275,14 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
         let rng = &mut rand::thread_rng();
         for (i, count) in count_list.into_iter().enumerate() {
             for _ in 0..count {
-                let mut offspring = species_set[i].random_genome(rng);
-                /*let mut offspring = species_set[i]
-                .mate(
-                    rng,
-                    self.params.hidden_activation,
-                    self.params.output_activation,
-                )
-                .unwrap();*/
+                // let mut offspring = species_set[i].random_genome(rng);
+                let mut offspring = species_set[i]
+                    .mate(
+                        rng,
+                        self.params.hidden_activation,
+                        self.params.output_activation,
+                    )
+                    .unwrap();
                 self.mutate(&mut offspring, innov_record, rng);
 
                 offspring_list.push(offspring);

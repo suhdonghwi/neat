@@ -89,11 +89,10 @@ impl NetworkGraph {
         self.output_number
     }
 
-    pub fn randomize_weights(&mut self, low: f64, high: f64) {
+    pub fn randomize_weights(&mut self, low: f64, high: f64, rng: &mut impl RngCore) {
         let uniform = Uniform::new(low, high);
-        let mut rng = rand::thread_rng();
         for edge_data in self.graph.edge_weights_mut() {
-            edge_data.set_weight(uniform.sample(&mut rng));
+            edge_data.set_weight(uniform.sample(rng));
         }
     }
 

@@ -13,6 +13,7 @@ pub struct Parameters {
 
     pub mutation: MutationParameters,
     pub speciation: SpeciationParameters,
+    pub reproduction: ReproductionParameters,
 }
 
 #[derive(Deserialize, Clone, Copy)]
@@ -41,4 +42,9 @@ pub struct SpeciationParameters {
     pub survival_rate: f64,
 
     pub elitism: usize,
+}
+
+#[derive(Deserialize, Clone, Copy)]
+pub struct ReproductionParameters {
+    pub crossover_rate: f64,
 }

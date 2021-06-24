@@ -8,26 +8,25 @@ output_activation = 'Linear'
 [mutation] 
 weight_perturbation = 0.8
 weight_assign = 0.1
-add_connection = 0.4
-remove_connection = 0.2
+add_connection = 0.5
+remove_connection = 0.5
 toggle_connection = 0.0
-add_node = 0.1
-remove_node = 0.1
+add_node = 0.2
+remove_node = 0.2
 
 weight_min = -1.0
 weight_max = 1.0
 
-perturb_min = -0.1
-perturb_max = 0.1
+perturb_min = -0.5
+perturb_max = 0.5
 
 [speciation]
 c1 = 1.0
 c2 = 0.5
-compatibility_threshold = 2.0
+compatibility_threshold = 1.5
 elitism = 2
 
 survival_rate = 0.2
-stagnant_max = 20
 
 [reproduction]
-crossover_rate = 0.5
+crossover_rate = 0.75

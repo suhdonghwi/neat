@@ -14,20 +14,19 @@ toggle_connection = 0.0
 add_node = 0.2
 remove_node = 0.2
 
-weight_min = -30.0
-weight_max = 30.0
+weight_min = -10.0
+weight_max = 10.0
 
-perturb_min = -0.5
-perturb_max = 0.5
+perturb_min = -2.0
+perturb_max = 2.0
 
 [speciation]
 c1 = 1.0
 c2 = 0.5
-compatibility_threshold = 25.0
+compatibility_threshold = 15.0
 elitism = 5
 
-survival_rate = 0.2
-stagnant_max = 5
+survival_rate = 0.1
 
 [reproduction]
-crossover_rate = 0.25
+crossover_rate = 0.75

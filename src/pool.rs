@@ -243,21 +243,11 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
 
         species_set = species_set
             .into_iter()
-            .filter(|s| s.stagnant() <= self.params.speciation.stagnant_max)
-            .collect();
-        if species_set.is_empty() {
-            panic!("remaining species_set size is 0; maybe compatibility threshold is too small?");
-        }
-
-        /*
-        species_set = species_set
-            .into_iter()
             .filter(|s| s.genome_count() > 2)
             .collect();
         if species_set.is_empty() {
             panic!("remaining species_set size is 0; maybe compatibility threshold is too small?");
         }
-        */
 
         let mut offspring_list: Vec<T> = Vec::new();
         for species in &species_set {

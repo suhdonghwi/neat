@@ -11,7 +11,7 @@ pub fn main() {
     let mut innov_record = InnovationRecord::new(params.input_number, params.output_number);
     let mut pool = Pool::<Feedforward>::new(params, args.verbosity, &mut innov_record);
 
-    for _ in 0..100 {
+    for _ in 0..300 {
         pool.evaluate(|_, network| {
             let n = 50;
             let mut error_sum = 0.0;

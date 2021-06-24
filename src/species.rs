@@ -8,6 +8,9 @@ pub struct SpeciesInfo<T: Network + Debug + Clone> {
     id: usize,
     representative: T,
     age: usize,
+
+    previous_fitness: Option<f64>,
+    stagnant: usize,
 }
 
 impl<T: Network + Debug + Clone> SpeciesInfo<T> {
@@ -16,6 +19,8 @@ impl<T: Network + Debug + Clone> SpeciesInfo<T> {
             id,
             representative,
             age,
+            previous_fitness: None,
+            stagnant: 0,
         }
     }
 
@@ -28,9 +33,6 @@ impl<T: Network + Debug + Clone> SpeciesInfo<T> {
 pub struct Species<'a, T: Network + Debug + Clone> {
     info: SpeciesInfo<T>,
     list: Vec<&'a T>,
-
-    previous_fitness: Option<f64>,
-    stagnant: usize,
 }
 
 impl<'a, T: Network + Debug + Clone> Species<'a, T> {
@@ -38,8 +40,6 @@ impl<'a, T: Network + Debug + Clone> Species<'a, T> {
         Species {
             list: Vec::new(),
             info,
-            previous_fitness: None,
-            stagnant: 0,
         }
     }
 
@@ -93,9 +93,12 @@ impl<'a, T: Network + Debug + Clone> Species<'a, T> {
             sum / len / len
         };
 
-        if fitness <= self.previous_fitness.unwrap_or(0.0) {
-            self.stagnant += 1;
+        if fitness <= self.info.previous_fitness.unwrap_or(0.0) {
+            self.info.stagnant += 1;
+        } else {
+            self.info.stagnant = 0;
         }
+        self.info.previous_fitness = Some(fitness);
 
         Some(fitness)
     }
@@ -145,5 +148,9 @@ impl<'a, T: Network + Debug + Clone> Species<'a, T> {
 
     pub fn id(&self) -> usize {
         self.info.id
+    }
+
+    pub fn stagnant(&self) -> usize {
+        self.info.stagnant
     }
 }

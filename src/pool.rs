@@ -241,6 +241,14 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
             species.kill_worst(self.params.speciation.survival_rate);
         }
 
+        species_set = species_set
+            .into_iter()
+            .filter(|s| s.stagnant() <= self.params.speciation.stagnant_max)
+            .collect();
+        if species_set.is_empty() {
+            panic!("remaining species_set size is 0; maybe compatibility threshold is too small?");
+        }
+
         /*
         species_set = species_set
             .into_iter()

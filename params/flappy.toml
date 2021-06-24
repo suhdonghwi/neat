@@ -27,6 +27,7 @@ compatibility_threshold = 100.0
 elitism = 5
 
 survival_rate = 0.2
+stagnant_max = 20
 
 [reproduction]
 crossover_rate = 0.5

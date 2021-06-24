@@ -23,10 +23,11 @@ perturb_max = 0.5
 [speciation]
 c1 = 1.0
 c2 = 0.5
-compatibility_threshold = 20.0
+compatibility_threshold = 25.0
 elitism = 5
 
 survival_rate = 0.2
+stagnant_max = 5
 
 [reproduction]
 crossover_rate = 0.25

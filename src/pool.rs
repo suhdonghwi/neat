@@ -241,6 +241,7 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
             species.kill_worst(self.params.speciation.survival_rate);
         }
 
+        /*
         species_set = species_set
             .into_iter()
             .filter(|s| s.genome_count() > 2)
@@ -248,6 +249,7 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
         if species_set.is_empty() {
             panic!("remaining species_set size is 0; maybe compatibility threshold is too small?");
         }
+        */
 
         let mut offspring_list: Vec<T> = Vec::new();
         for species in &species_set {
@@ -274,10 +276,13 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
 
         let rng = &mut rand::thread_rng();
         for (i, count) in count_list.into_iter().enumerate() {
+            let species = &species_set[i];
             for _ in 0..count {
                 let mut offspring;
-                if random01(rng) < self.params.reproduction.crossover_rate {
-                    offspring = species_set[i]
+                if species.genome_count() > 3
+                    && random01(rng) < self.params.reproduction.crossover_rate
+                {
+                    offspring = species
                         .mate(
                             rng,
                             self.params.hidden_activation,
@@ -285,10 +290,10 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
                         )
                         .unwrap();
                 } else {
-                    offspring = species_set[i].random_genome(rng);
-                    self.mutate(&mut offspring, innov_record, rng);
+                    offspring = species.random_genome(rng);
                 }
 
+                self.mutate(&mut offspring, innov_record, rng);
                 offspring_list.push(offspring);
             }
         }

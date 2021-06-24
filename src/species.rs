@@ -62,8 +62,11 @@ impl<'a, T: Network + Debug + Clone> Species<'a, T> {
     }
 
     pub fn kill_worst(&mut self, survival_rate: f64) {
-        self.list
-            .truncate(((self.list.len() as f64) * survival_rate).floor() as usize);
+        let mut remaining = ((self.list.len() as f64) * survival_rate).floor() as usize;
+        if remaining == 0 {
+            remaining = 1;
+        }
+        self.list.truncate(remaining);
     }
 
     pub fn replace_representative(&mut self, rng: &mut impl RngCore) {

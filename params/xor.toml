@@ -29,4 +29,4 @@ elitism = 5
 survival_rate = 0.2
 
 [reproduction]
-crossover_rate = 0.7
+crossover_rate = 0.25

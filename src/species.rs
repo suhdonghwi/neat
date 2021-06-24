@@ -28,6 +28,9 @@ impl<T: Network + Debug + Clone> SpeciesInfo<T> {
 pub struct Species<'a, T: Network + Debug + Clone> {
     info: SpeciesInfo<T>,
     list: Vec<&'a T>,
+
+    previous_fitness: Option<f64>,
+    stagnant: usize,
 }
 
 impl<'a, T: Network + Debug + Clone> Species<'a, T> {
@@ -35,6 +38,8 @@ impl<'a, T: Network + Debug + Clone> Species<'a, T> {
         Species {
             list: Vec::new(),
             info,
+            previous_fitness: None,
+            stagnant: 0,
         }
     }
 
@@ -74,17 +79,25 @@ impl<'a, T: Network + Debug + Clone> Species<'a, T> {
         self.info.representative = self.list[index].clone();
     }
 
-    pub fn adjusted_fitness_average(&self) -> Option<f64> {
+    pub fn update_adjusted_fitness(&mut self) -> Option<f64> {
         let mut sum = 0.0;
+        let len = self.list.len() as f64;
+
         for network in &self.list {
             sum += network.fitness()?;
         }
 
-        if self.list.is_empty() {
-            Some(0.0)
+        let fitness = if self.list.is_empty() {
+            0.0
         } else {
-            Some(sum / (self.list.len() as f64) / (self.list.len() as f64))
+            sum / len / len
+        };
+
+        if fitness <= self.previous_fitness.unwrap_or(0.0) {
+            self.stagnant += 1;
         }
+
+        Some(fitness)
     }
 
     pub fn genome_count(&self) -> usize {

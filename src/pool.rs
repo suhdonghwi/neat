@@ -258,8 +258,8 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
 
         let target_count = self.params.population - offspring_list.len();
         let adj_fitness_list: Vec<f64> = species_set
-            .iter()
-            .map(|s| s.adjusted_fitness_average().unwrap())
+            .iter_mut()
+            .map(|s| s.update_adjusted_fitness().unwrap())
             .collect();
         let adj_fitness_sum: f64 = adj_fitness_list.iter().sum();
 

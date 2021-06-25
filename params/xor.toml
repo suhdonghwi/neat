@@ -26,7 +26,7 @@ c2 = 0.5
 compatibility_threshold = 15.0
 elitism = 5
 
-survival_rate = 0.1
+survival_rate = 0.5
 
 [reproduction]
 crossover_rate = 0.75

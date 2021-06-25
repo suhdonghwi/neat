@@ -14,8 +14,8 @@ toggle_connection = 0.0
 add_node = 0.2
 remove_node = 0.2
 
-weight_min = -1.0
-weight_max = 1.0
+weight_min = -3.0
+weight_max = 3.0
 
 perturb_min = -0.5
 perturb_max = 0.5

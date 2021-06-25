@@ -89,7 +89,7 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
 
         if random01(rng) < self.params.mutation.remove_node {
             let to_remove = network.graph().random_node(rng);
-            network.mutate_remove_node(to_remove);
+            network.mutate_remove_node(to_remove, innov_record);
         }
 
         if random01(rng) < self.params.mutation.add_connection {

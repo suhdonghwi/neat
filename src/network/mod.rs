@@ -51,10 +51,15 @@ pub trait Network {
         self.graph_mut().add_node(index, innov_record);
         true
     }
-    fn mutate_remove_node(&mut self, index: NodeIndex) -> bool {
+
+    fn mutate_remove_node(
+        &mut self,
+        index: NodeIndex,
+        innov_record: &mut InnovationRecord,
+    ) -> bool {
         let node = self.graph().node(index);
         if node.kind() == NodeKind::Hidden {
-            self.graph_mut().remove_node(index);
+            self.graph_mut().remove_node(index, innov_record);
             true
         } else {
             false

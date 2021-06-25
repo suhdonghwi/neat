@@ -3,9 +3,9 @@ use std::{
     fmt::{self, Display},
 };
 
-use petgraph::algo;
-use petgraph::graph::Edge;
 use petgraph::graph::{DiGraph, EdgeIndex, NodeIndex};
+use petgraph::{algo, EdgeDirection::Incoming};
+use petgraph::{graph::Edge, EdgeDirection::Outgoing};
 
 use rand::{
     distributions::{Bernoulli, Distribution, Uniform},
@@ -244,7 +244,24 @@ impl NetworkGraph {
         new_node_index
     }
 
-    pub fn remove_node(&mut self, node: NodeIndex) {
+    pub fn remove_node(&mut self, node: NodeIndex, innov_record: &mut InnovationRecord) {
+        let mut neighbors = self.graph.neighbors_directed(node, Incoming).detach();
+        while let Some((edge_index, source_index)) = neighbors.next(&self.graph) {
+            let mut outgoing_neighbors = self.graph.neighbors_directed(node, Outgoing).detach();
+
+            while let Some((_, target_index)) = outgoing_neighbors.next(&self.graph) {
+                let source_id = self.graph[source_index].id();
+                let target_id = self.graph[target_index].id();
+                let innov_number = innov_record.new_connection(source_id, target_id);
+
+                self.graph.add_edge(
+                    source_index,
+                    target_index,
+                    EdgeData::new(self.graph[edge_index].get_weight(), innov_number),
+                );
+            }
+        }
+
         self.graph.remove_node(node);
         self.toposort_cache = None;
     }

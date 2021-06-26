@@ -70,11 +70,11 @@ def plot_fitness_max(cases):
     plt.ylabel("Fitness")
 
 
-def plot_succ_gens(cases):
+def plot_succ_gens(cases, fitness_threshold):
     succ_gens = []
     for gens in cases:
         for (i, gen) in enumerate(gens):
-            if gen.fitness_max >= 3.9:
+            if gen.fitness_max >= fitness_threshold:
                 succ_gens.append(i)
                 break
 
@@ -82,11 +82,11 @@ def plot_succ_gens(cases):
     sns.histplot(succ_gens, kde=True)
 
 
-def plot_size(cases):
+def plot_size(cases, fitness_threshold):
     sizes = []
     for gens in cases:
         for (i, gen) in enumerate(gens):
-            if gen.fitness_max >= 3.9:
+            if gen.fitness_max >= fitness_threshold:
                 sizes.append(gen.best_edges_count)
                 break
 
@@ -95,27 +95,23 @@ def plot_size(cases):
 
 
 case1 = split_cases("./analysis/output.txt")
-case2 = split_cases("./analysis/output-no.txt")
+fitness_threshold = 3.95
+cases = [(case1, "")]
 
-cases = [case1, case2]
-labels = ["With destructive mutation", "Without destructive mutation"]
-
-for case in cases:
+for case, _ in cases:
     plot_fitness_max(case)
     plt.show()
 
 
-for case, label in zip(cases, labels):
-    plot_succ_gens(case)
+for case, label in cases:
+    plot_succ_gens(case, fitness_threshold)
 
-    plt.title("survival rate = " + label)
     plt.xlabel("Generation")
     plt.show()
 
 
-for case, label in zip(cases, labels):
-    plot_size(case)
+for case, label in cases:
+    plot_size(case, fitness_threshold)
 
-    plt.title("survival rate = " + label)
     plt.xlabel("Size")
     plt.show()

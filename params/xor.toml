@@ -17,8 +17,8 @@ remove_node = 0.2
 weight_min = -10.0
 weight_max = 10.0
 
-perturb_min = -2.0
-perturb_max = 2.0
+perturb_min = -1.0
+perturb_max = 1.0
 
 [speciation]
 c1 = 1.0
@@ -26,7 +26,7 @@ c2 = 0.5
 compatibility_threshold = 15.0
 elitism = 5
 
-survival_rate = 0.5
+survival_rate = 0.1
 
 [reproduction]
-crossover_rate = 0.75
+crossover_rate = 0.3

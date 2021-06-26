@@ -1,6 +1,6 @@
 input_number = 1
 output_number = 1
-population = 150
+population = 300
 
 hidden_activation = 'Tanh'
 output_activation = 'Linear'
@@ -17,16 +17,16 @@ remove_node = 0.2
 weight_min = -3.0
 weight_max = 3.0
 
-perturb_min = -0.5
-perturb_max = 0.5
+perturb_min = -0.1
+perturb_max = 0.1
 
 [speciation]
 c1 = 1.0
 c2 = 0.5
-compatibility_threshold = 1.5
-elitism = 2
+compatibility_threshold = 2.0
+elitism = 5
 
-survival_rate = 0.2
+survival_rate = 0.4
 
 [reproduction]
-crossover_rate = 0.75
+crossover_rate = 0.0

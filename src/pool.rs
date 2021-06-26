@@ -243,7 +243,7 @@ impl<'a, T: Network + Debug + Clone> Pool<T> {
 
         species_set = species_set
             .into_iter()
-            .filter(|s| s.genome_count() > 2)
+            .filter(|s| s.genome_count() > 1)
             .collect();
         if species_set.is_empty() {
             panic!("remaining species_set size is 0; maybe compatibility threshold is too small?");

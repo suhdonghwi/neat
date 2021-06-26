@@ -51,8 +51,8 @@ impl MainState {
             font,
         );
         let mut sin_points = Vec::new();
-        for i in -100..=100 {
-            sin_points.push(na::Point2::new(i as f32 / 100.0, 0.0));
+        for i in -50..=50 {
+            sin_points.push(na::Point2::new(i as f32 / 50.0, 0.0));
         }
 
         MainState {
@@ -70,19 +70,19 @@ impl event::EventHandler for MainState {
     fn update(&mut self, ctx: &mut ggez::Context) -> ggez::GameResult {
         self.timer += ggez::timer::delta(ctx);
 
-        if self.timer >= Duration::from_secs_f64(0.05) {
+        if self.timer >= Duration::from_secs_f64(0.00) {
             let generation = self.pool.generation();
             let mut best_network = self
                 .pool
                 .evaluate(|_, network| {
-                    let n = 100;
+                    let n = 50;
                     let mut error_sum = 0.0;
 
                     for i in -n..=n {
                         let x = 1.0 * i as f64 / n as f64;
 
                         let output = network.activate(&[x]).unwrap()[0];
-                        let expected = (1.0 * x * std::f64::consts::PI).sin() * 0.5;
+                        let expected = (2.0 * x * std::f64::consts::PI).sin() * 0.5;
                         let err = output - expected;
 
                         error_sum += err * err;

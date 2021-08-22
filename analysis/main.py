@@ -79,6 +79,7 @@ def plot_succ_gens(cases, fitness_threshold):
                 break
 
     print("Success : " + str(len(succ_gens)))
+    print("Mean : " + str(sum(succ_gens) / len(succ_gens)))
     sns.histplot(succ_gens, kde=True)
 
 
@@ -94,18 +95,26 @@ def plot_size(cases, fitness_threshold):
     sns.countplot(x=sizes)
 
 
-case1 = split_cases("./analysis/output.txt")
-fitness_threshold = 3.95
-cases = [(case1, "")]
+case1 = split_cases("./analysis/output-yes.txt")
+case2 = split_cases("./analysis/output-no.txt")
+fitness_threshold = 3.9
 
-for case, _ in cases:
+cases = [
+    (case1, "With destructive mutation"),
+    (case2, "Without destructive mutation"),
+]
+
+for case, label in cases:
     plot_fitness_max(case)
+
+    plt.title(label)
     plt.show()
 
 
 for case, label in cases:
     plot_succ_gens(case, fitness_threshold)
 
+    plt.title(label)
     plt.xlabel("Generation")
     plt.show()
 
@@ -113,5 +122,6 @@ for case, label in cases:
 for case, label in cases:
     plot_size(case, fitness_threshold)
 
+    plt.title(label)
     plt.xlabel("Size")
     plt.show()
